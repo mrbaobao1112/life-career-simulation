@@ -1,6 +1,16 @@
 # Lịch sử phiên bản
 
-## v5: Tài chính và gia cảnh (hiện tại)
+## v6: Tháng đầu thực tế và chạm vào nhân vật (hiện tại)
+- Lương thử việc 85%, tính theo ngày công: bắt đầu 18/11 thì lương nhận 10/12 chỉ khoảng 3,6 triệu (9/21 ngày công). Màn ngày lương hiện bảng tính chi tiết.
+- Tạm ứng lương sau 10 ngày đi làm (tối đa 50% số đã làm), trừ vào lương kỳ sau.
+- Kế hoạch tháng đầu: tối ngày thứ hai, người thuê trọ và ở ghép xem dự báo dòng tiền và chủ động thu xếp: xin gia đình (gia đình bình thường cho vay, hẹn trả khi có lương), hẹn chủ nhà đóng tiền nhà vào ngày lương (hỏi sớm không mất phí), nhờ Tùng ứng phần tiền nhà (ở ghép), vay Linh, tạm ứng lương. Có thể mở lại bất cứ lúc nào qua hoạt động "Tính toán tiền nong tháng này".
+- Phút chót đắt hơn: xin gia đình áy náy gấp đôi, Tùng khó đồng ý hơn, xin nộp chậm sát hạn mất phí 5%.
+- Sổ nợ và màn trả nợ khi đến hẹn: trả hết, trả một nửa, hoặc xin khất (ảnh hưởng quan hệ). Dự báo dòng tiền có tính các khoản nợ.
+- Lương chỉ được nhận một lần mỗi kỳ, kể cả khi tải lại game.
+- Chạm vào nhân vật (màn hình đầu, ảnh đại diện, trong khung cảnh): nhân vật vẫy tay, nhảy, xoay người hoặc ngáp nếu đang mệt, kèm câu nói theo tình trạng thật (đói, buồn ngủ, ví mỏng…). Nhân vật phụ cũng phản ứng với câu nói riêng.
+- Kiểm thử hai tháng (đến 10/1): so sánh thu xếp sớm và phút chót.
+
+## v5: Tài chính và gia cảnh
 - Tiền khởi đầu mới: ở cùng bố mẹ 4 triệu, thuê trọ 4,5 triệu, ở ghép 3,5 triệu (tiền tiết kiệm làm thêm và tiền mừng tốt nghiệp).
 - Sổ hóa đơn: mỗi khoản có mã kỳ, hạn, trạng thái; chỉ trả một lần, kể cả khi lưu và tải lại game.
 - Chu kỳ tiền nhà tính từ ngày dọn vào (16/11), tháng sau đến hạn 16/12. Điện nước internet và cước điện thoại đến hạn ngày 1 hằng tháng. Xăng xe 15.000đ mỗi ngày ra ngoài.

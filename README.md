@@ -23,6 +23,8 @@ Bản chơi thử hiện tại là **tuần đầu tiên sau khi tốt nghiệp*
 - **Thói quen ăn uống:** dinh dưỡng tính theo khoảng 10 bữa gần nhất, hồ sơ thói quen trong mục Hồ sơ.
 - **Sự kiện ba loại:** có lịch hẹn, bất ngờ, hậu quả (kèm nguyên nhân).
 - **Điện thoại trong game:** tin nhắn, nhóm chat, trả lời ảnh hưởng độ thân, để "đã xem" quá lâu sẽ có hậu quả.
+- **Tháng đầu đi thuê nhà:** lương thử việc theo ngày công, kế hoạch tháng đầu, nhờ vả gia đình, bạn bè, chủ nhà, tạm ứng lương, sổ nợ.
+- **Chạm vào nhân vật** để nhân vật phản ứng và nói câu theo tình trạng thật.
 - **Animation và âm thanh:** nhân vật vươn vai, ngáp, dụi mắt, ôm đầu tùy giấc ngủ đêm trước; phản ứng theo sự kiện; âm thanh tổng hợp có nút tắt tiếng.
 - **Nhật ký cuối ngày** và **tổng kết tuần** với danh hiệu.
 
@@ -48,6 +50,7 @@ npm test              # kiểm thử hệ thống + 30 lượt chơi ngẫu nhi�
 npm run ngau-nhien    # 50 lượt chơi ngẫu nhiên trọn tuần
 npm run can-bang      # so sánh 5 chiến lược chơi để kiểm tra cân bằng
 npm run tai-chinh     # kiểm thử sổ hóa đơn và mô phỏng tài chính cả tháng
+npm run hai-thang     # mô phỏng hai tháng, so sánh thu xếp sớm và phút chót
 ```
 
 ## Hướng phát triển

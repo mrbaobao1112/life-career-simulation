@@ -7,7 +7,8 @@
     "he-thong": "node kiem-thu-he-thong.js",
     "ngau-nhien": "node choi-ngau-nhien.js 50",
     "can-bang": "node can-bang-chien-luoc.js",
-    "tai-chinh": "node kiem-thu-tai-chinh.js"
+    "tai-chinh": "node kiem-thu-tai-chinh.js",
+    "hai-thang": "node mo-phong-hai-thang.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3"
