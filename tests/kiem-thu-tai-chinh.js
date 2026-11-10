@@ -40,6 +40,6 @@ for (const bg of ['nha','tro','ghep']) for (const sp of Object.keys(SPEND)) for 
   if (r.loiRa.length) famRows.push({ 'Nơi ở':tag, 'Chi tiêu':sp, 'Việc':job?'Có việc':'Chưa', 'Gia cảnh':fam, 'Số dư 16/12':Math.round(r.d31/1000)+'k', 'Lối ra':r.loiRa.join('; ') });
   w.close();
 }
-require('fs').writeFileSync('" + require("path").join(__dirname, "ket-qua-tai-chinh.json") + "', JSON.stringify({ rows, famRows }, null, 1));
+require('fs').writeFileSync(require('path').join(__dirname, 'ket-qua-tai-chinh.json'), JSON.stringify({ rows, famRows }, null, 1));
 console.table(rows.map(r => { const { ['Lối ra đã dùng']:x, ...rest } = r; return rest; }));
 console.log('LỐI RA (gia đình bình thường):'); rows.filter(r => r['Lối ra đã dùng'] !== '–').forEach(r => console.log(' ', r['Nơi ở'], r['Chi tiêu'], r['Việc'], '→', r['Lối ra đã dùng']));
