@@ -3,7 +3,7 @@
    ========================================================= */
 function newGame(name, gender, bg, look, fam){
   const b = BAL.BG[bg];
-  S = { v:6, advances:{}, fam: fam || 'tb', bills:[], loans:[], spend:{}, finDay:0, famHelp:{}, finLast:null, name, gender, bg, look: look || defaultLook(gender), phone:{ threads:{}, unread:{}, pending:{} }, hang:{}, tick:0, day:0, slot:'morning',
+  S = { v:7, habit:{}, feed:[], evLast:{}, opt:{}, fast:null, appliedList:[], ws0:null, advances:{}, fam: fam || 'tb', bills:[], loans:[], spend:{}, finDay:0, famHelp:{}, finLast:null, name, gender, bg, look: look || defaultLook(gender), phone:{ threads:{}, unread:{}, pending:{} }, hang:{}, tick:0, day:0, slot:'morning',
     money:b.money, energy:80, health:75, mood:65, tech:b.tech, soft:b.soft, nutr:60,
     rel:{ family:60, tung: bg === 'ghep' ? 66 : 60, linh:56, boss:50, dung:50, mai:50, phong:50 },
     job:null, applied:null, ivDay:0, cv:null, sleepDebt:0, eveEnergy:null, bedHour:23, meals:[], actLog:[], am:null, prep:0, iv:null, backupDay:0,
@@ -11,14 +11,16 @@ function newGame(name, gender, bg, look, fam){
     flags:{}, once:{}, sleep:8, sleepLog:[], bedShift:0, hangover:false, lateToday:false,
     stat:{ miTom:0, lateNights:0, ot:0, study:0, run:0, calls:0, bugsMade:0, bugsFixed:0, tasks:0, lateWork:0, workDays:0 },
     memo:[], notes:[], queue:[], cur:null, d0:null, w0:null, phase:'play' };
-  S.w0 = snap();
+  S.w0 = snap(); S.g0 = snap(); S.m0 = { day:1, ...snap(), stat:{ ...S.stat } };
   startDay();
 }
 
 function startDay(){
   S.day++;
   S.slot = 'morning';
-  S.notes = [];
+  S.notes = []; S.feed = [];
+  if (S.day > 1 && S.day === weekStart(S.day)) { S.w0 = snap(); S.ws0 = { ...S.stat, perf:S.perf }; }          // sang tuần mới
+  if (S.day > 1 && dayInfo().date === 1) { S.mPrev = S.m0; S.m0 = { day:S.day, ...snap(), stat:{ ...S.stat } }; }   // sang tháng mới
   S.otTonight = false; S.unfinished = null; S.askCount = 0; S.bedShift = 0;
   S.flags.gamedTonight = false; S.flags.latePenalized = false;
   S.d0 = snap();

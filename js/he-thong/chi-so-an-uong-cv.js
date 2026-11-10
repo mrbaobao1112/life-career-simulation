@@ -7,8 +7,10 @@ function shapeGains(before, actId, npc){
   const dim = v => 1 - Math.pow(v / 100, 2) * BAL.DIMINISH;
   for (const k of ['mood','health','tech','soft']) {
     const d = S[k] - before[k];
-    if (d > 0) S[k] = before[k] + d * fade * dim(before[k]) * (k === 'mood' ? relF : 1) * (k === 'tech' || k === 'soft' ? learn : 1);
+    if (d > 0) S[k] = before[k] + d * fade * dim(before[k]) * (k === 'mood' ? relF : 1) * (k === 'tech' || k === 'soft' ? learn * (before[k] >= BAL.SKILL_KNEE2 ? BAL.SKILL_SLOW2 : before[k] >= BAL.SKILL_KNEE ? BAL.SKILL_SLOW : 1) : 1);
   }
+  // Ở mức cao, phần lẻ được làm tròn theo xác suất để kỹ năng vẫn nhích dần thay vì đứng yên
+  for (const k of ['tech','soft']) if (before[k] >= BAL.SKILL_KNEE && S[k] > before[k]) { const f = Math.floor(S[k]); S[k] = f + (chance(S[k] - f) ? 1 : 0); }
   for (const k of Object.keys(S.rel)) { const d = S.rel[k] - before.rel[k]; if (d > 0) S.rel[k] = before.rel[k] + d * fade * (1 - Math.pow(before.rel[k] / 100, 2) * .6); }
   if (actId) { (S.actLog = S.actLog || []).push({ id:actId, d:S.day }); if (S.actLog.length > 40) S.actLog.shift(); }
 }

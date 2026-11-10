@@ -27,7 +27,13 @@ const BAL = {
   DIMINISH: .7,           // chỉ số càng gần 100, điểm cộng càng ít
   REPEAT_FADE: .7,        // mỗi lần lặp lại cùng hoạt động trong 2 ngày, hiệu quả nhân thêm hệ số này
   LOW_ENERGY_LEARN: .6,   // năng lượng dưới 30: hiệu quả học còn 60%
+  SKILL_KNEE: 55, SKILL_SLOW: .3,   // chuyên môn, kỹ năng mềm từ 55 trở lên thì tăng chậm hẳn (để 8 tuần không chạm trần 100)
+  SKILL_KNEE2: 80, SKILL_SLOW2: .1, // từ 80 trở lên thì gần như chỉ còn nhích từng chút
   MOOD_DRIFT: .15,        // mỗi đêm tinh thần kéo về mức 60 một phần
+  TRADA_INVITE: .3,       // xác suất đồng nghiệp rủ đi trà đá lúc tan làm
+  EVENT_RATE: .6,         // sau tuần đầu: xác suất một buổi có thể có sự kiện bất ngờ
+  REVIEW_DAY: 12,         // nhận xét đầu tiên của trưởng nhóm: thứ Sáu đầu tiên từ ngày này (27/11)
+  REVIEW_MIN_DAYS: 5,     // phải đi làm ít nhất chừng này ngày mới có nhận xét
   // Buổi sáng (phút)
   PREP_MIN: 35, BUFFER_MIN: 25, APPOINT: 9 * 60,
   COMMUTE: { nha:{ hotay:20, banhmi:30, cudem:15, loren:25 }, tro:{ hotay:40, banhmi:35, cudem:45, loren:30 }, ghep:{ hotay:25, banhmi:20, cudem:30, loren:35 } },
@@ -42,6 +48,15 @@ const COMPANIES = {
             desc:'12 người, một con mèo, rất nhiều ước mơ. Học cực nhanh, giờ giấc cực… linh hoạt.' },
   loren:  { name:'Giải Pháp Số Lò Rèn', type:'Công ty nhỏ', icon:'🔨', salary:8000000, pref:null, need:0, ot:.3,
             desc:'Đang thiếu người gấp. Rất gấp.' },
+  // Các công ty xuất hiện trong những đợt tin tuyển dụng sau (dành cho người chưa có việc)
+  songhong: { name:'Sông Hồng Tech', type:'Outsource vừa', icon:'🌊', salary:9000000, pref:'stable', need:40, ot:.3,
+            desc:'300 nhân viên, làm dự án cho khách Hàn Quốc. Quy củ, hơi nhiều họp.' },
+  xeom:   { name:'Xe Ôm Xanh', type:'Startup', icon:'🛵', salary:9500000, pref:'proactive', need:44, ot:.4,
+            desc:'Ứng dụng gọi xe ôm cho các ngõ nhỏ. Việc nhiều, người ít, ai cũng làm ba vai.' },
+  trasua: { name:'Trà Sữa Số', type:'Công ty sản phẩm', icon:'🧋', salary:11000000, pref:'passion', need:50, ot:.2,
+            desc:'Phần mềm quản lý cho chuỗi trà sữa. Lương ổn, phỏng vấn hỏi khá sâu.' },
+  giaytot: { name:'Giấy Tốt Agency', type:'Công ty nhỏ', icon:'📰', salary:8500000, pref:'stable', need:36, ot:.3,
+            desc:'Làm website cho doanh nghiệp nhỏ. Khách đổi ý liên tục, nhưng học được nhiều thứ.' },
 };
 
 const PEOPLE = {
@@ -54,15 +69,6 @@ const PEOPLE = {
   phong: { name:'Phong', icon:'🌱', note:'Fresher cùng đợt', work:true },
 };
 
-const DAYS = [null,
-  { date:16, dow:'Thứ Hai',  quote:'Có công mài sắt, có ngày nộp CV.' },
-  { date:17, dow:'Thứ Ba',   quote:'Ăn quả nhớ kẻ trồng cây, đi phỏng vấn nhớ mang CV.' },
-  { date:18, dow:'Thứ Tư',   quote:'Đi một ngày đàng, học một sàng khôn, cài một ngày môi trường.' },
-  { date:19, dow:'Thứ Năm',  quote:'Một cây làm chẳng nên non, một dev sửa chẳng hết bug.' },
-  { date:20, dow:'Thứ Sáu',  quote:'Thứ Sáu là ngày đẹp trời để không cập nhật gì lên hệ thống.' },
-  { date:21, dow:'Thứ Bảy',  quote:'Ngủ nướng cũng là một cách yêu bản thân.' },
-  { date:22, dow:'Chủ Nhật', quote:'Chủ Nhật là ngày của những việc định làm từ thứ Hai.' },
-];
 const SLOTS = ['morning','noon','afternoon','evening','night'];
 const SLOT_INFO = { morning:['Sáng','07:00'], noon:['Trưa','12:00'], afternoon:['Chiều','13:30'], evening:['Tối','18:30'], night:['Đêm','22:00'] };
 

@@ -9,9 +9,14 @@ Bối cảnh là thành phố hư cấu **Hà Thành**, mang chất Hà Nội. G
 - Chơi trực tiếp: https://mrbaobao1112.github.io/life-career-simulation/
 - Hoặc tải cả thư mục về (phải có đủ `index.html`, `css/` và `js/`) rồi mở file `index.html` bằng trình duyệt. Không cần cài đặt gì.
 
-Bản chơi thử hiện tại là **tuần đầu tiên sau khi tốt nghiệp** (7 ngày trong game). Tiến trình được tự động lưu trong trình duyệt.
+Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghiệp** (56 ngày trong game, từ 16/11/2026 đến 10/1/2027). Tiến trình được tự động lưu trong trình duyệt.
 
 ## Tính năng hiện có
+
+- **Nếp sinh hoạt:** việc thường ngày (ăn, ngủ, họp đầu ngày, tắc đường) tự diễn ra theo nếp của nhân vật và hiện thành nhật ký trong ngày; người chơi chỉ quyết định việc đáng quyết định. Đổi nếp bất cứ lúc nào bằng nút “Nếp sinh hoạt”.
+- **Qua nhanh và tua:** “Qua nhanh hôm nay” cho ngày tự trôi theo nếp; “Tua đến…” chạy nhiều ngày liền và dừng ở mốc tiếp theo hoặc khi có việc cần quyết định.
+- **Các mốc trong 8 tuần:** nhận xét của trưởng nhóm 27/11, Tùng trả nợ cuối tháng, hóa đơn ngày 1, lương ngày 10, tiền nhà ngày 16; tổng kết mỗi Chủ nhật và mỗi đầu tháng.
+- **Tìm việc tiếp:** người chưa có việc được nộp hồ sơ lại mỗi thứ Hai, vào các công ty chưa từng nộp.
 
 - **Tạo nhân vật:** tên, giới tính, kiểu tóc, màu tóc, màu da; gia cảnh (khá giả, bình thường, khó khăn) và nơi ở (ở cùng bố mẹ, thuê trọ, ở ghép) chọn độc lập.
 - **Tài chính:** sổ hóa đơn, chi phí cố định, khả năng duy trì cuộc sống, áp lực tài chính theo bậc, các lối ra khi thiếu tiền.
@@ -35,10 +40,10 @@ index.html        Khung trang và danh sách file cần nạp (thứ tự nạp 
 css/              Giao diện: bố cục và màu sắc, nhân vật và điện thoại, animation
 js/
   du-lieu/        Con số cân bằng (BAL) và nội dung: task, câu hỏi phỏng vấn, hoạt động
-  loi/            Trạng thái game, lưu game, vòng lặp ngày, xếp lịch trong ngày
+  loi/            Trạng thái game, lưu game, lịch, vòng lặp ngày, xếp lịch trong ngày, nếp sinh hoạt và tua nhanh
   he-thong/       Giấc ngủ và năng lượng, tài chính (FIN), chỉ số, ăn uống, CV, điện thoại, gặp gỡ
   canh/           Các cảnh: tìm việc, đi làm, đời sống
-  su-kien/        Sự kiện, gia cảnh, nhờ vả, ngày lương, trả nợ
+  su-kien/        Sự kiện, gia cảnh, nhờ vả, ngày lương, trả nợ, các mốc theo thời gian
   hinh-anh/       Danh mục đồ, nhân vật chibi, bối cảnh, animation và âm thanh (ANIM)
   giao-dien/      Màn chơi, tổng kết tuần, màn mở đầu, hồ sơ
 tests/            Kiểm thử tự động (chạy bằng Node.js)
@@ -53,7 +58,10 @@ Muốn sửa gì thì mở file nào:
 | Con số cân bằng (năng lượng, điểm cộng…) | `js/du-lieu/can-bang.js` |
 | Tiền, lương, hóa đơn | `js/he-thong/tai-chinh.js` |
 | Task, câu hỏi phỏng vấn, hoạt động tự do | `js/du-lieu/noi-dung.js` |
-| Sự kiện | `js/su-kien/su-kien.js` |
+| Sự kiện, số ngày chờ trước khi lặp lại | `js/su-kien/su-kien.js` |
+| Nhận xét của trưởng nhóm, Tùng trả nợ, tổng kết tháng | `js/su-kien/moc-thoi-gian.js` |
+| Ngày bắt đầu, ngày kết thúc, ngày lễ, câu trên lịch bóc | `js/loi/lich.js` |
+| Việc nào tự chạy, nếp mặc định, cách tua | `js/loi/nep-sinh-hoat.js` |
 | Tin nhắn điện thoại | `js/he-thong/dien-thoai.js` |
 | Hình nhân vật, kiểu tóc, quần áo | `js/hinh-anh/chibi.js`, `js/hinh-anh/danh-muc-do.js` |
 | Tốc độ animation, âm thanh | `js/hinh-anh/animation-am-thanh.js` |
@@ -68,9 +76,10 @@ Cần cài [Node.js](https://nodejs.org/) (bản 18 trở lên).
 ```bash
 cd tests
 npm install
-npm test              # kiểm thử hệ thống + 30 lượt chơi ngẫu nhiên
-npm run ngau-nhien    # 50 lượt chơi ngẫu nhiên trọn tuần
-npm run can-bang      # so sánh 5 chiến lược chơi để kiểm tra cân bằng
+npm test              # kiểm thử hệ thống, tài chính, các mốc 56 ngày + 20 lượt chơi ngẫu nhiên trọn 56 ngày
+npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ
+npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày
+npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra cân bằng (mất vài phút)
 npm run tai-chinh     # kiểm thử sổ hóa đơn và mô phỏng tài chính cả tháng
 npm run hai-thang     # mô phỏng hai tháng, so sánh thu xếp sớm và phút chót
 ```

@@ -1,7 +1,7 @@
 const { JSDOM } = require('jsdom');
 const fs = require('fs');
 const html = require('./nap-game')();
-let st = {runs:0, errors:0, jobs:{}, noJob:0, fail:[], scenes:{}, replies:0, hang:0, msgs:0, steps:[]};
+let st = {runs:0, errors:0, lastDay:{}, jobs:{}, noJob:0, fail:[], scenes:{}, replies:0, hang:0, msgs:0, steps:[]};
 const N = +process.argv[2] || 300;
 for (let run=0; run<N; run++){
   const errs=[];
@@ -18,9 +18,11 @@ for (let run=0; run<N; run++){
     d.querySelectorAll('.bgopt[data-f]')[run%3].click(); d.querySelectorAll('.bgopt[data-b]')[run%3].click();
     d.querySelector('#go').click();
     let steps=0;
-    while(steps<900){
+    while(steps<8000){
       steps++;
       if (d.querySelector('#again')) break;
+      const nw = d.querySelector('#nextWeek'); if (nw){ nw.click(); continue; }
+      const fd = d.querySelector('#ffDay'); if (fd && Math.random()<.1){ fd.click(); continue; }
       // điện thoại
       if (Math.random()<.15 && !d.querySelector('#phoneFab').hidden){
         d.querySelector('#phoneFab').click();
@@ -39,7 +41,7 @@ for (let run=0; run<N; run++){
     st.steps.push(steps);
     if (!d.querySelector('#again')) errs.push('no end');
     const S = w.eval('S');
-    if (S){ if (S.job) st.jobs[S.job.co]=(st.jobs[S.job.co]||0)+1; else st.noJob++;
+    if (S){ st.lastDay[S.day]=(st.lastDay[S.day]||0)+1; if (S.day !== 56) errs.push('kết thúc ở ngày '+S.day); if (S.job) st.jobs[S.job.co]=(st.jobs[S.job.co]||0)+1; else st.noJob++;
       st.msgs += Object.values(S.phone.threads).reduce((a,t)=>a+t.length,0);
       const h=d.querySelector('#app').innerHTML+d.querySelector('#dlg').innerHTML; if(/undefined|NaN/.test(h)) errs.push('undefined/NaN: '+h.match(/.{60}(undefined|NaN).{40}/)?.[0]); }
   } catch(e){ errs.push(e.stack.split('\n').slice(0,3).join(' | ')); }
@@ -48,4 +50,5 @@ for (let run=0; run<N; run++){
   w.close();
 }
 const avg=a=>Math.round(a.reduce((x,y)=>x+y,0)/a.length);
-console.log(JSON.stringify({runs:st.runs, errors:st.errors, jobs:st.jobs, noJob:st.noJob, replies:st.replies, hang:st.hang, avgMsgsPerRun:Math.round(st.msgs/st.runs), avgSteps:avg(st.steps), fail:st.fail, scenes:st.scenes},null,1));
+console.log(JSON.stringify({runs:st.runs, errors:st.errors, ngayKetThuc:st.lastDay, jobs:st.jobs, noJob:st.noJob, replies:st.replies, hang:st.hang, avgMsgsPerRun:Math.round(st.msgs/st.runs), avgSteps:avg(st.steps), fail:st.fail, scenes:st.scenes},null,1));
+if (st.errors) process.exit(1);

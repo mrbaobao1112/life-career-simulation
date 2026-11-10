@@ -1,6 +1,27 @@
 # Lịch sử phiên bản
 
-## v6.1: Tách file, không đổi lối chơi (hiện tại)
+## v7: Nếp sinh hoạt và tám tuần đầu tiên (hiện tại)
+Đổi cách chơi theo góp ý “chơi giống làm bài test”, và kéo dài bản thử từ 7 ngày lên 56 ngày (16/11/2026 đến 10/1/2027).
+- Nếp sinh hoạt: bữa ăn, giờ ngủ, họp đầu ngày, tắc đường, task buổi chiều tự diễn ra theo nếp của nhân vật và hiện thành một dòng trong nhật ký của ngày. Bữa ăn và giờ ngủ chỉ hỏi lần đầu; lựa chọn đó thành nếp. Đổi nếp bằng nút “Nếp sinh hoạt”. Mọi con số vẫn tính bằng đúng công thức cũ.
+- Màn hình ngày: dải năm buổi, nhật ký những việc đã diễn ra kèm số tiền, giờ rảnh chọn bằng các ô nhỏ thay cho danh sách câu trả lời.
+- Bớt nhãn cộng trừ: trên lựa chọn chỉ còn tiền, thời gian và rủi ro; kết quả hiện mũi tên lên xuống thay cho con số. Bật lại chi tiết trong “Nếp sinh hoạt”.
+- Mỗi ngày đi làm còn một task cần quyết định; task buổi chiều làm theo cách quen tay. Lời rủ trà đá lúc tan làm chỉ thỉnh thoảng mới có.
+- “Qua nhanh hôm nay” (có từ ngày đầu tiên) và “Tua đến…” ở cuối ngày: game tự chạy theo nếp, dừng ở mốc tiếp theo hoặc khi có việc cần quyết định, rồi hiện bảng tóm tắt. Trong lúc tua không có sự kiện bất ngờ và điện thoại im lặng.
+- Lịch động: thứ, ngày, tháng tính từ 16/11/2026; nghỉ Tết Dương lịch 1/1; câu trên lịch bóc xoay vòng.
+- Các mốc: nhận xét của chị Hạnh thứ Sáu 27/11 (bản ngắn), Tùng trả nợ cuối tháng (trả đủ, trả một nửa hoặc xin khất), hóa đơn 1/12, lương 10/12, tiền nhà 16/12, lương 10/1, góp tiền chợ, gửi tiền về nhà.
+- Sự kiện và tin nhắn có số ngày chờ trước khi lặp lại, thay cho “chỉ một lần”.
+- Chưa có việc thì mỗi thứ Hai được nộp hồ sơ lại vào công ty chưa từng nộp (thêm 4 công ty); có thể sửa lại CV trong giờ rảnh.
+- Tổng kết mỗi Chủ nhật, tổng kết tháng vào sáng ngày 1, màn kết thúc ngày 10/1. Danh hiệu tính theo từng tuần.
+- Bản lưu của bản 7 ngày chơi tiếp được sang ngày 8.
+- Cân bằng: chuyên môn và kỹ năng mềm từ 55 trở lên tăng chậm hẳn, để sau 8 tuần không chạm trần 100.
+- Kiểm thử mới `kiem-thu-56-ngay.js`; bài chơi ngẫu nhiên và bảng cân bằng chạy trọn 56 ngày.
+
+Chưa làm trong bản này (để lại cho bản sau):
+- Tuần 3 đến 8 còn ít nội dung mới: vẫn là khoảng 10 task và các sự kiện viết cho tuần đầu, lặp lại theo thời gian chờ.
+- Chưa rút gọn câu chữ trong phỏng vấn, task và sự kiện; hoạt động xã hội chưa chuyển hẳn sang tin nhắn.
+- Đánh giá thử việc đầy đủ; quan hệ chưa phai dần khi lâu không gặp.
+
+## v6.1: Tách file, không đổi lối chơi
 - Tách `index.html` (hơn 3.000 dòng) thành 3 file giao diện trong `css/` và 25 file theo từng hệ thống trong `js/` (dữ liệu cân bằng, tài chính, giấc ngủ và năng lượng, sự kiện, nhân vật chibi và bối cảnh, animation và âm thanh, giao diện, lưu game…). Chỉ cắt và chuyển chỗ, không sửa dòng lệnh nào.
 - Game chơi y như v6; bản lưu cũ vẫn dùng được. Vẫn mở được bằng cách bấm đúp `index.html` và vẫn chạy trên GitHub Pages, không cần công cụ build.
 - Kiểm thử: thêm `tests/nap-game.js` để ghép các file lại khi kiểm thử; 5 bài kiểm thử chỉ đổi dòng đọc file.
