@@ -1,0 +1,408 @@
+{
+ "rows": [
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "–",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "12405k",
+   "Số dư 16/12": "12285k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "–",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "3660k",
+   "Số dư 16/12": "3600k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "–",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "11133k",
+   "Số dư 16/12": "10695k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "11/12",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "2388k",
+   "Số dư 16/12": "2010k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "19/11",
+   "Căng thẳng": "26/11",
+   "Thiếu tiền": "1/12",
+   "Số dư 10/12": "8725k",
+   "Số dư 16/12": "6915k",
+   "Ngày thiếu tiền ăn": 9,
+   "Lối ra đã dùng": "1/12 Hỏi vay Tùng",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "19/11",
+   "Căng thẳng": "26/11",
+   "Thiếu tiền": "1/12",
+   "Số dư 10/12": "0k",
+   "Số dư 16/12": "0k",
+   "Ngày thiếu tiền ăn": 16,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "–",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "12521k",
+   "Số dư 16/12": "8655k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "17/11",
+   "Căng thẳng": "11/12",
+   "Thiếu tiền": "16/12",
+   "Số dư 10/12": "2776k",
+   "Số dư 16/12": "0k",
+   "Ngày thiếu tiền ăn": 1,
+   "Lối ra đã dùng": "16/12 Hỏi vay Tùng",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "–",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "11153k",
+   "Số dư 16/12": "6945k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "17/11",
+   "Căng thẳng": "11/12",
+   "Thiếu tiền": "16/12",
+   "Số dư 10/12": "1408k",
+   "Số dư 16/12": "0k",
+   "Ngày thiếu tiền ăn": 1,
+   "Lối ra đã dùng": "16/12 Hỏi vay Tùng",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "19/11",
+   "Căng thẳng": "26/11",
+   "Thiếu tiền": "1/12",
+   "Số dư 10/12": "9725k",
+   "Số dư 16/12": "4515k",
+   "Ngày thiếu tiền ăn": 9,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "17/11",
+   "Căng thẳng": "26/11",
+   "Thiếu tiền": "1/12",
+   "Số dư 10/12": "0k",
+   "Số dư 16/12": "0k",
+   "Ngày thiếu tiền ăn": 16,
+   "Lối ra đã dùng": "16/12 Hỏi vay Tùng",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "–",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "11983k",
+   "Số dư 16/12": "9695k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "17/11",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "2238k",
+   "Số dư 16/12": "10k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "–",
+   "Căng thẳng": "–",
+   "Thiếu tiền": "–",
+   "Số dư 10/12": "10591k",
+   "Số dư 16/12": "7955k",
+   "Ngày thiếu tiền ăn": 0,
+   "Lối ra đã dùng": "–",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "17/11",
+   "Căng thẳng": "11/12",
+   "Thiếu tiền": "16/12",
+   "Số dư 10/12": "846k",
+   "Số dư 16/12": "0k",
+   "Ngày thiếu tiền ăn": 1,
+   "Lối ra đã dùng": "16/12 Hỏi vay Tùng",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc sớm",
+   "Bắt đầu lo": "19/11",
+   "Căng thẳng": "26/11",
+   "Thiếu tiền": "29/11",
+   "Số dư 10/12": "9725k",
+   "Số dư 16/12": "5665k",
+   "Ngày thiếu tiền ăn": 11,
+   "Lối ra đã dùng": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh",
+   "Trừ trùng": "không"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa có việc",
+   "Bắt đầu lo": "17/11",
+   "Căng thẳng": "26/11",
+   "Thiếu tiền": "29/11",
+   "Số dư 10/12": "0k",
+   "Số dư 16/12": "0k",
+   "Ngày thiếu tiền ăn": 18,
+   "Lối ra đã dùng": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh; 16/12 Xin chủ nhà nộp chậm",
+   "Trừ trùng": "không"
+  }
+ ],
+ "famRows": [
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc",
+   "Gia cảnh": "tb",
+   "Số dư 16/12": "6915k",
+   "Lối ra": "1/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc",
+   "Gia cảnh": "kha",
+   "Số dư 16/12": "6915k",
+   "Lối ra": "1/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Bố mẹ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc",
+   "Gia cảnh": "kho",
+   "Số dư 16/12": "6915k",
+   "Lối ra": "1/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Chưa",
+   "Gia cảnh": "tb",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Chưa",
+   "Gia cảnh": "kha",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Tiết kiệm",
+   "Việc": "Chưa",
+   "Gia cảnh": "kho",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa",
+   "Gia cảnh": "tb",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa",
+   "Gia cảnh": "kha",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa",
+   "Gia cảnh": "kho",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa",
+   "Gia cảnh": "tb",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa",
+   "Gia cảnh": "kha",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Thuê trọ",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa",
+   "Gia cảnh": "kho",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa",
+   "Gia cảnh": "tb",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa",
+   "Gia cảnh": "kha",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Bình thường",
+   "Việc": "Chưa",
+   "Gia cảnh": "kho",
+   "Số dư 16/12": "0k",
+   "Lối ra": "16/12 Hỏi vay Tùng"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc",
+   "Gia cảnh": "tb",
+   "Số dư 16/12": "5665k",
+   "Lối ra": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc",
+   "Gia cảnh": "kha",
+   "Số dư 16/12": "5665k",
+   "Lối ra": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Có việc",
+   "Gia cảnh": "kho",
+   "Số dư 16/12": "5665k",
+   "Lối ra": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa",
+   "Gia cảnh": "tb",
+   "Số dư 16/12": "0k",
+   "Lối ra": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh; 16/12 Xin chủ nhà nộp chậm"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa",
+   "Gia cảnh": "kha",
+   "Số dư 16/12": "0k",
+   "Lối ra": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh; 16/12 Xin chủ nhà nộp chậm"
+  },
+  {
+   "Nơi ở": "Ở ghép",
+   "Chi tiêu": "Thoải mái",
+   "Việc": "Chưa",
+   "Gia cảnh": "kho",
+   "Số dư 16/12": "0k",
+   "Lối ra": "1/12 Hỏi vay Tùng; 1/12 Hỏi vay Linh; 16/12 Xin chủ nhà nộp chậm"
+  }
+ ]
+}

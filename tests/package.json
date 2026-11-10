@@ -3,10 +3,13 @@
   "private": true,
   "description": "Kiểm thử tự động cho bản chơi thử Life & Career Simulation",
   "scripts": {
-    "test": "node kiem-thu-he-thong.js && node choi-ngau-nhien.js 30",
+    "test": "node kiem-thu-he-thong.js && node kiem-thu-tai-chinh.js && node choi-ngau-nhien.js 30",
     "he-thong": "node kiem-thu-he-thong.js",
     "ngau-nhien": "node choi-ngau-nhien.js 50",
-    "can-bang": "node can-bang-chien-luoc.js"
+    "can-bang": "node can-bang-chien-luoc.js",
+    "tai-chinh": "node kiem-thu-tai-chinh.js"
   },
-  "devDependencies": { "jsdom": "24.1.3" }
+  "devDependencies": {
+    "jsdom": "24.1.3"
+  }
 }

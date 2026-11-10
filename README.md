@@ -13,7 +13,8 @@ Bản chơi thử hiện tại là **tuần đầu tiên sau khi tốt nghiệp*
 
 ## Tính năng hiện có
 
-- **Tạo nhân vật:** tên, giới tính, kiểu tóc, màu tóc, màu da; 3 hoàn cảnh xuất phát (ở cùng bố mẹ, thuê trọ, ở ghép).
+- **Tạo nhân vật:** tên, giới tính, kiểu tóc, màu tóc, màu da; gia cảnh (khá giả, bình thường, khó khăn) và nơi ở (ở cùng bố mẹ, thuê trọ, ở ghép) chọn độc lập.
+- **Tài chính:** sổ hóa đơn, chi phí cố định, khả năng duy trì cuộc sống, áp lực tài chính theo bậc, các lối ra khi thiếu tiền.
 - **Tìm việc:** viết CV (độ nổi bật, độ trung thực, kỹ năng khai báo), chọn công ty, phỏng vấn 3 vòng, thương lượng lương, phương án dự phòng khi trượt.
 - **Đi làm:** họp đầu ngày, task dạng lá bài với 4 cách xử lý, lỗi do làm vội quay lại về sau, OT.
 - **Đời sống:** bữa ăn theo hoàn cảnh, hoạt động tự do, rủ bạn bè và đồng nghiệp đi chơi với câu chuyện mở dần theo độ thân.
@@ -46,6 +47,7 @@ npm install
 npm test              # kiểm thử hệ thống + 30 lượt chơi ngẫu nhiên
 npm run ngau-nhien    # 50 lượt chơi ngẫu nhiên trọn tuần
 npm run can-bang      # so sánh 5 chiến lược chơi để kiểm tra cân bằng
+npm run tai-chinh     # kiểm thử sổ hóa đơn và mô phỏng tài chính cả tháng
 ```
 
 ## Hướng phát triển

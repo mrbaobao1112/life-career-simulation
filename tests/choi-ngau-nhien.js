@@ -1,6 +1,6 @@
 const { JSDOM } = require('jsdom');
 const fs = require('fs');
-const html = fs.readFileSync(require('path').join(__dirname, '..', 'index.html'), 'utf8');
+const html = fs.readFileSync(require("path").join(__dirname, "..", "index.html"), "utf8");
 let st = {runs:0, errors:0, jobs:{}, noJob:0, fail:[], scenes:{}, replies:0, hang:0, msgs:0, steps:[]};
 const N = +process.argv[2] || 300;
 for (let run=0; run<N; run++){
@@ -15,7 +15,7 @@ for (let run=0; run<N; run++){
     d.querySelectorAll('#hcs .sw')[run%6].click();
     if (run%4===0) d.querySelector('#rnd').click();
     if (run%2) d.querySelector('.gopt[data-g="nu"]').click();
-    d.querySelectorAll('.bgopt')[run%3].click();
+    d.querySelectorAll('.bgopt[data-f]')[run%3].click(); d.querySelectorAll('.bgopt[data-b]')[run%3].click();
     d.querySelector('#go').click();
     let steps=0;
     while(steps<900){

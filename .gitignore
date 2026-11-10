@@ -4,3 +4,4 @@ node_modules/
 .DS_Store
 Thumbs.db
 tests/ket-qua-can-bang.json
+tests/ket-qua-tai-chinh.json

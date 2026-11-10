@@ -14,7 +14,7 @@ for (const [name, pref] of Object.entries(PREF)) {
     const dom = new JSDOM(html, { runScripts:'dangerously', pretendToBeVisual:true, url:'https://example.org/',
       beforeParse(w){ w.matchMedia = () => ({matches:true}); w.scrollTo=()=>{}; w.HTMLElement.prototype.focus=function(){}; } });
     const w = dom.window, d = w.document;
-    d.querySelector('#fresh').click(); d.querySelectorAll('.bgopt')[run % 3].click(); d.querySelector('#go').click();
+    d.querySelector('#fresh').click(); d.querySelectorAll(".bgopt[data-f]")[run % 3].click(); d.querySelectorAll(".bgopt[data-b]")[run % 3].click(); d.querySelector('#go').click();
     let mood100 = 0;
     for (let i = 0; i < 900; i++) {
       if (d.querySelector('#again')) break;

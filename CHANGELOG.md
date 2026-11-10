@@ -1,6 +1,18 @@
 # Lịch sử phiên bản
 
-## v4: Animation và âm thanh (hiện tại)
+## v5: Tài chính và gia cảnh (hiện tại)
+- Tiền khởi đầu mới: ở cùng bố mẹ 4 triệu, thuê trọ 4,5 triệu, ở ghép 3,5 triệu (tiền tiết kiệm làm thêm và tiền mừng tốt nghiệp).
+- Sổ hóa đơn: mỗi khoản có mã kỳ, hạn, trạng thái; chỉ trả một lần, kể cả khi lưu và tải lại game.
+- Chu kỳ tiền nhà tính từ ngày dọn vào (16/11), tháng sau đến hạn 16/12. Điện nước internet và cước điện thoại đến hạn ngày 1 hằng tháng. Xăng xe 15.000đ mỗi ngày ra ngoài.
+- Khả năng duy trì cuộc sống: tính theo chi tiêu thật 7 ngày gần nhất, có hóa đơn sắp đến hạn và lương sắp nhận; hiện trong Hồ sơ và báo cáo tuần.
+- Áp lực tài chính theo bậc: ổn định, lo lắng, căng thẳng, thiếu tiền; nhật ký chỉ nhắc khi đổi bậc.
+- Lối ra khi thiếu tiền: vay Tùng hoặc Linh, xin nộp chậm tiền nhà (phí 5%), xin bố mẹ (theo gia cảnh), xin khất; ăn chịu hoặc nhịn khi hết tiền ăn.
+- Tách gia cảnh (khá giả, bình thường, khó khăn) khỏi nơi ở; mỗi gia cảnh có một sự kiện đặc trưng trong tuần đầu.
+- Ở cùng bố mẹ: góp tiền chợ 1 triệu/tháng sau khi có lương; về nhà sau 23 giờ thì bố mẹ phật lòng.
+- Kiểm thử tài chính: sổ hóa đơn chống trừ trùng, mô phỏng cả tháng 3 nơi ở × 3 mức chi tiêu × có hoặc chưa có việc × 3 gia cảnh.
+- Chưa hiện khi chơi (chờ kéo dài bản thử): hóa đơn 1/12, lương 10/12, tiền nhà 16/12, góp tiền chợ, gửi tiền về nhà, trả nợ bạn bè.
+
+## v4: Animation và âm thanh
 - Nhân vật chibi tách thành bộ phận cử động được: tay, đầu, mắt, thân.
 - Chuyển động nền: chớp mắt, thở nhẹ.
 - Animation thức dậy mỗi sáng theo dữ liệu đêm hôm trước: vươn vai (ngủ đủ), dụi mắt (hơi thiếu ngủ), ngáp (nợ ngủ nhiều), ôm đầu lắc lư (dư âm bia), giật mình kèm đồng hồ báo thức (ngủ quên).

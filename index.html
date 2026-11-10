@@ -350,9 +350,9 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
    ========================================================= */
 const BAL = {
   BG: {
-    nha:  { money: 5000000,  rent: 0,       tech: 30, soft: 33 },
-    tro:  { money: 8000000,  rent: 3500000, tech: 34, soft: 30 },
-    ghep: { money: 6000000,  rent: 2000000, tech: 30, soft: 36 },
+    nha:  { money: 4000000,  rent: 0,       tech: 30, soft: 33 },
+    tro:  { money: 4500000,  rent: 3500000, tech: 34, soft: 30 },
+    ghep: { money: 3500000,  rent: 2000000, tech: 30, soft: 36 },
   },
   LIVING_PER_MONTH: 4000000,   // chi phí ăn uống, đi lại ước tính mỗi tháng
   DAYS_TO_PAYDAY: 18,          // từ Chủ Nhật 22/11 đến ngày nhận lương 10/12
@@ -533,7 +533,7 @@ const ACTS = [
 /* =========================================================
    TRẠNG THÁI & TIỆN ÍCH
    ========================================================= */
-const SAVE_KEY = 'lcs-tuan-dau-tien-v3';
+const SAVE_KEY = 'lcs-tuan-dau-tien-v5';
 let S = null;
 let current = null;
 
@@ -569,9 +569,9 @@ function wipe(){ try { localStorage.removeItem(SAVE_KEY); } catch(e) {} }
 /* =========================================================
    VÒNG LẶP NGÀY
    ========================================================= */
-function newGame(name, gender, bg, look){
+function newGame(name, gender, bg, look, fam){
   const b = BAL.BG[bg];
-  S = { v:3, name, gender, bg, look: look || defaultLook(gender), phone:{ threads:{}, unread:{}, pending:{} }, hang:{}, tick:0, day:0, slot:'morning',
+  S = { v:5, fam: fam || 'tb', bills:[], loans:[], spend:{}, finDay:0, famHelp:{}, finLast:null, name, gender, bg, look: look || defaultLook(gender), phone:{ threads:{}, unread:{}, pending:{} }, hang:{}, tick:0, day:0, slot:'morning',
     money:b.money, energy:80, health:75, mood:65, tech:b.tech, soft:b.soft, nutr:60,
     rel:{ family:60, tung: bg === 'ghep' ? 66 : 60, linh:56, boss:50, dung:50, mai:50, phong:50 },
     job:null, applied:null, ivDay:0, cv:null, sleepDebt:0, eveEnergy:null, bedHour:23, meals:[], actLog:[], am:null, prep:0, iv:null, backupDay:0,
@@ -590,10 +590,16 @@ function startDay(){
   S.otTonight = false; S.unfinished = null; S.askCount = 0; S.bedShift = 0;
   S.flags.gamedTonight = false; S.flags.latePenalized = false;
   S.d0 = snap();
+  S.flags.outLate = false;
   applyWake();
+  if (goingOut()) { const f = Math.min(FIN.FUEL, S.money); if (f > 0) { S.money -= f; spendLog(f); note(`Xăng xe: −${fmt(f)}.`); } }
   clampAll();
   tickPhone();
   buildSlot();
+  const fe = processFinance(), extra = [];
+  for (const e of fe) { extra.push(e); if (e.id === 'payday') { if (S.bg === 'nha') extra.push({ id:'house_contrib' }); if (S.fam === 'kho' && S.flags.dutyPromise) extra.push({ id:'fam_send' }); } }
+  if (extra.length) S.queue.splice(1, 0, ...extra);
+  clampAll();
   advance();
 }
 
@@ -669,13 +675,125 @@ function morningLine(){
 }
 
 /* ----- Ban đêm: dinh dưỡng, áp lực công việc, tinh thần về mức trung bình, áp lực tài chính ----- */
-function finPressure(){
-  const b = BAL.BG[S.bg], days = S.job ? BAL.DAYS_TO_PAYDAY + (7 - S.day) : 30;
-  const need = b.rent + BAL.LIVING_PER_MONTH * days / 30, r = S.money / need;
-  if (r < .6) return { label:'Báo động', pen:6, note:'Lo tiền nhà và tiền ăn sắp tới: tinh thần −6.' };
-  if (r < 1) return { label:'Hơi chật vật', pen:3, note:'Bắt đầu lo chuyện tiền bạc: tinh thần −3.' };
-  return { label: r >= 1.6 ? 'Thoải mái' : 'Ổn định', pen:0 };
+/* =========================================================
+   v5: TÀI CHÍNH – sổ hóa đơn, chi phí cố định, khả năng duy trì, áp lực theo bậc
+   ========================================================= */
+const FIN = {
+  RENT_DAY: 16,                         // chu kỳ thuê tính từ ngày dọn vào (16/11): tháng sau đến hạn ngày 16
+  UTIL: { tro:400000, ghep:250000 },    // điện nước internet, đến hạn ngày 1 hằng tháng (ở ghép đã chia đôi)
+  PHONE: 100000,                        // cước điện thoại, đến hạn ngày 1 hằng tháng
+  FUEL: 15000,                          // xăng xe mỗi ngày phải ra ngoài
+  PAYDAY: 10,                           // ngày nhận lương hằng tháng
+  LATE_FEE: .05,                        // phí xin nộp chậm tiền nhà
+  CHEAPEST_MEAL: 6000,
+  LOAN_DAYS: 14,                        // hạn trả tiền vay bạn bè
+  HOUSE_CONTRIB: 1000000,               // góp tiền chợ khi ở cùng bố mẹ, sau khi có lương
+  FAM_EVENT_DAY: 4,                     // sự kiện gia cảnh xuất hiện từ tối ngày thứ 4
+  NORMAL: { nha:63000, tro:108000, ghep:96000 },  // mức chi tiêu bình thường mỗi ngày (dùng khi chưa đủ dữ liệu)
+  SAVER:  { nha:10000, tro:51000,  ghep:38000 },  // mức tiết kiệm tối đa mỗi ngày
+  LOOKAHEAD: 40, RUNWAY_MAX: 120,
+};
+const START_DATE = new Date(2026, 10, 16);
+function dateOf(d){ const x = new Date(START_DATE); x.setDate(x.getDate() + d - 1); return x; }
+const fmtD = d => { const x = dateOf(d); return `${x.getDate()}/${x.getMonth() + 1}`; };
+const monthKey = (d = S.day) => { const x = dateOf(d); return `${x.getMonth() + 1}/${x.getFullYear()}`; };
+const isPayday = d => dateOf(d).getDate() === FIN.PAYDAY;
+const rwTxt = n => n >= FIN.RUNWAY_MAX ? 'hơn 4 tháng' : `khoảng ${n} ngày`;
+
+// Lịch thu chi định kỳ: nguồn duy nhất cho cả sổ hóa đơn và phép tính khả năng duy trì
+function scheduleOn(d){
+  const x = dateOf(d), m = x.getMonth() + 1, per = `${m}-${x.getFullYear()}`, out = [];
+  const rent = BAL.BG[S.bg].rent;
+  if (rent && x.getDate() === FIN.RENT_DAY && d > 1) out.push({ id:`rent-${per}`, kind:'rent', name:`Tiền nhà tháng ${m}`, amount:rent, due:d });
+  if (x.getDate() === 1 && d > 1) {
+    if (FIN.UTIL[S.bg]) out.push({ id:`util-${per}`, kind:'util', name:`Điện nước, internet tháng ${m}`, amount:FIN.UTIL[S.bg], due:d });
+    out.push({ id:`phone-${per}`, kind:'phone', name:`Cước điện thoại tháng ${m}`, amount:FIN.PHONE, due:d });
+  }
+  return out;
 }
+function ensureBills(){
+  S.bills = S.bills || [];
+  for (let d = S.day; d <= S.day + FIN.LOOKAHEAD; d++)
+    for (const b of scheduleOn(d)) if (!S.bills.some(x => x.id === b.id)) S.bills.push({ ...b, paid:false });
+}
+function payBill(b){
+  if (!b || b.paid || S.money < b.amount) return false;
+  S.money -= b.amount; b.paid = true; b.paidDay = S.day;
+  note(`Đã trả ${b.name.toLowerCase()}: −${fmt(b.amount)}.`);
+  return true;
+}
+// Chạy đúng một lần mỗi ngày (S.finDay), mỗi hóa đơn chỉ trả một lần (b.paid): không thể trừ tiền hai lần, kể cả khi tải lại game
+function processFinance(){
+  if (S.finDay === S.day) return [];
+  S.finDay = S.day;
+  ensureBills();
+  const ev = [];
+  if (S.job && S.day > S.job.start && isPayday(S.day)) {
+    S.money += S.job.salary; S.flags.paidCount = (S.flags.paidCount || 0) + 1;
+    note(`Nhận lương: +${fmt(S.job.salary)}.`); memo(`Nhận lương ${fmtTr(S.job.salary)}`); ev.push({ id:'payday' });
+  }
+  for (const L of (S.loans || [])) if (!L.repaid && L.due <= S.day) {
+    if (S.money >= L.amount) { S.money -= L.amount; L.repaid = true; note(`Trả ${PEOPLE[L.from].name} ${fmt(L.amount)} đã vay.`); }
+    else if (!L.extended) { L.extended = true; L.due = S.day + 7; rel(L.from, -5); note(`Chưa trả được tiền vay ${PEOPLE[L.from].name}, xin khất thêm một tuần.`); }
+  }
+  for (const b of S.bills.filter(b => !b.paid && b.due <= S.day).sort((a, b) => a.due - b.due))
+    if (!payBill(b) && !b.alerted) { b.alerted = true; ev.push({ id:'bill_short', arg:b.id }); }
+  return ev;
+}
+function spendLog(a){ if (a > 0) { S.spend = S.spend || {}; S.spend[S.day] = (S.spend[S.day] || 0) + a; } }
+// Chi tiêu hằng ngày = trung bình chi tiêu thực 7 ngày gần nhất (chưa đủ 3 ngày thì dùng mức bình thường theo nơi ở)
+function avgDaily(){
+  const sp = S.spend || {}, days = [];
+  for (let d = S.day - 1; d >= Math.max(1, S.day - 7); d--) days.push(sp[d] || 0);
+  if (days.length < 3) return FIN.NORMAL[S.bg] + (S.job ? FIN.FUEL : 0);
+  return Math.max(FIN.SAVER[S.bg], Math.round(days.reduce((a, b) => a + b, 0) / days.length));
+}
+const saverDaily = () => FIN.SAVER[S.bg] + (S.job ? FIN.FUEL : 0);
+// Mô phỏng từng ngày phía trước: chi tiêu hằng ngày + hóa đơn đến hạn − lương sắp nhận, đến khi số dư âm
+function runway(daily){
+  let m = S.money;
+  const bills = S.bills || [], unpaid = bills.filter(b => !b.paid);
+  for (let i = 0; i <= FIN.RUNWAY_MAX; i++) {
+    const d = S.day + i;
+    if (i > 0) { m -= daily; if (S.job && isPayday(d) && d > S.job.start) m += S.job.salary; }
+    for (const b of unpaid) if (i === 0 ? b.due <= d : b.due === d) m -= b.amount;
+    if (i > 0) for (const b of scheduleOn(d)) if (!bills.some(x => x.id === b.id)) m -= b.amount;
+    if (m < 0) return i;
+  }
+  return FIN.RUNWAY_MAX;
+}
+function nextIncomeIn(){ if (!S.job) return null; for (let i = 1; i <= 31; i++) if (isPayday(S.day + i) && S.day + i > S.job.start) return i; return null; }
+const FIN_STAGE = {
+  stable: { label:'Ổn định', pen:0 },
+  worried: { label:'Lo lắng', pen:2, note:'Tiền không còn dư dả so với thời gian đến khoản thu tiếp theo: bắt đầu thấy lo.' },
+  tense: { label:'Căng thẳng', pen:4, note:'Sắp đến hạn hóa đơn mà số dư chưa đủ: căng thẳng.' },
+  short: { label:'Thiếu tiền', pen:6, note:'Không đủ tiền trả hóa đơn hoặc tiền ăn: rất căng thẳng.' },
+};
+function finStage(){
+  const avg = avgDaily(), r = runway(avg), inc = nextIncomeIn(), bills = S.bills || [];
+  let key = 'stable';
+  if (bills.some(b => !b.paid && b.due <= S.day) || S.money < FIN.CHEAPEST_MEAL) key = 'short';
+  else if (bills.some(b => !b.paid && b.due > S.day && b.due <= S.day + 5 && S.money - avg * (b.due - S.day) < b.amount)) key = 'tense';
+  else if (r < (inc ?? 30) + 7) key = 'worried';
+  return { key, ...FIN_STAGE[key], r, avg };
+}
+// Giữ tên cũ để các chỗ khác vẫn dùng được
+function finPressure(){ const s = finStage(); return { label:s.label, pen:s.pen, note:s.note }; }
+function billsHTML(list){
+  return list.map(b => `<div class="hb"><span>${b.name}, hạn ${fmtD(b.due)}${b.due <= S.day ? ' (quá hạn)' : ''}</span><span>${fmt(b.amount)}</span></div>`).join('');
+}
+function finCardHTML(){
+  const st = finStage(), rw = runway(st.avg), rs = runway(saverDaily());
+  const up = (S.bills || []).filter(b => !b.paid).sort((a, b) => a.due - b.due).slice(0, 4);
+  const loans = (S.loans || []).filter(L => !L.repaid);
+  return `<div class="food"><div class="food-top"><span>Tình trạng</span><b class="lv ${st.key === 'stable' ? 'good' : st.key === 'worried' ? 'ok' : 'bad'}">${st.label}</b></div>
+    <div class="hb"><span>Theo cách chi tiêu hiện tại (~${fmt(st.avg)}/ngày)</span><span>${rwTxt(rw)}</span></div>
+    <div class="hb"><span>Nếu tiết kiệm tối đa (~${fmt(saverDaily())}/ngày)</span><span>${rwTxt(rs)}</span></div>
+    ${up.length ? `<p class="muted">Sắp đến hạn:</p>${billsHTML(up)}` : ''}
+    ${loans.map(L => `<div class="hb"><span>Đang nợ ${PEOPLE[L.from].name}, hạn ${fmtD(L.due)}</span><span>${fmt(L.amount)}</span></div>`).join('')}
+    <p class="muted">Số ngày duy trì tính cả hóa đơn sắp đến hạn${S.job ? ' và lương sắp nhận' : ''}, chưa tính sự kiện bất ngờ.</p></div>`;
+}
+
 function nightly(){
   updateNutr();
   if (S.nutr < 30) { S.health -= 3; note('Ăn uống kém nhiều bữa liền: sức khỏe giảm.'); }
@@ -683,7 +801,8 @@ function nightly(){
   else if (S.nutr >= 70) S.health += 1;
   if (isWorkday()) S.mood -= BAL.WORK_STRESS;
   S.mood -= Math.round((S.mood - 60) * BAL.MOOD_DRIFT);
-  const fp = finPressure(); if (fp.pen) { S.mood -= fp.pen; note(fp.note); }
+  const st = finStage(); if (st.pen) S.mood -= st.pen;
+  if (st.key !== S.finLast) { if (st.note) note(st.note); S.finLast = st.key; }
 }
 
 /* ----- Công thức điểm cộng: giảm dần khi chỉ số cao, khi lặp lại, khi mệt; tinh thần phụ thuộc độ thân ----- */
@@ -761,6 +880,8 @@ function sceneType(ref){
   if (id === 'call_invite') return { t:'consequence', cause:'Vì sáng nay bạn đã nộp hồ sơ…' };
   if (id === 'bk_call') return { t:'random' };
   if (id === 'bug_back') { const b = S.bugs.find(x => x.due <= S.day); return { t:'consequence', cause: b ? `Vì hôm trước bạn chọn “làm nhanh” task ${b.title}…` : '' }; }
+  if (id === 'bill_short') return { t:'consequence', cause:'Vì đến hạn thanh toán mà số dư không đủ…' };
+  if (id === 'payday') return { t:'scheduled' };
   if (id === 'bug_weekend') return { t:'consequence', cause:'Vì trong tuần có một task bị làm vội…' };
   if (id === 'wake' && S.flags.hangoverToday) return { t:'consequence', cause:'Vì tối qua đi bia hơi với Tùng…' };
   if (id === 'wake' && (S.day === S.ivDay || (S.job && S.day === S.job.start))) return { t:'scheduled' };
@@ -801,7 +922,7 @@ function buildSlot(){
   } else if (s === 'evening') {
     if (S.otTonight === true) q.push({ id:'ot' });
     else if (S.otTonight === 'home') q.push({ id:'meal', arg:'dinner' }, { id:'homework' });
-    else { q.push({ id:'meal', arg:'dinner' }); maybeEvent(q, 'evening'); q.push({ id:'activity', arg:'evening' }); }
+    else { q.push({ id:'meal', arg:'dinner' }); if (S.day >= FIN.FAM_EVENT_DAY && !S.once.fam) { S.once.fam = true; q.push({ id:'ev', arg:'fam_' + (S.fam || 'tb') }); } else maybeEvent(q, 'evening'); q.push({ id:'activity', arg:'evening' }); }
   } else if (s === 'night') {
     if (S.flags.gamedTonight && chance(.6)) q.push({ id:'ev', arg:'morebattle' });
     if (S.stat.miTom >= 3 && !S.once.noodle) { S.once.noodle = true; q.push({ id:'ev', arg:'noodle' }); }
@@ -1312,6 +1433,12 @@ SC.meal = (kind) => {
       const dish = pick(APP_DISHES); logMeal('app', dish.v); S.mood += 4; S.energy += 4;
       return `Bạn gọi ${dish.name}. ${dish.t}`; } });
   }
+  if (!c.some(x => !x.cost || x.cost <= S.money)) {
+    c.push({ icon:'📒', label:'Ăn chịu ở quán cơm bụi quen', hints:['📒 Ghi nợ 35.000đ, trả trong 7 ngày'], noSpend:true, fx:() => { logMeal('rice');
+      (S.bills = S.bills || []).push({ id:`tab-${S.day}-${kind}`, kind:'tab', name:'Tiền ăn chịu quán cơm', amount:35000, due:S.day + 7, paid:false });
+      return 'Cô bán hàng ghi tên bạn vào cuốn sổ nhỏ. Cuốn sổ có vẻ đã chứng kiến nhiều thế hệ sinh viên.'; } });
+    c.push({ icon:'😶', label:'Nhịn bữa này', hints:['🥗 Bỏ bữa','🙂 −3'], fx:() => { logMeal('skip'); S.mood -= 3; return 'Bạn uống một cốc nước thật to và tự nhủ là mình không đói.'; } });
+  }
   return { icon: kind === 'lunch' ? '🍽️' : '🌆', title: kind === 'lunch' ? 'Bữa trưa' : 'Bữa tối',
     html: P(intro, `<span class="tip">Ăn uống dạo này: ${nutrWord()}. Xem chi tiết trong Hồ sơ.</span>`), choices: c };
 };
@@ -1345,7 +1472,7 @@ SC.bedtime = () => {
       const bed = o.h + S.bedShift, hrs = wake + 24 - bed;
       const est = wakeRows(S.energy, hrs, bed, S.sleepDebt || 0, S.hangover).e;
       return { icon:o.icon, label:o.label, hints:[`😴 Ngủ ${fmtH(hrs)}`, `⚡ Sáng mai khoảng ${est}`], fx:() => {
-        S.sleep = hrs; S.bedHour = bed; S.eveEnergy = S.energy; S.flags.lateOT = false;
+        S.sleep = hrs; S.bedHour = bed; S.eveEnergy = S.energy; if (S.bg === 'nha' && (S.flags.outLate || S.flags.lateOT)) { rel('family', -2); note('Về nhà sau 23 giờ, mẹ vẫn ngồi chờ ở phòng khách.'); } S.flags.lateOT = false;
         if (bed >= 24.5) S.stat.lateNights++;
         nightly();
         return { silent:true }; } };
@@ -1453,11 +1580,11 @@ const EVENTS = {
     html: P('Tùng nhắn: “Ra quán bia hơi đầu ngõ ngay! Hôm nay tao bao… một phần.”'),
     choices: [
       { icon:'🍻', label:'Đi luôn!', cost:150000, hints:['🙂 +12','🤝 +Tùng','🥴 Mai dễ mệt'], fx:() => {
-        rel('tung',8); S.mood += 12; S.energy -= 12; S.health -= 3; S.hangover = true; logMeal('party');
+        rel('tung',8); S.mood += 12; S.energy -= 12; S.health -= 3; S.hangover = true; logMeal('party'); S.flags.outLate = true;
         S.queue = S.queue.filter(r => r.id !== 'activity'); memo('Đi nhậu với Tùng'); note('Bia hơi với Tùng: vui, nhưng mai sẽ mệt.');
         return { text:'Bia hơi, lạc rang, chuyện trên trời dưới biển. Tùng hứa “cốc cuối” khoảng sáu lần.', bg:'biahoi', npc:'tung', npcExpr:'drunk', meExpr:'happy' }; } },
       { icon:'🥤', label:'Đi, nhưng chỉ uống nước ngọt', cost:60000, hints:['🙂 +6','🤝 +Tùng'], fx:() => {
-        rel('tung',4); S.mood += 6; S.queue = S.queue.filter(r => r.id !== 'activity');
+        rel('tung',4); S.mood += 6; S.flags.outLate = true; S.queue = S.queue.filter(r => r.id !== 'activity');
         return { text:'Tùng gọi bạn là “người tỉnh táo duy nhất ở Hà Thành”. Bạn coi đó là lời khen.', bg:'biahoi', npc:'tung', npcExpr:'happy' }; } },
       { icon:'🏠', label:'Từ chối, ở nhà', fx:() => { rel('tung',-3);
         return 'Tùng gửi một sticker con mèo khóc. Rồi gửi thêm ảnh đĩa nem rán để bạn hối hận.'; } },
@@ -1549,6 +1676,92 @@ const EVENTS = {
         return 'Tin nhắn hiện chữ “Đã xem”. Bạn cũng hiện chữ “Đã mệt”.'; } },
     ] }) },
 };
+
+/* ----- v5: Gia cảnh, lối ra khi thiếu tiền, ngày lương ----- */
+const FAMILY = {
+  kha: { name:'Gia đình khá giả', icon:'🏡', desc:'Bố mẹ có điều kiện và nhiều mối quen. Hỗ trợ được khi cần, đổi lại là những kỳ vọng không nhỏ.',
+    helpDesc:'Bố mẹ hỗ trợ được khá nhiều, nhưng mỗi lần xin là một lần thấy mình chưa tự lập.',
+    help:{ max:3000000, mood:-6, rel:-1, text:(a, ok) => `Bố chuyển khoản ${fmt(a)} ngay, kèm câu: “Bao giờ con mới tự lo được hả con?”${ok ? '' : ' Vẫn chưa đủ để trả hóa đơn.'}` } },
+  tb:  { name:'Gia đình bình thường', icon:'🏠', desc:'Bố mẹ đủ sống, hỗ trợ được một ít khi thật cần. Phần lớn con đường phía trước là của bạn.',
+    helpDesc:'Bố mẹ hỗ trợ được một khoản nhỏ, kèm nhiều lời dặn dò.',
+    help:{ max:1500000, mood:-3, rel:-2, text:(a, ok) => `Mẹ chuyển ${fmt(a)}, dặn: “Tiêu cho cẩn thận, bố mẹ cũng phải tính.”${ok ? '' : ' Vẫn chưa đủ để trả hóa đơn.'}` } },
+  kho: { name:'Gia đình khó khăn', icon:'🌱', desc:'Bố mẹ vất vả, khó hỗ trợ tiền bạc. Bù lại, bạn có một động lực rất rõ ràng để cố gắng.',
+    helpDesc:'Bố mẹ gần như không thể hỗ trợ, và xin tiền khiến bạn rất áy náy.',
+    help:{ max:300000, mood:-8, rel:0, text:(a, ok) => `Mẹ gom được ${fmt(a)} gửi lên. Bạn biết đó là tiền mẹ để dành mua thuốc.${ok ? '' : ' Vẫn chưa đủ để trả hóa đơn.'}` } },
+};
+SC.bill_short = (id) => {
+  const b = (S.bills || []).find(x => x.id === id);
+  if (!b || b.paid) return { icon:'✅', title:'Hóa đơn đã được trả', html:P('Khoản này đã được thanh toán.'), choices:[{ icon:'👍', label:'Tiếp tục', fx:() => ({ silent:true }) }] };
+  const need = b.amount - S.money, mk = monthKey(), F = FAMILY[S.fam] || FAMILY.tb, c = [];
+  for (const k of ['tung','linh']) {
+    const used = (S.loans || []).some(L => L.from === k && L.mk === mk), low = S.rel[k] < 40;
+    c.push({ icon:PEOPLE[k].icon, label:`Hỏi vay ${PEOPLE[k].name} ${fmt(need)}`, desc:`Phải trả lại trong ${FIN.LOAN_DAYS} ngày.`, noSpend:true, disabled: used || low,
+      hints: used ? ['Đã vay tháng này'] : low ? ['🔒 Chưa đủ thân'] : ['🤝 Trả chậm sẽ ảnh hưởng quan hệ'],
+      fx:() => { (S.loans = S.loans || []).push({ from:k, amount:need, due:S.day + FIN.LOAN_DAYS, mk }); S.money += need; payBill(b); rel(k, -1);
+        memo(`Vay ${PEOPLE[k].name} ${fmt(need)} để trả ${b.name.toLowerCase()}`);
+        return { npc:k, text: k === 'tung' ? `Tùng chuyển khoản ngay, kèm tin nhắn: “Giờ mày hiểu cảm giác của tao rồi đấy.” Đã trả xong ${b.name.toLowerCase()}.`
+                                         : `Linh chuyển tiền và dặn: “Nhớ trả đúng hẹn nhé, tao cũng đang tiết kiệm.” Đã trả xong ${b.name.toLowerCase()}.` }; } });
+  }
+  if (b.kind === 'rent' && !b.delayed) {
+    const who = S.bg === 'tro' ? 'bà chủ trọ' : 'chủ nhà';
+    c.push({ icon:'🙏', label:`Xin ${who} nộp chậm 5 ngày`, noSpend:true, hints:[`💸 Phí ${Math.round(FIN.LATE_FEE * 100)}%: +${fmt(Math.round(b.amount * FIN.LATE_FEE))}`, '🙂 −3'],
+      fx:() => { b.delayed = true; b.due = S.day + 5; b.amount = Math.round(b.amount * (1 + FIN.LATE_FEE)); b.alerted = false; S.mood -= 3; memo(`Xin nộp chậm ${b.name.toLowerCase()}`);
+        return `${who[0].toUpperCase() + who.slice(1)} đồng ý, kèm một bài giảng ngắn về “tuổi trẻ phải biết lo xa”. Hạn mới: ${fmtD(b.due)}.`; } });
+  }
+  const famUsed = (S.famHelp || {})[mk];
+  c.push({ icon:'👪', label:'Gọi điện xin bố mẹ hỗ trợ', desc:F.helpDesc, noSpend:true, disabled: !!famUsed,
+    hints: famUsed ? ['Đã xin tháng này'] : [`💰 Tối đa ${fmt(F.help.max)}`, `🙂 ${F.help.mood}`],
+    fx:() => { S.famHelp = { ...(S.famHelp || {}), [mk]:true }; const amt = Math.min(F.help.max, need); S.money += amt; S.mood += F.help.mood; rel('family', F.help.rel);
+      const ok = payBill(b); memo(`Xin bố mẹ ${fmt(amt)}`); return F.help.text(amt, ok); } });
+  c.push({ icon:'📝', label:'Chưa trả được, xin khất', noSpend:true, hints:['🙂 −10','Tự trả khi đủ tiền'],
+    fx:() => { S.mood -= 10; b.debt = true; memo(`Khất ${b.name.toLowerCase()}`);
+      return 'Bạn nhắn xin khất. Cả ngày hôm đó, mỗi lần điện thoại rung bạn lại giật mình.'; } });
+  return { icon:'🧾', title:`Không đủ tiền trả ${b.name.toLowerCase()}`,
+    html:P(`Hôm nay đến hạn ${b.name.toLowerCase()}: <b>${fmt(b.amount)}</b>. Bạn chỉ có ${fmt(S.money)}, còn thiếu <b>${fmt(need)}</b>.`), choices:c };
+};
+SC.payday = () => ({ icon:'💰', title:'Ngày nhận lương',
+  html:P(`Tin nhắn ngân hàng: tài khoản <b>+${fmt(S.job.salary)}</b>. Bạn đọc đi đọc lại con số ba lần.`),
+  choices:[{ icon:'🎉', label:'Tuyệt vời!', fx:() => ({ text:'Lần đầu tiên trong đời, bạn có một khoản tiền do chính mình làm ra.', meExpr:'happy' }) }] });
+SC.house_contrib = () => ({ icon:'🍲', title:'Tiền chợ',
+  html:P(`Tối hôm nhận lương, mẹ ngồi xuống cạnh bạn: “Giờ con đi làm rồi, góp với bố mẹ ít tiền chợ nhé. ${fmtTr(FIN.HOUSE_CONTRIB)} một tháng thôi.”`),
+  choices:[
+    { icon:'💵', label:`Góp ${fmtTr(FIN.HOUSE_CONTRIB)}`, cost:FIN.HOUSE_CONTRIB, hints:['🤝 +Bố mẹ'], fx:() => { rel('family',6); S.mood += 3; memo('Góp tiền chợ với bố mẹ');
+      return 'Mẹ cầm tiền, không nói gì, nhưng tối đó mâm cơm có thêm đĩa thịt kho trứng.'; } },
+    { icon:'🪙', label:`Góp ${fmt(FIN.HOUSE_CONTRIB / 2)} thôi ạ`, cost:FIN.HOUSE_CONTRIB / 2, fx:() => { rel('family',1); return 'Mẹ gật đầu: “Ừ, tháng đầu còn nhiều khoản.”'; } },
+    { icon:'⏳', label:'Xin để tháng sau', hints:['🤝 −Bố mẹ'], fx:() => { rel('family',-6); S.mood -= 2; return 'Mẹ bảo “ừ”. Bố không nói gì cả bữa cơm.'; } },
+  ] });
+SC.fam_send = () => ({ icon:'📮', title:'Gửi tiền về nhà',
+  html:P('Lương về. Bạn nhớ lời hứa với mẹ về học phí của em.'),
+  choices:[
+    { icon:'💵', label:'Gửi về 1.000.000đ', cost:1000000, hints:['🙂 +8','🤝 +Bố mẹ'], fx:() => { rel('family',6); S.mood += 8; memo('Gửi tiền về giúp gia đình');
+      return { text:'Mẹ gọi lại ngay, giọng nghèn nghẹn. Em bạn nhắn: “Em cảm ơn!” kèm mười cái sticker.', meExpr:'happy' }; } },
+    { icon:'🪙', label:'Gửi về 500.000đ', cost:500000, hints:['🙂 +4'], fx:() => { rel('family',3); S.mood += 4; return 'Mẹ bảo thế là quý lắm rồi.'; } },
+    { icon:'😔', label:'Tháng này chưa gửi được', hints:['🙂 −4'], fx:() => { rel('family',-4); S.mood -= 4; return 'Mẹ bảo không sao. Bạn thì thấy có sao.'; } },
+  ] });
+Object.assign(EVENTS, {
+  fam_kha: { build:() => ({ icon:'🏡', title:'Bố có một mối quen', html:'', choices:[
+    { icon:'💪', label:'“Con cảm ơn bố, nhưng con muốn tự mình thử đã.”', fx:() => { rel('family',-1); S.mood += 4; S.flags.selfMade = true; memo('Từ chối nhờ quan hệ của bố');
+      return 'Bố im lặng một lúc rồi bảo: “Ừ, tùy con. Nhưng đừng để bố mẹ phải lo.” Bạn thấy nhẹ nhõm, kèm một chút áp lực.'; } },
+    { icon:'🤔', label:'“Để con suy nghĩ thêm ạ.”', fx:() => { rel('family',1); return 'Bố gật gù. Bạn biết câu chuyện này sẽ còn quay lại.'; } },
+    { icon:'🤝', label:'“Bố nói giúp con với.”', fx:() => { rel('family',5); S.mood -= 2; S.flags.famConnect = true; memo('Nhờ bố giới thiệu việc ở ngân hàng');
+      return 'Bố vui ra mặt. Mẹ đã kịp gọi cho bác Hùng trước khi bạn ăn xong bát cơm.'; } },
+  ] }) },
+  fam_tb: { build:() => ({ icon:'🏠', title:'Mẹ hỏi chuyện chi tiêu', html:'', choices:[
+    { icon:'🧮', label:'Kể thật số tiền đã tiêu', fx:() => { rel('family',3); const t = Object.values(S.spend || {}).reduce((a, b) => a + b, 0);
+      return `Bạn kể: từ đầu tuần đã tiêu ${fmt(t)}. Mẹ không trách, chỉ dặn bớt gọi đồ ăn qua ứng dụng.`; } },
+    { icon:'✉️', label:'Cùng mẹ lập kế hoạch chi tiêu', fx:() => { rel('family',4); S.soft += 1; S.mood += 2;
+      return 'Mẹ chỉ cho bạn cách chia tiền vào ba phong bì: ăn uống, tiền nhà, để dành. Một phương pháp không cần ứng dụng nào.'; } },
+    { icon:'😶', label:'Ậm ừ cho qua', fx:() => { rel('family',-2); return 'Mẹ thở dài: “Thôi, lớn rồi, tự biết.” Câu này nghe nhẹ mà không nhẹ.'; } },
+  ] }) },
+  fam_kho: { build:() => ({ icon:'🌱', title:'Học phí của em', html:'', choices:[
+    { icon:'🤞', label:'“Có lương con gửi về mẹ nhé.”', fx:() => { rel('family',5); S.mood += 4; S.flags.dutyPromise = true; memo('Hứa gửi tiền về đóng học phí cho em');
+      return 'Mẹ bảo không cần, nhưng giọng mẹ nhẹ hẳn đi. Bạn có thêm một lý do để cố gắng.'; } },
+    { icon:'💵', label:'Gửi ngay 300.000đ', cost:300000, fx:() => { rel('family',6); S.mood += 6;
+      return 'Số tiền không nhiều, nhưng mẹ nhắn lại một tin rất dài. Bạn đọc đến cuối thì cay mắt.'; } },
+    { icon:'⏳', label:'“Mẹ đợi con ổn định đã nhé.”', fx:() => { rel('family',-1); S.mood -= 3;
+      return 'Mẹ bảo “ừ, con lo cho mình trước”. Bạn biết mẹ nói thật, nhưng vẫn thấy áy náy.'; } },
+  ] }) },
+});
 
 SC.ev = (id) => EVENTS[id].build();
 
@@ -2229,6 +2442,22 @@ SC.hangout = (k) => {
 };
 ART.hangout = () => ({});
 
+Object.assign(ART, {
+  bill_short: () => ({ bg:'home', meExpr:'sad' }),
+  payday: () => ({ bg:'office', meExpr:'happy', meAnim:'jump' }),
+  house_contrib: () => ({ bg:'home', npc:'family' }),
+  fam_send: () => ({ bg:'home' }),
+  'ev:fam_kha': () => S.bg === 'nha'
+    ? { bg:'home', npc:'family', npcExpr:'neutral', html:P('Bữa tối, bố đặt đũa xuống, giọng rất nghiêm túc.'), talk:[ { w:'dad', t:'“Bác Hùng bạn bố đang làm ở ngân hàng. Con có muốn bố nói một tiếng không? Ổn định, lương tốt, bố mẹ cũng yên tâm.”' } ] }
+    : { kind:'phone', from:'family', html:'', msgs:[ 'Bố đây.', 'Bác Hùng bạn bố đang làm ở ngân hàng. Con có muốn bố nói một tiếng không? Ổn định, lương tốt, bố mẹ cũng yên tâm.' ] },
+  'ev:fam_tb': () => S.bg === 'nha'
+    ? { bg:'home', npc:'family', html:P('Mẹ ngồi xuống cạnh bạn sau bữa tối.'), talk:[ { w:'mom', t:'“Tháng này con tiêu hết bao nhiêu rồi? Nhớ để dành một ít, có gì còn xoay.”' } ] }
+    : { kind:'phone', from:'family', html:'', msgs:[ 'Tháng này con tiêu hết bao nhiêu rồi?', 'Nhớ để dành một ít, có gì còn xoay.' ] },
+  'ev:fam_kho': () => S.bg === 'nha'
+    ? { bg:'home', npc:'family', npcExpr:'sad', html:P('Bạn nghe thấy bố mẹ nói chuyện nhỏ trong bếp.'), talk:[ { w:'mom', t:'“Học kỳ này em con phải đóng 2 triệu học phí. Bố mẹ đang xoay, con đừng lo nhé.”' } ] }
+    : { kind:'phone', from:'family', html:'', msgs:[ 'Học kỳ này em con phải đóng 2 triệu học phí.', 'Bố mẹ đang xoay, con đừng lo nhé.' ] },
+});
+EV_TYPE.fam_kha = EV_TYPE.fam_tb = EV_TYPE.fam_kho = 'random';
 ACTS.splice(1, 0, HANGOUT_ACT);
 
 /* =========================================================
@@ -2357,6 +2586,7 @@ function choose(i){
   const before = snap();
   if (ch.cost) S.money -= ch.cost;
   let out = ch.fx ? ch.fx() : '';
+  if (!ch.noSpend && S.money < before.money) spendLog(before.money - S.money);
   shapeGains(before, ch.actId, ch.npc !== undefined ? ch.npc : (current.kind === 'phone' ? null : current.npc));
   clampAll();
   if (typeof out === 'string') out = { text:out };
@@ -2477,21 +2707,14 @@ function renderWeek(){
   } else jobHTML = P('Bạn chưa có việc sau tuần đầu tiên.', S.flags.jobSearch ? 'Bạn đã lưu lại một loạt tin tuyển dụng cho tuần sau.' : 'Tuần sau sẽ là một tuần tìm việc nghiêm túc hơn.');
 
   // Tài chính
-  const need = b.rent + BAL.LIVING_PER_MONTH * BAL.DAYS_TO_PAYDAY / 30;
-  let finLabel, finHTML;
-  if (c) {
-    const r = S.money / need;
-    finLabel = r >= 1.6 ? 'Thoải mái' : r >= 1 ? 'Ổn định' : r >= .6 ? 'Hơi chật vật' : 'Báo động';
-    finHTML = P(`Lương tháng đầu ${fmtTr(S.job.salary)} sẽ về vào ngày 10/12, còn ${BAL.DAYS_TO_PAYDAY} ngày nữa.`,
-                `Từ giờ đến lúc đó, bạn cần khoảng ${fmt(need)} cho ăn ở${b.rent ? ` (gồm tiền nhà ${fmt(b.rent)})` : ''}. Hiện có ${fmt(S.money)}.`);
-  } else {
-    const perDay = Math.max(spent, 100000) / 7;
-    const days = Math.floor((S.money - b.rent) / perDay);
-    finLabel = days >= 45 ? 'Ổn định' : days >= 20 ? 'Hơi chật vật' : 'Báo động';
-    finHTML = P(`Với mức chi tiêu tuần này${b.rent ? ' và tiền nhà sắp đến hạn' : ''}, số tiền còn lại đủ sống khoảng ${Math.max(days, 0)} ngày.`);
-  }
-  finHTML = P(`Đầu tuần ${fmt(w0.money)}, cuối tuần ${fmt(S.money)}. Đã tiêu ${fmt(Math.max(spent, 0))}.`) + finHTML +
-            P(`Tình trạng tài chính: <b>${finLabel}</b>.`, S.flags.loanTung ? `Tùng đang nợ bạn ${fmt(S.flags.loanTung)}. Hạn trả: “cuối tháng”.` : '');
+  const st = finStage(), rwN = runway(st.avg), rsN = runway(saverDaily());
+  const upB = (S.bills || []).filter(x => !x.paid).sort((x, y) => x.due - y.due).slice(0, 4);
+  const finLabel = st.label;
+  let finHTML = P(`Đầu tuần ${fmt(w0.money)}, cuối tuần ${fmt(S.money)}. Đã tiêu ${fmt(Math.max(spent, 0))}, trung bình khoảng ${fmt(st.avg)} mỗi ngày.`,
+    `Theo cách chi tiêu hiện tại, bạn duy trì được ${rwTxt(rwN)}; nếu tiết kiệm tối đa, ${rwTxt(rsN)}.`,
+    c ? `Lương tháng đầu ${fmtTr(S.job.salary)} về ngày 10/12.` : 'Bạn chưa có thu nhập.');
+  if (upB.length) finHTML += `<p class="muted">Các khoản sắp đến hạn:</p><div class="food">${billsHTML(upB)}</div>`;
+  finHTML += P(`Tình trạng tài chính: <b>${finLabel}</b>.`, S.flags.loanTung ? `Tùng đang nợ bạn ${fmt(S.flags.loanTung)}. Hạn trả: “cuối tháng”.` : '');
 
   // Quan hệ
   const met = Object.keys(PEOPLE).filter(k => !PEOPLE[k].work || (S.job && S.day >= S.job.start));
@@ -2549,7 +2772,7 @@ function hideHUD(){ $('#top').hidden = true; $('#bars').hidden = true; $('#foot'
 function renderTitle(){
   hideHUD();
   const saved = load();
-  const canResume = saved && saved.v === 3 && saved.phase;
+  const canResume = saved && saved.v === 5 && saved.phase;
   const demo = { hair:'hair_short', hairColor:'#2B2321', skin:'#FFD6BA', outfit:{ kind:'shirt', color:'#FFFFFF' }, tie:true, acc:[] };
   $('#stage').innerHTML = `<section class="title-wrap">
     <div class="title-art">
@@ -2575,9 +2798,9 @@ function renderSetup(){
   hideHUD();
   const st = { gender:'nam', bg:null, look:defaultLook('nam'), hairTouched:false };
   const BGS = [
-    { k:'nha',  icon:'🏠', label:'Ở cùng bố mẹ trong thành phố', desc:'Không tốn tiền nhà, có cơm mẹ nấu. Đổi lại, mỗi bữa cơm là một buổi phỏng vấn về tương lai.', hints:['💰 5 triệu','🏠 0đ/tháng'] },
-    { k:'tro',  icon:'🏚️', label:'Sinh viên tỉnh, thuê trọ một mình', desc:'Đã đóng cọc và tiền trọ tháng 11. Tự do tuyệt đối, kể cả tự do ăn mì tôm. Dễ cô đơn.', hints:['💰 8 triệu','🏠 3,5 triệu/tháng'] },
-    { k:'ghep', icon:'🛋️', label:'Ở ghép với Tùng, bạn cùng lớp', desc:'Chi phí vừa phải, luôn có người để nói chuyện. Tùng là bạn tốt, và là chuyên gia rủ rê.', hints:['💰 6 triệu','🏠 2 triệu/tháng'] },
+    { k:'nha',  icon:'🏠', label:'Ở cùng bố mẹ trong thành phố', desc:'Không tốn tiền nhà, có cơm mẹ nấu. Đổi lại, mỗi bữa cơm là một buổi phỏng vấn về tương lai.', hints:['💰 4 triệu','🏠 0đ/tháng'] },
+    { k:'tro',  icon:'🏚️', label:'Sinh viên tỉnh, thuê trọ một mình', desc:'Đã đóng cọc và tiền trọ tháng đầu (16/11–15/12). Tự do tuyệt đối, kể cả tự do ăn mì tôm. Dễ cô đơn.', hints:['💰 4,5 triệu','🏠 3,5 triệu/tháng, hạn ngày 16'] },
+    { k:'ghep', icon:'🛋️', label:'Ở ghép với Tùng, bạn cùng lớp', desc:'Chi phí vừa phải, luôn có người để nói chuyện. Tùng là bạn tốt, và là chuyên gia rủ rê.', hints:['💰 3,5 triệu','🏠 2 triệu/tháng, hạn ngày 16'] },
   ];
   $('#stage').innerHTML = `<article class="scene">
     <header class="sh"><span class="si" aria-hidden="true">🎓</span><h2>Tạo nhân vật</h2></header>
@@ -2596,12 +2819,16 @@ function renderSetup(){
           <button type="button" class="ghost sm" id="rnd">🎲 Ngẫu nhiên</button>
         </div>
       </div></div>
-    <div class="field"><span class="lab">Hoàn cảnh xuất phát</span>
+    <div class="field"><span class="lab">Gia cảnh</span>
+      <p class="hint" style="text-align:left;margin:0 0 4px">Gia cảnh ảnh hưởng đến kỳ vọng, sự hỗ trợ và trách nhiệm trong gia đình, không ảnh hưởng đến tiền khởi đầu.</p>
+      ${Object.entries(FAMILY).map(([k, f]) => `<button type="button" class="bgopt" data-f="${k}" aria-pressed="false"><span class="cl">${f.icon} ${f.name}</span><span class="cd">${f.desc}</span></button>`).join('')}</div>
+    <div class="field"><span class="lab">Nơi ở</span>
+      <p class="hint" style="text-align:left;margin:0 0 4px">Số tiền khởi đầu là tiền tiết kiệm từ làm thêm thời sinh viên và tiền mừng tốt nghiệp.</p>
       ${BGS.map(b => `<button type="button" class="bgopt" data-b="${b.k}" aria-pressed="false">
         <span class="cl">${b.icon} ${b.label}</span><span class="cd">${b.desc}</span>
         <span class="chips">${b.hints.map(h => `<span class="chip">${h}</span>`).join('')}</span></button>`).join('')}</div>
     <button class="btn" type="button" id="go" disabled>Bắt đầu tuần mới</button>
-    <p class="hint" id="goHint">Chọn một hoàn cảnh xuất phát để bắt đầu.</p>
+    <p class="hint" id="goHint">Chọn gia cảnh và nơi ở để bắt đầu.</p>
   </article>`;
   const go = $('#go');
   const refresh = () => {
@@ -2625,14 +2852,17 @@ function renderSetup(){
     if (!CAT[st.look.hair].fit.includes(st.gender)) st.look.hair = defaultLook(st.gender).hair;
     refresh();
   }));
-  document.querySelectorAll('.bgopt').forEach(b => b.addEventListener('click', () => {
-    st.bg = b.dataset.b; document.querySelectorAll('.bgopt').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-    go.disabled = false; $('#goHint').hidden = true;
+  const ready = () => { go.disabled = !(st.bg && st.fam); $('#goHint').hidden = !go.disabled; };
+  document.querySelectorAll('.bgopt[data-b]').forEach(b => b.addEventListener('click', () => {
+    st.bg = b.dataset.b; document.querySelectorAll('.bgopt[data-b]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); ready();
+  }));
+  document.querySelectorAll('.bgopt[data-f]').forEach(b => b.addEventListener('click', () => {
+    st.fam = b.dataset.f; document.querySelectorAll('.bgopt[data-f]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); ready();
   }));
   go.addEventListener('click', () => {
     const name = ($('#nm').value || '').trim() || 'Minh';
-    if (!st.bg) return;
-    newGame(name, st.gender, st.bg, { ...st.look });
+    if (!st.bg || !st.fam) return;
+    newGame(name, st.gender, st.bg, { ...st.look }, st.fam);
   });
 }
 
@@ -2645,12 +2875,14 @@ function openProfile(){
   const skill = (k, ic) => `<div style="margin-top:8px"><div class="bar-l"><span>${ic} ${LBL[k]}</span><b>${S[k]}</b></div><div class="bar"><i style="width:${S[k]}%"></i></div></div>`;
   $('#dlgBody').innerHTML = `<div class="prof-top"><span class="ph-av big">${headSVG(playerLook('casual'), playerExpr())}</span><h2>${esc(S.name)}</h2></div>
     <div class="kv" style="margin-top:10px">
-      <span>Hoàn cảnh</span><span>${bgName}</span>
+      <span>Nơi ở</span><span>${bgName}</span>
+      <span>Gia cảnh</span><span>${(FAMILY[S.fam] || FAMILY.tb).name}</span>
       <span>Công việc</span><span>${job}</span>
       <span>Giấc ngủ gần nhất</span><span>${S.day > 1 ? fmtH(S.sleep) : 'Chưa có'}</span>
       <span>Ăn uống dạo này</span><span>${nutrWord()}</span>
     </div>
     <h3>Kỹ năng</h3>${skill('tech','🧠')}${skill('soft','🗣️')}
+    <h3>Tài chính</h3>${finCardHTML()}
     <h3>CV đã nộp</h3>${cvHTML()}
     <h3>Hồ sơ ăn uống</h3>${foodHTML()}
     <h3>Các mối quan hệ</h3>
