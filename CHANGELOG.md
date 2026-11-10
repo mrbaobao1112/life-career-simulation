@@ -1,6 +1,15 @@
 # Lịch sử phiên bản
 
-## v3: Logic một ngày (hiện tại)
+## v4: Animation và âm thanh (hiện tại)
+- Nhân vật chibi tách thành bộ phận cử động được: tay, đầu, mắt, thân.
+- Chuyển động nền: chớp mắt, thở nhẹ.
+- Animation thức dậy mỗi sáng theo dữ liệu đêm hôm trước: vươn vai (ngủ đủ), dụi mắt (hơi thiếu ngủ), ngáp (nợ ngủ nhiều), ôm đầu lắc lư (dư âm bia), giật mình kèm đồng hồ báo thức (ngủ quên).
+- Animation cho sự kiện và kết quả lựa chọn: nhảy mừng khi nhận offer, xụi vai khi bị từ chối, lê bước sau OT, giật mình với sự kiện bất ngờ, gục xuống với sự kiện hậu quả; nhân vật phụ phản ứng (nhún vui, lắc đầu); người đang nói gật đầu theo từng câu thoại.
+- Số dư đếm lùi hoặc tiến và nháy màu khi tiền thay đổi, thanh chỉ số nháy khi thay đổi.
+- Âm thanh tổng hợp (không cần file ngoài): chuông báo thức, ngáp, vươn vai, xé lịch, tiền, tin nhắn, nhận offer, bị từ chối, sự kiện. Có nút bật hoặc tắt tiếng.
+- Bấm vào khung cảnh để bỏ qua animation; tự tắt chuyển động khi thiết bị bật chế độ giảm chuyển động.
+
+## v3: Logic một ngày
 - Năng lượng buổi sáng tính cộng dồn: năng lượng tối qua + hồi phục khi ngủ, giới hạn trần, sau đó trừ nợ ngủ, dư âm bia, ngủ quá muộn. Có bảng giải thích từng dòng.
 - Sửa lỗi cũ: năng lượng buổi sáng trước đây bị đặt lại theo số giờ ngủ, bỏ qua năng lượng tối hôm trước.
 - Nợ ngủ tích lũy qua nhiều đêm, sự kiện "Cơ thể đòi nợ ngủ".
