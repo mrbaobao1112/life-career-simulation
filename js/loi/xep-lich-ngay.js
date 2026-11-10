@@ -34,6 +34,7 @@ function buildSlot(){
     else if (d === S.backupDay) q.push({ id:'bk_call' });
     else if (work) {
       pushCommute(q);
+      q.push({ id:'cut', arg:'arrive' });                    // phân cảnh đến công ty (tự bỏ qua khi tua hoặc khi tắt sân khấu)
       if (first) q.push({ id:'ob_arrive' }, { id:'ob_env' }, { id:'ob_team' });
       else { q.push({ id:'standup' }, { id:'task', arg:{} }); maybeEvent(q, 'workmorning'); }
     } else {
@@ -52,7 +53,7 @@ function buildSlot(){
       q.push({ id:'task', arg:{ first, auto:!first } });       // task buổi chiều tự làm theo cách quen tay
       if (!first) maybeEvent(q, 'workafternoon');
       if (reviewDue()) q.push({ id:'review' });
-      q.push({ id:'endwork', arg:{} });
+      q.push({ id:'endwork', arg:{} }, { id:'cut', arg:'leave' });
     } else { maybeEvent(q, 'freeafternoon'); q.push({ id:'activity', arg:'afternoon' }); }
   } else if (s === 'evening') {
     if (S.otTonight === true) q.push({ id:'ot' });

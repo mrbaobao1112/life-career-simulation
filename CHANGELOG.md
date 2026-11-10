@@ -1,6 +1,18 @@
 # Lịch sử phiên bản
 
-## v7: Nếp sinh hoạt và tám tuần đầu tiên (hiện tại)
+## v8 (thử nghiệm): Văn phòng sống (hiện tại)
+Lát cắt thử nghiệm hướng “thế giới đang sống”: một ngày đi làm ở công ty. Luật chơi và con số không đổi, chỉ thay phần hình của các cảnh ở công ty.
+- Sân khấu văn phòng: hai dãy bàn, cửa ra vào, bảng công việc, góc lấy nước. Mỗi nhân vật có vị trí và đi lại được.
+- Động tác mới dùng lại được: đi bộ (chân tách riêng), ngồi gõ phím, nói chuyện, cầm cốc uống, đi xe máy.
+- Phân cảnh đến công ty: đi xe máy tới, xuống xe, vào cửa, đồng nghiệp chào, ngồi vào bàn. Phân cảnh tan làm: mọi người lần lượt ra về; tối OT thì bạn ở lại. Bấm nút là bỏ qua; tự bỏ qua khi tua nhanh.
+- Đồng nghiệp có lịch riêng theo buổi: gõ phím, đi lấy nước, ra bảng công việc, sang bàn nhau trao đổi vài câu, chị Hạnh đi họp.
+- Khi có sự kiện với đồng nghiệp (nhờ mua cà phê, sinh nhật, lỗi quay lại, nhận xét), người đó đi tới bàn bạn. Buổi sáng không có sự kiện thì vẫn có người ghé qua nói một câu.
+- Chạm vào bất kỳ ai trên sân khấu: họ phản ứng và nói một câu. Chỉ để cho vui, không ảnh hưởng chỉ số.
+- Bật tắt bằng ô “Văn phòng sống” trong “Nếp sinh hoạt” để so với hình tĩnh cũ. Khi thiết bị bật giảm chuyển động: nhân vật đứng yên đúng chỗ, bỏ các phân cảnh.
+
+Chưa làm: các địa điểm khác (nhà, quán ăn, cà phê, công viên), thời tiết, lịch của nhân vật ngoài giờ làm, phân cảnh riêng cho các mốc lớn.
+
+## v7: Nếp sinh hoạt và tám tuần đầu tiên
 Đổi cách chơi theo góp ý “chơi giống làm bài test”, và kéo dài bản thử từ 7 ngày lên 56 ngày (16/11/2026 đến 10/1/2027).
 - Nếp sinh hoạt: bữa ăn, giờ ngủ, họp đầu ngày, tắc đường, task buổi chiều tự diễn ra theo nếp của nhân vật và hiện thành một dòng trong nhật ký của ngày. Bữa ăn và giờ ngủ chỉ hỏi lần đầu; lựa chọn đó thành nếp. Đổi nếp bằng nút “Nếp sinh hoạt”. Mọi con số vẫn tính bằng đúng công thức cũ.
 - Màn hình ngày: dải năm buổi, nhật ký những việc đã diễn ra kèm số tiền, giờ rảnh chọn bằng các ô nhỏ thay cho danh sách câu trả lời.

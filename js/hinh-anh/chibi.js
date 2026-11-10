@@ -25,8 +25,8 @@ function armsSVG(L){
 function bodySVG(L){
   const o = L.outfit, c = o.color, sk = L.skin, dk = shade(c === '#FFFFFF' ? '#D8DEE6' : c, -.2);
   const pants = { pajama:c, shirt:'#3A4A5E', blazer:'#2E3646', tee:'#4A6FA5', jersey:'#2E3A59', hoodie:'#3B4252', polo:'#5C5146', cardigan:'#6B5B73' }[o.kind] || '#3A4A5E';
-  let s = `<rect x="45" y="118" width="12" height="17" rx="5" fill="${pants}"/><rect x="63" y="118" width="12" height="17" rx="5" fill="${pants}"/>
-    <ellipse cx="50" cy="136" rx="8" ry="4" fill="#3A3A44"/><ellipse cx="70" cy="136" rx="8" ry="4" fill="#3A3A44"/>
+  let s = `<g class="cb-legL"><rect x="45" y="118" width="12" height="17" rx="5" fill="${pants}"/><ellipse cx="50" cy="136" rx="8" ry="4" fill="#3A3A44"/></g>
+    <g class="cb-legR"><rect x="63" y="118" width="12" height="17" rx="5" fill="${pants}"/><ellipse cx="70" cy="136" rx="8" ry="4" fill="#3A3A44"/></g>
     <g class="cb-backarms">${armsSVG(L)}</g>
     
     <path class="cb-torso" d="M35 99 Q35 88 47 88 L73 88 Q85 88 85 99 L87 124 Q60 130 33 124Z" fill="${c}" stroke="${dk}" stroke-width="1.2"/>`;

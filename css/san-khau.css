@@ -1,0 +1,47 @@
+/* ---------- v8: sân khấu sống (nhân vật đi lại, ngồi làm việc, trò chuyện) ---------- */
+.panel.stage{cursor:default}
+.stage svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.stage .actor{transition:transform 1s linear;cursor:pointer}
+.stage .actor.snap{transition:none}
+.stage .actor.gone{opacity:0;pointer-events:none}
+.stage .flip{transform-box:fill-box;transform-origin:50% 50%}
+.stage .actor.left .flip{transform:scaleX(-1)}
+.stage .fade{transition:opacity .45s ease}
+.stage .fade.out{opacity:0}
+
+/* Các động tác dùng lại được: gắn lớp act-… vào nhóm .cb của nhân vật */
+.cb .cb-legL,.cb .cb-legR{transform-box:fill-box;transform-origin:50% 0}
+.act-walk{animation:walkBob .42s ease-in-out infinite}
+.act-walk .cb-legL{animation:legSwing .42s ease-in-out infinite}
+.act-walk .cb-legR{animation:legSwing .42s ease-in-out infinite reverse}
+.act-walk .cb-front .cb-armL{animation:armSwing .42s ease-in-out infinite reverse}
+.act-walk .cb-front .cb-armR{animation:armSwing .42s ease-in-out infinite}
+@keyframes legSwing{0%,100%{transform:rotate(-24deg)}50%{transform:rotate(24deg)}}
+@keyframes armSwing{0%,100%{transform:rotate(-16deg)}50%{transform:rotate(16deg)}}
+@keyframes walkBob{50%{transform:translateY(-2.5px)}}
+
+.act-type .cb-front .cb-armL{animation:typeTap .34s ease-in-out infinite}
+.act-type .cb-front .cb-armR{animation:typeTap .34s ease-in-out infinite .17s}
+.act-type .cb-head{animation:typeLook 5.5s ease-in-out infinite}
+@keyframes typeTap{50%{transform:translateY(-4px)}}
+@keyframes typeLook{0%,70%,100%{transform:rotate(0)}78%,90%{transform:rotate(-4deg)}}
+
+.act-talk .cb-head{animation:talkNod .9s ease-in-out infinite}
+.act-talk .cb-front .cb-armR{animation:talkHand 1.8s ease-in-out infinite}
+@keyframes talkNod{50%{transform:rotate(3.5deg) translateY(1px)}}
+@keyframes talkHand{0%,60%,100%{transform:rotate(0)}75%{transform:rotate(-38deg)}}
+
+.act-drink .cb-front .cb-armR{animation:drinkUp 2.2s ease-in-out infinite}
+@keyframes drinkUp{0%,25%,100%{transform:rotate(0)}45%,75%{transform:rotate(-95deg) translate(-3px,-4px)}}
+
+.act-ride{animation:rideShake .22s linear infinite}
+@keyframes rideShake{50%{transform:translateY(-1.2px)}}
+
+.stage .say{pointer-events:none;animation:sayIn .22s ease-out}
+@keyframes sayIn{from{opacity:0;transform:translateY(4px)}}
+.stage .skipbtn{position:absolute;right:8px;bottom:8px;font-size:12.5px;padding:5px 10px;background:var(--card);opacity:.92}
+
+@media (prefers-reduced-motion: reduce){
+  .stage .actor{transition:none}
+  .act-walk,.act-walk *,.act-type *,.act-talk *,.act-drink *,.act-ride,.stage .say{animation:none!important}
+}

@@ -97,5 +97,21 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   check('Danh sách không có công ty đã trượt và có 3 nơi khác', list.length === 3 && !list.includes('banhmi') && !list.includes('loren'), list.join());
   w.close(); }
 
+// 7. Sân khấu văn phòng (v8): cảnh ở công ty có đủ 5 nhân vật; tắt đi thì về hình tĩnh; phân cảnh không chặn đường
+{ const w = mk(); start(w, 'tro'); const d = w.document;
+  w.eval(`S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; S.job = { co:'hotay', salary:10000000, start:3 }; S.deck = shuffle(TASKS.map(t => t.id)); S.day = 8; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);
+  d.querySelector('#stage .choice').click();                                   // thức dậy
+  const id1 = w.eval('S.cur.id'), actors = d.querySelectorAll('.panel.stage svg .actor').length;
+  check('Ngày đi làm: cảnh task hiện trên sân khấu với 5 nhân vật', id1 === 'task' && actors === 5 && !w.errs.length, `cảnh ${id1}, ${actors} nhân vật ${w.errs[0] || ''}`);
+  check('Phân cảnh đến công ty tự bỏ qua khi bật giảm chuyển động', w.eval(`(S.feed || []).length >= 0 && !S.queue.some(r => r.id === 'cut' && r.arg === 'arrive')`));
+  w.eval(`S.opt.stage = false; renderScene();`);
+  check('Tắt “Văn phòng sống” thì dùng lại hình tĩnh', !d.querySelector('.panel.stage') && !!d.querySelector('.panel svg'));
+  w.eval(`S.opt.stage = true; window.matchMedia = () => ({ matches:false }); S.queue.unshift({ id:'cut', arg:'leave' }); S.queue.unshift(S.cur); S.cur = null; S.fast = null; advance();`);
+  d.querySelector('#stage .choice').click(); if (d.querySelector('#next')) d.querySelector('#next').click();
+  const id2 = w.eval('S.cur && S.cur.id + ":" + S.cur.arg');
+  check('Có chuyển động: phân cảnh hiện ra và bấm một lần là qua', id2 === 'cut:leave' && !!d.querySelector('#stage .choice'), String(id2));
+  d.querySelector('#stage .choice').click(); check('Qua phân cảnh, game đi tiếp bình thường', w.eval('!S.cur || S.cur.id !== "cut"') && !w.errs.length, w.errs[0] || '');
+  w.eval('window.matchMedia = () => ({ matches:true })'); w.close(); }
+
 console.log(fail ? `\n${fail} mục KHÔNG đạt` : '\nTất cả đều đạt');
 process.exit(fail ? 1 : 0);
