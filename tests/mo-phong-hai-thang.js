@@ -1,5 +1,5 @@
 const { JSDOM } = require('jsdom');
-const html = require('fs').readFileSync(process.env.GAME || require("path").join(__dirname, "..", "index.html"),'utf8');
+const html = require('./nap-game')(process.env.GAME);
 const mk = () => new JSDOM(html, { runScripts:'dangerously', pretendToBeVisual:true, url:'https://example.org/',
   beforeParse(w){ w.matchMedia = () => ({matches:true}); w.scrollTo=()=>{}; w.HTMLElement.prototype.focus=function(){}; } }).window;
 // kiểm tra lương và chống trừ trùng

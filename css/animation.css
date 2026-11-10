@@ -1,0 +1,79 @@
+/* ---------- v4: animation ---------- */
+.cb{transform-box:fill-box;transform-origin:50% 100%}
+.cb .cb-armL,.cb .cb-armR,.cb .cb-head,.cb .cb-eye,.cb .cb-torso,.cb .cb-alarm{transform-box:fill-box}
+.cb .cb-armL{transform-origin:80% 3%}.cb .cb-armR{transform-origin:20% 3%}
+.cb .cb-head{transform-origin:50% 100%}.cb .cb-eye{transform-origin:50% 50%}.cb .cb-torso{transform-origin:50% 100%}
+.cb .cb-alarm{transform-origin:50% 50%}
+.cb .cb-front{display:none}
+.anim-yawn .cb-front,.anim-rub .cb-front,.anim-headache .cb-front{display:inline}
+.anim-yawn .cb-backarms,.anim-rub .cb-backarms,.anim-headache .cb-backarms{display:none}
+.cb-idle .cb-eye{animation:blink 4.6s infinite}
+.cb-idle .cb-torso{animation:breathe 3.4s ease-in-out infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.1)}}
+@keyframes breathe{50%{transform:scaleY(1.035)}}
+/* thức dậy */
+.anim-stretch .cb-armL{animation:stretchL var(--a-wake) ease-in-out 1}
+.anim-stretch .cb-armR{animation:stretchR var(--a-wake) ease-in-out 1}
+.anim-stretch .cb-head{animation:tiltBack var(--a-wake) ease-in-out 1}
+@keyframes stretchL{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(100deg)}}
+@keyframes stretchR{0%,100%{transform:rotate(0)}30%,70%{transform:rotate(-100deg)}}
+@keyframes tiltBack{30%,70%{transform:rotate(-5deg) translateY(-2px)}}
+.anim-yawn .cb-armR{animation:handMouth var(--a-wake) ease-in-out 1}
+.anim-yawn .cb-head{animation:yawnHead var(--a-wake) ease-in-out 1}
+@keyframes handMouth{0%,100%{transform:rotate(0)}30%,75%{transform:rotate(130deg)}}
+@keyframes yawnHead{30%,75%{transform:rotate(-7deg)}90%{transform:rotate(4deg) translateY(2px)}}
+.anim-rub .cb-armL{animation:rubL var(--a-wake) ease-in-out 1}
+.anim-rub .cb-armR{animation:rubR var(--a-wake) ease-in-out 1}
+@keyframes rubL{0%,100%{transform:rotate(0)}25%,55%{transform:rotate(-168deg)}40%,70%{transform:rotate(-156deg)}}
+@keyframes rubR{0%,100%{transform:rotate(0)}25%,55%{transform:rotate(168deg)}40%,70%{transform:rotate(156deg)}}
+.anim-headache .cb-head{animation:sway var(--a-wake) ease-in-out 1}
+.anim-headache .cb-armR{animation:holdHead var(--a-wake) ease-in-out 1}
+@keyframes sway{20%{transform:rotate(-7deg)}45%{transform:rotate(6deg)}70%{transform:rotate(-5deg)}90%{transform:rotate(3deg)}}
+@keyframes holdHead{0%,100%{transform:rotate(0)}20%,80%{transform:rotate(-158deg)}}
+.anim-jolt{animation:jolt var(--a-wake) ease-out 1}
+.anim-jolt .cb-alarm{animation:ring .45s ease-in-out 3}
+@keyframes jolt{8%{transform:translateY(-14px)}16%{transform:translateY(0)}24%{transform:translateX(-3px)}32%{transform:translateX(3px)}40%{transform:translateX(-2px)}48%{transform:translateX(0)}}
+/* khoảnh khắc */
+.anim-jump{animation:jump var(--a-moment) ease-out 1}
+.anim-jump .cb-armL{animation:stretchL var(--a-moment) ease-in-out 1}
+.anim-jump .cb-armR{animation:stretchR var(--a-moment) ease-in-out 1}
+@keyframes jump{15%{transform:translateY(-16px)}30%{transform:translateY(0)}45%{transform:translateY(-10px)}60%{transform:translateY(0)}}
+.anim-cheer,.anim-hop,.anim-surprise{animation:hop .7s ease-out 1}
+@keyframes hop{25%{transform:translateY(-9px)}50%{transform:translateY(0)}}
+.anim-slump .cb-head{animation:droop var(--a-moment) ease-in-out 1 forwards}
+.anim-slump .cb-armL{animation:sagL var(--a-moment) ease-in-out 1 forwards}
+.anim-slump .cb-armR{animation:sagR var(--a-moment) ease-in-out 1 forwards}
+@keyframes droop{to{transform:rotate(6deg) translateY(4px)}}
+@keyframes sagL{to{transform:rotate(-8deg)}}@keyframes sagR{to{transform:rotate(8deg)}}
+.anim-drag{animation:dragSway var(--a-moment) ease-in-out 1}
+.anim-drag .cb-head{animation:droop var(--a-moment) ease-in-out 1 forwards}
+@keyframes dragSway{25%{transform:rotate(-3deg)}50%{transform:rotate(2deg)}75%{transform:rotate(-2deg)}}
+.anim-nod .cb-head,.anim-bob .cb-head{animation:nod .5s ease-in-out 1}
+@keyframes nod{35%{transform:rotate(4deg) translateY(2px)}70%{transform:rotate(-2deg)}}
+.anim-jitter{animation:jitter 1.2s linear 1}
+@keyframes jitter{10%,30%,50%,70%,90%{transform:translateX(-1.2px)}20%,40%,60%,80%{transform:translateX(1.2px)}}
+.anim-shake .cb-head{animation:shakeHead .8s ease-in-out 1}
+@keyframes shakeHead{20%{transform:rotate(-6deg)}40%{transform:rotate(6deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}}
+.panel{cursor:pointer}
+.panel.skip [class*="anim-"],.panel.skip [class*="anim-"] *{animation:none!important}
+/* số dư và thanh chỉ số */
+.money.down{animation:flashDown .7s ease-out 1}.money.up{animation:flashUp .7s ease-out 1}
+@keyframes flashDown{30%{color:var(--bad);transform:translateY(2px)}}
+@keyframes flashUp{30%{color:var(--good);transform:translateY(-2px)}}
+.bar.pulse{animation:pulse .6s ease-out 1}
+@keyframes pulse{40%{box-shadow:0 0 0 3px rgba(31,95,209,.25)}}
+@media (prefers-reduced-motion: reduce){.cb,.cb *,.money,.bar{animation:none!important}}
+/* ---------- v6: chạm vào nhân vật ---------- */
+#meG,#npcG,#avatar,.title-chibi{cursor:pointer}
+#avatar,.title-chibi{position:relative;border-radius:12px}
+#avatar:focus-visible,.title-chibi:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.panel{position:relative}
+.quip{position:absolute;left:50%;top:8px;transform:translateX(-50%);background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:12px;padding:4px 10px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:var(--shadow);pointer-events:none;z-index:5;animation:quipIn 1.9s ease forwards}
+.quip.left{left:26%}.quip.right{left:72%}.quip.below{top:auto;bottom:-30px}
+.title-chibi .quip{top:6px;left:100%;transform:none}
+@keyframes quipIn{0%{opacity:0;margin-top:6px}12%{opacity:1;margin-top:0}80%{opacity:1}100%{opacity:0}}
+.anim-wave .cb-armR{animation:wave 1.2s ease-in-out 1}
+@keyframes wave{0%,100%{transform:rotate(0)}20%,50%,80%{transform:rotate(-120deg)}35%,65%{transform:rotate(-92deg)}}
+.anim-spin{animation:spin .8s ease-in-out 1}
+@keyframes spin{25%{transform:scaleX(-1)}50%{transform:scaleX(1)}75%{transform:scaleX(-1)}}
+@media (prefers-reduced-motion: reduce){.quip{animation:none}}

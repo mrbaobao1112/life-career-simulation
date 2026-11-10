@@ -1,5 +1,5 @@
 const { JSDOM } = require('jsdom');
-const html = require('fs').readFileSync(require('path').join(__dirname, '..', 'index.html'), 'utf8');
+const html = require('./nap-game')();
 const mk = () => { const dom = new JSDOM(html, { runScripts:'dangerously', pretendToBeVisual:true, url:'https://example.org/',
   beforeParse(w){ w.matchMedia = () => ({matches:true}); w.scrollTo=()=>{}; w.HTMLElement.prototype.focus=function(){}; } }); return dom.window; };
 // 1. Tái hiện ca năng lượng
