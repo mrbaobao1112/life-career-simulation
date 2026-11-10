@@ -1,6 +1,12 @@
 # Lịch sử phiên bản
 
-## v6: Tháng đầu thực tế và chạm vào nhân vật (hiện tại)
+## v6.1: Tách file, không đổi lối chơi (hiện tại)
+- Tách `index.html` (hơn 3.000 dòng) thành 3 file giao diện trong `css/` và 25 file theo từng hệ thống trong `js/` (dữ liệu cân bằng, tài chính, giấc ngủ và năng lượng, sự kiện, nhân vật chibi và bối cảnh, animation và âm thanh, giao diện, lưu game…). Chỉ cắt và chuyển chỗ, không sửa dòng lệnh nào.
+- Game chơi y như v6; bản lưu cũ vẫn dùng được. Vẫn mở được bằng cách bấm đúp `index.html` và vẫn chạy trên GitHub Pages, không cần công cụ build.
+- Kiểm thử: thêm `tests/nap-game.js` để ghép các file lại khi kiểm thử; 5 bài kiểm thử chỉ đổi dòng đọc file.
+- README có bảng “Muốn sửa gì thì mở file nào”.
+
+## v6: Tháng đầu thực tế và chạm vào nhân vật
 - Lương thử việc 85%, tính theo ngày công: bắt đầu 18/11 thì lương nhận 10/12 chỉ khoảng 3,6 triệu (9/21 ngày công). Màn ngày lương hiện bảng tính chi tiết.
 - Tạm ứng lương sau 10 ngày đi làm (tối đa 50% số đã làm), trừ vào lương kỳ sau.
 - Kế hoạch tháng đầu: tối ngày thứ hai, người thuê trọ và ở ghép xem dự báo dòng tiền và chủ động thu xếp: xin gia đình (gia đình bình thường cho vay, hẹn trả khi có lương), hẹn chủ nhà đóng tiền nhà vào ngày lương (hỏi sớm không mất phí), nhờ Tùng ứng phần tiền nhà (ở ghép), vay Linh, tạm ứng lương. Có thể mở lại bất cứ lúc nào qua hoạt động "Tính toán tiền nong tháng này".

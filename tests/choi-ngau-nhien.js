@@ -1,6 +1,6 @@
 const { JSDOM } = require('jsdom');
 const fs = require('fs');
-const html = fs.readFileSync(require("path").join(__dirname, "..", "index.html"), "utf8");
+const html = require('./nap-game')();
 let st = {runs:0, errors:0, jobs:{}, noJob:0, fail:[], scenes:{}, replies:0, hang:0, msgs:0, steps:[]};
 const N = +process.argv[2] || 300;
 for (let run=0; run<N; run++){

@@ -7,7 +7,7 @@ Bối cảnh là thành phố hư cấu **Hà Thành**, mang chất Hà Nội. G
 ## Chơi thử
 
 - Chơi trực tiếp: https://mrbaobao1112.github.io/life-career-simulation/
-- Hoặc tải về và mở file `index.html` bằng trình duyệt. Không cần cài đặt gì.
+- Hoặc tải cả thư mục về (phải có đủ `index.html`, `css/` và `js/`) rồi mở file `index.html` bằng trình duyệt. Không cần cài đặt gì.
 
 Bản chơi thử hiện tại là **tuần đầu tiên sau khi tốt nghiệp** (7 ngày trong game). Tiến trình được tự động lưu trong trình duyệt.
 
@@ -31,13 +31,35 @@ Bản chơi thử hiện tại là **tuần đầu tiên sau khi tốt nghiệp*
 ## Cấu trúc thư mục
 
 ```
-index.html        Toàn bộ game (HTML, CSS, JavaScript trong một file)
+index.html        Khung trang và danh sách file cần nạp (thứ tự nạp quan trọng, đừng đổi chỗ)
+css/              Giao diện: bố cục và màu sắc, nhân vật và điện thoại, animation
+js/
+  du-lieu/        Con số cân bằng (BAL) và nội dung: task, câu hỏi phỏng vấn, hoạt động
+  loi/            Trạng thái game, lưu game, vòng lặp ngày, xếp lịch trong ngày
+  he-thong/       Giấc ngủ và năng lượng, tài chính (FIN), chỉ số, ăn uống, CV, điện thoại, gặp gỡ
+  canh/           Các cảnh: tìm việc, đi làm, đời sống
+  su-kien/        Sự kiện, gia cảnh, nhờ vả, ngày lương, trả nợ
+  hinh-anh/       Danh mục đồ, nhân vật chibi, bối cảnh, animation và âm thanh (ANIM)
+  giao-dien/      Màn chơi, tổng kết tuần, màn mở đầu, hồ sơ
 tests/            Kiểm thử tự động (chạy bằng Node.js)
 docs/             Ghi chú thiết kế
 CHANGELOG.md      Lịch sử các phiên bản
 ```
 
-Các con số cân bằng (tiền, lương, tốc độ hồi phục năng lượng…) nằm trong hằng số `BAL` ở đầu phần JavaScript của `index.html`, có chú thích để dễ chỉnh khi thử nghiệm.
+Muốn sửa gì thì mở file nào:
+
+| Muốn sửa | Mở file |
+|---|---|
+| Con số cân bằng (năng lượng, điểm cộng…) | `js/du-lieu/can-bang.js` |
+| Tiền, lương, hóa đơn | `js/he-thong/tai-chinh.js` |
+| Task, câu hỏi phỏng vấn, hoạt động tự do | `js/du-lieu/noi-dung.js` |
+| Sự kiện | `js/su-kien/su-kien.js` |
+| Tin nhắn điện thoại | `js/he-thong/dien-thoai.js` |
+| Hình nhân vật, kiểu tóc, quần áo | `js/hinh-anh/chibi.js`, `js/hinh-anh/danh-muc-do.js` |
+| Tốc độ animation, âm thanh | `js/hinh-anh/animation-am-thanh.js` |
+| Màu sắc, cỡ chữ | `css/giao-dien.css` |
+
+Các file dùng chung biến với nhau và được nạp lần lượt theo danh sách trong `index.html`. Khi thêm file mới, nhớ thêm một dòng `<script src="...">` vào đúng vị trí, và tránh đặt trùng tên biến với file khác.
 
 ## Chạy kiểm thử
 

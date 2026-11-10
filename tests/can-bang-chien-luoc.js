@@ -1,5 +1,5 @@
 const { JSDOM } = require('jsdom');
-const html = require('fs').readFileSync(require('path').join(__dirname, '..', 'index.html'), 'utf8');
+const html = require('./nap-game')();
 const PREF = {
   'Ăn chơi': ['Đi luôn','Trà đá','Cà phê','Rủ ai','Rủ ','Chơi game','Thêm một trận','Mời cả team','Gọi đồ ăn','Bún chả','Tâm sự','Có! Để tao','02:00','00:30','Đi trung tâm'],
   'Chăm học': ['Viết lại cẩn thận','Ôn câu hỏi','Học thêm','Làm kỹ','Đi học cùng','Ghi lại','Hỏi anh Dũng','23:30','Cơm','Tự nấu','Nấu chung','Đo xem','So sánh'],
