@@ -62,7 +62,7 @@ const ACTS = [
       return pick(['Bạn làm tiếp dự án cá nhân: một app nhắc uống nước. Bạn quên uống nước trong lúc làm.',
                    'Ba video bài giảng, hai bài tập. Bạn hiểu ra một điều mà trước giờ chỉ gật gù cho qua.',
                    'Bạn đọc mã nguồn của một thư viện nổi tiếng. Choáng ngợp, nhưng học được vài cách viết rất gọn.']); } },
-  { id:'jobs', icon:'🔎', label:'Lướt tin tuyển dụng cho tuần sau', slots:['morning','afternoon'], cond:()=>!S.job && S.day >= 3 && S.day <= 5,
+  { id:'jobs', icon:'🔎', label:'Lướt tin tuyển dụng', slots:['morning','afternoon'], cond:()=>!S.job && S.day >= 3 && !isDayOff(),
     hints:['🗂️ Chuẩn bị cho tuần sau','🙂 −2'],
     fx:()=>{ S.soft += 1; S.mood -= 2; S.flags.jobSearch = (S.flags.jobSearch||0) + 1;
       return 'Bạn lưu 6 tin tuyển dụng. Bốn tin yêu cầu “3 năm kinh nghiệm cho vị trí Fresher”. Hai tin còn lại có vẻ khả thi.'; } },
@@ -115,3 +115,7 @@ const ACTS = [
       return 'Bạn định chỉ đi dạo. Bạn về nhà với một cái áo, một cái cốc, và một cảm giác hơi có lỗi với ví tiền.'; } },
 ];
 
+
+// Tên ngắn hiện trên ô chọn việc lúc rảnh
+const ACT_SHORT = { prep:'Ôn phỏng vấn', study:'Học thêm', jobs:'Xem tin tuyển dụng', cafe:'Cà phê với Linh', trada:'Trà đá với Tùng', game:'Chơi game', film:'Xem phim',
+  run:'Chạy bộ quanh hồ', rest:'Nằm nghỉ', family:'Gọi cho bố mẹ', family2:'Uống trà với bố mẹ', clean:'Dọn phòng', shop:'Đi mua sắm', hangout:'Rủ ai đó đi chơi', budget:'Tính tiền nong', cv:'Sửa lại CV' };

@@ -79,23 +79,23 @@ SC.task = (arg) => {
       <div class="tk-meta">Hạn: ${DEADLINE[t.d]}</div></div>`;
   const intro = ref.arg.first
     ? '<p class="tip">Mỗi task là một lá bài. Không có cách xử lý nào đúng tuyệt đối: làm nhanh thì có rủi ro, làm kỹ thì tốn sức, hỏi người khác thì tốn… sự kiên nhẫn của họ.</p>'
-    : P(S.slot === 'morning' ? 'Họp xong, task mới xuất hiện trên bảng của bạn.' : 'Buổi chiều, thêm một task nữa.');
+    : P(S.slot === 'morning' ? 'Task hôm nay của bạn:' : 'Buổi chiều, thêm một task nữa.');
   const warn = S.energy < 25 ? '<p class="warn">Năng lượng đang rất thấp. Làm gì lúc này cũng dễ hỏng hơn.</p>' : '';
   const n = S.askCount + 1;
   const choices = [
-    { icon:'⚡', label:'Làm nhanh cho xong', hints:['⏱ Khoảng 1 giờ','⚠️ Có thể sót lỗi','⚡ −8'], fx:() => {
+    { key:'fast', icon:'⚡', label:'Làm nhanh cho xong', hints:['⏱ Khoảng 1 giờ','⚠️ Có thể sót lỗi','⚡ −8'], fx:() => {
       S.energy -= 8; S.stat.tasks++; S.perf += 1;
       if (chance(.62 + S.tech/200 - t.d*.12 - lowE))
         return `Bạn xử lý “${t.title}” trong chưa đầy một tiếng. Chị Mai kiểm tra lại, không thấy vấn đề gì. Hôm nay vũ trụ đứng về phía bạn.`;
       S.stat.bugsMade++; S.bugs.push({ id:t.id, title:t.title, due:S.day + 1 });
       return `Xong “${t.title}” trong 40 phút, đẩy code lên luôn. Có một cảm giác mơ hồ là bạn đã quên kiểm tra trường hợp nào đó. Cảm giác này thường đúng.`; } },
-    { icon:'🔬', label:'Làm kỹ từng bước', hints:['⏱ Khoảng 3 giờ','🧠 +2 Chuyên môn','⚡ −15'], fx:() => {
+    { key:'careful', icon:'🔬', label:'Làm kỹ từng bước', hints:['⏱ Khoảng 3 giờ','🧠 +2 Chuyên môn','⚡ −15'], fx:() => {
       S.energy -= 15; S.tech += 2; S.stat.tasks++;
       if (chance(.9 + S.tech/300 - t.d*.13 - lowE)) { S.perf += 2;
         return `Bạn làm “${t.title}” cẩn thận từng bước, viết cả ghi chú. Chị Mai test xong nhắn: “Sạch sẽ ghê.” Bạn học thêm được vài điều.`; }
       S.unfinished = t.title;
       return `Bạn làm kỹ đến mức… chưa xong. “${t.title}” khó hơn bạn tưởng. Hết giờ mà vẫn còn dang dở.`; } },
-    { icon:'🎧', label:'Hỏi anh Dũng (senior)', hints: n <= 2 ? ['⏱ Nhanh','🤝 Anh Dũng sẵn lòng'] : ['⏱ Nhanh',`😬 Lần hỏi thứ ${n} hôm nay`], fx:() => {
+    { key:'ask', icon:'🎧', label:'Hỏi anh Dũng (senior)', hints: n <= 2 ? ['⏱ Nhanh','🤝 Anh Dũng sẵn lòng'] : ['⏱ Nhanh',`😬 Lần hỏi thứ ${n} hôm nay`], fx:() => {
       S.askCount++; S.energy -= 6; S.stat.tasks++; S.perf += 1;
       if (S.askCount <= 2) { rel('dung',4); S.tech += 1;
         return `Anh Dũng tháo một bên tai nghe, chỉ đúng chỗ cần sửa trong 2 phút. “${t.title}” xong gọn. Bạn học được một mẹo hay.`; }
@@ -150,7 +150,7 @@ SC.bug_weekend = () => {
 SC.endwork = () => {
   const ref = S.cur;
   if (!ref.arg || typeof ref.arg !== 'object') ref.arg = {};
-  if (ref.arg.ask === undefined) { ref.arg.ask = chance(co().ot); save(); }
+  if (ref.arg.ask === undefined) { ref.arg.ask = chance(co().ot); ref.arg.invite = chance(BAL.TRADA_INVITE); save(); }
   const head = 'Năm rưỡi chiều. Văn phòng bắt đầu có tiếng kéo ghế.';
   if (S.unfinished && S.otTonight !== true) {
     return { icon:'🕠', title:'Hết giờ làm', html: P(head, `Task “${S.unfinished}” vẫn còn dang dở.`),
@@ -177,7 +177,7 @@ SC.endwork = () => {
     return { icon:'🕠', title:'Hết giờ làm (trừ bạn)', html: P(head, 'Mọi người lần lượt ra về. Bạn thì không.'),
       choices: [{ icon:'🍱', label:'Đi lấy cơm hộp, chuẩn bị OT', fx:() => ({ silent:true }) }] };
   }
-  return { icon:'🕠', title:'Hết giờ làm', html: P(head, 'Phong ngó qua vách ngăn: “Đi trà đá không ông? Chị Mai đi đấy.”'),
+  return { plain:true, icon:'🕠', title:'Hết giờ làm', html: P(head, 'Phong ngó qua vách ngăn: “Đi trà đá không ông? Chị Mai đi đấy.”'),
     choices: [
       { icon:'🏠', label:'Về nhà thôi', fx:() => ({ silent:true }) },
       { icon:'🧊', label:'Đi trà đá với Phong và chị Mai', cost:15000, hints:['🤝 +Đồng nghiệp','🙂 +5'], fx:() => {

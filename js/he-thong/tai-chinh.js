@@ -87,7 +87,7 @@ function processFinance(){
   ensureBills();
   const ev = [];
   if (S.job && isPayday(S.day)) { const p = payFor(S.day); S.paidPer = S.paidPer || {}; if (p.days > 0 && !S.paidPer[p.per]) { S.paidPer[p.per] = true;
-    S.money += p.amount; S.lastPay = p; S.flags.paidCount = (S.flags.paidCount || 0) + 1;
+    S.money += p.amount; (S.income = S.income || {})[S.day] = p.amount; S.lastPay = p; S.flags.paidCount = (S.flags.paidCount || 0) + 1;
     note(`Nhận lương: +${fmt(p.amount)} (${p.days} ngày công).`); memo(`Nhận lương ${fmt(p.amount)}`); ev.push({ id:'payday' }); } }
   if (openLoans().some(L => L.due <= S.day)) ev.push({ id:'repay' });
   for (const b of S.bills.filter(b => !b.paid && b.due <= S.day).sort((a, b) => a.due - b.due))

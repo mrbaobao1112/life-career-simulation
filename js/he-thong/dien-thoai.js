@@ -17,7 +17,7 @@ const MSGS = {
   linh_video: { th:'linh', ctx:['afternoon','evening'], msgs:[['linh','Xem video này chưa, con mèo biết code 😂'],['linh','🎬 meo-viet-code.mp4']],
     replies:[ { t:'Hahaha thật á 😂', fx:() => { rel('linh',2); S.mood += 3; }, resp:'Nó còn viết code sạch hơn tao' }, { t:'Chưa, tí tao xem', fx:() => rel('linh',1), resp:'Xem đi rồi bình luận!' } ],
     ignore:{ fx:() => rel('linh',-2), resp:'Ơ, đã xem mà không trả lời à 😤' } },
-  tung_football: { th:'tung', ctx:['afternoon','evening'], cond:() => S.day <= 5, msgs:[['tung','Chủ Nhật đá bóng sân Cầu Mây không? Thiếu đúng 1 người!']],
+  tung_football: { th:'tung', ctx:['afternoon','evening'], cond:() => !isWeekend(), msgs:[['tung','Chủ Nhật đá bóng sân Cầu Mây không? Thiếu đúng 1 người!']],
     replies:[ { t:'Có! Để tao đi', fx:() => { rel('tung',3); S.flags.football = true; }, resp:'Chuẩn! 7 giờ sáng nhé, đừng ngủ nướng' }, { t:'Tuần này tao bận rồi', fx:() => rel('tung',-1), resp:'Đồ phản bội 😤 (đùa đấy)' } ],
     ignore:{ fx:() => rel('tung',-3), resp:'Alo? Còn sống không?' } },
   tung_meme: { th:'tung', ctx:['morning','evening'], msgs:[['tung','🖼️ Ảnh chế: “Khi cập nhật hệ thống vào chiều thứ Sáu” 🔥']],
@@ -26,13 +26,13 @@ const MSGS = {
   team_lunch: { th:'team', ctx:['morning'], cond:() => isWorkday() && S.day > S.job.start, msgs:[['phong','Trưa nay ai đi bún chả không mọi người?'],['mai','Chị đi! 🙋‍♀️']],
     replies:[ { t:'Cho em một suất!', fx:() => { rel('phong',2); rel('mai',2); }, resp:'Ok, 12 giờ dưới sảnh nhé', who:'phong' }, { t:'Hôm nay em ăn tại bàn ạ', fx:() => {}, resp:'Chăm thế 😅', who:'phong' } ],
     ignore:{} },
-  team_meeting: { th:'team', ctx:['afternoon'], cond:() => isWorkday() && S.day < 5, msgs:[['boss','Mai 9 giờ họp nhé cả nhà, nhớ cập nhật bảng công việc trước khi về.']],
+  team_meeting: { th:'team', ctx:['afternoon'], cond:() => isWorkday() && isWorkday(S.day + 1), msgs:[['boss','Mai 9 giờ họp nhé cả nhà, nhớ cập nhật bảng công việc trước khi về.']],
     replies:[ { t:'Dạ em nhận ạ 👍', fx:() => rel('boss',2), resp:'Cảm ơn em.', who:'boss' }, { t:'👍', fx:() => rel('boss',1) } ],
     ignore:{ fx:() => rel('boss',-3), resp:'Ai chưa đọc tin nhắn thì đọc giúp chị nhé 🙂', who:'boss', note:'Không phản hồi tin nhắn của chị Hạnh trong nhóm.' } },
   team_umbrella: { th:'team', ctx:['afternoon'], cond:() => isWorkday(), msgs:[['mai','Ai để quên ô màu hồng ở phòng pantry thế? Chị dùng tạm nhé 😌']],
     replies:[ { t:'Ô của em đấy chị 😭', fx:() => { rel('mai',2); S.mood += 1; }, resp:'Ô xinh đấy, mai chị trả', who:'mai' }, { t:'Haha 😂', fx:() => rel('mai',1) } ],
     ignore:{} },
-  phong_nervous: { th:'phong', ctx:['evening'], cond:() => isWorkday() && S.day < 5, msgs:[['phong','Ông ơi, mai họp đầu ngày phải nói gì thế? Tôi run quá 😰']],
+  phong_nervous: { th:'phong', ctx:['evening'], cond:() => isWorkday() && isWorkday(S.day + 1) && S.stat.workDays <= 3, msgs:[['phong','Ông ơi, mai họp đầu ngày phải nói gì thế? Tôi run quá 😰']],
     replies:[ { t:'Hôm qua làm gì, hôm nay làm gì, vướng gì. Ba câu thôi!', fx:() => { rel('phong',4); S.soft += 1; }, resp:'Ông là cứu tinh của tôi 🙏' }, { t:'Tôi cũng không biết 😭', fx:() => rel('phong',1), resp:'Thôi hai đứa cùng run vậy' } ],
     ignore:{ fx:() => rel('phong',-2), resp:'Thôi tôi tự lo vậy…' } },
   dung_doc: { th:'dung', ctx:['evening'], cond:() => isWorkday() && S.rel.dung >= 56, msgs:[['dung','Gửi em tài liệu anh tự viết, dễ hiểu hơn tài liệu chính thức.'],['dung','📎 huong-dan-du-an-ban-that.pdf']],
@@ -43,13 +43,16 @@ function ph(){ if (!S.phone) S.phone = { threads:{}, unread:{}, pending:{} }; re
 function pushMsg(th, who, t){ const p = ph(); (p.threads[th] = p.threads[th] || []).push({ who, t, d:S.day, time:SLOT_INFO[S.slot][1] }); }
 function addUnread(th, n = 1){ const p = ph(); p.unread[th] = (p.unread[th] || 0) + n; S.flags.ring = true; }
 const unreadCount = () => Object.values(ph().unread).reduce((a, b) => a + b, 0);
+// Số ngày chờ trước khi một tin nhắn có thể đến lại. Tin không có trong bảng này chỉ đến một lần.
+const MSG_CD = { mom_breakfast:6, mom_weather:12, linh_video:9, tung_football:7, tung_meme:6, team_lunch:5, team_meeting:7 };
+function msgReady(id){ const last = (S.evLast || {})['m_' + id]; if (last === undefined) return !S.once['m_' + id]; return !!MSG_CD[id] && S.day - last >= MSG_CD[id]; }
 function maybeMsg(slot){
   if (!chance(.5)) return;
   const p = ph();
-  const pool = shuffle(Object.entries(MSGS).filter(([id, m]) => m.ctx.includes(slot) && !S.once['m_' + id] && !p.pending[m.th] && (!m.cond || m.cond())));
+  const pool = shuffle(Object.entries(MSGS).filter(([id, m]) => m.ctx.includes(slot) && msgReady(id) && !p.pending[m.th] && (!m.cond || m.cond())));
   if (!pool.length) return;
   const [id, m] = pool[0];
-  S.once['m_' + id] = true;
+  S.once['m_' + id] = true; (S.evLast = S.evLast || {})['m_' + id] = S.day;
   m.msgs.forEach(([who, t]) => pushMsg(m.th, who, t));
   addUnread(m.th, m.msgs.length);
   if (m.replies) p.pending[m.th] = { id, deadline:(S.tick || 0) + 2 };

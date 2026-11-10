@@ -40,11 +40,10 @@ function wakeTable(){
 
 /* ----- Buổi sáng: dậy + chuẩn bị + đi đường + chậm trễ = giờ đến ----- */
 const hm = m => clock(m / 60);
-function commuteTo(d){ const c = isWorkday(d) ? S.job.co : d === S.backupDay ? 'loren' : S.applied; return BAL.COMMUTE[S.bg][c] || 30; }
+function commuteTo(d){ const c = isWorkday(d) ? S.job.co : d === S.backupDay ? 'loren' : S.applied; return (BAL.COMMUTE[S.bg] || {})[c] || 30; }
 function alarmFor(d){
-  if (d > 7) return S.job ? (BAL.APPOINT - BAL.PREP_MIN - (BAL.COMMUTE[S.bg][S.job.co] || 30) - BAL.BUFFER_MIN) / 60 : BAL.WAKE_FREE;
   if (goingOut(d)) return (BAL.APPOINT - BAL.PREP_MIN - commuteTo(d) - BAL.BUFFER_MIN) / 60;
-  return d >= 6 ? BAL.WAKE_WEEKEND : BAL.WAKE_FREE;
+  return isDayOff(d) ? BAL.WAKE_WEEKEND : BAL.WAKE_FREE;
 }
 function planMorning(){
   const commute = commuteTo(S.day), wake = Math.round(alarmFor(S.day) * 60);

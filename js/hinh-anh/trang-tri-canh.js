@@ -8,7 +8,7 @@ function ivPass(){
   return S.iv.tech >= c.need && hr >= BAL.HR_PASS;
 }
 const ART = {
-  wake: (a, sc) => ({ meAnim:wakeAnimKey(), meExpr:WAKE_ANIM[wakeAnimKey()].expr, meExtras:WAKE_ANIM[wakeAnimKey()].extras, bg:'home', html: sc.html + wakeTable() + (S.am ? `<p class="plan">${morningLine()}</p>` : '') }),
+  wake: (a, sc) => ({ meAnim:wakeAnimKey(), meExpr:WAKE_ANIM[wakeAnimKey()].expr, meExtras:WAKE_ANIM[wakeAnimKey()].extras, bg:'home', html: sc.html + (S.wakeInfo ? `<details class="fd"><summary>⚡ Năng lượng sáng nay: ${S.energy}. Xem cách tính</summary>${wakeTable()}</details>` : '') + (S.am ? `<p class="plan">${morningLine()}</p>` : '') }),
   d1_cv: () => ({ bg:'home' }),
   apply: () => ({ bg:'home' }),
   call_invite: () => ({ bg:'home', npc:'hr', npcExpr:'happy',

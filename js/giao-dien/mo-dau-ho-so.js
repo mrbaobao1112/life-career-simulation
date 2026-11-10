@@ -6,7 +6,7 @@ function hideHUD(){ $('#top').hidden = true; $('#bars').hidden = true; $('#foot'
 function renderTitle(){
   hideHUD();
   const saved = load();
-  const canResume = saved && saved.v === 6 && saved.phase;
+  const canResume = saved && (saved.v === 6 || saved.v === 7) && saved.phase;
   const demo = { hair:'hair_short', hairColor:'#2B2321', skin:'#FFD6BA', outfit:{ kind:'shirt', color:'#FFFFFF' }, tie:true, acc:[] };
   $('#stage').innerHTML = `<section class="title-wrap">
     <div class="title-art">
@@ -15,16 +15,28 @@ function renderTitle(){
       <div class="title-chibi" role="button" tabindex="0" aria-label="Chạm vào nhân vật">${chibiSVG(demo, 'happy', { label:'Nhân vật chính' })}</div>
     </div>
     <h1>Life &amp; Career Simulation</h1>
-    <p class="lead">Bản chơi thử: tuần đầu tiên sau khi tốt nghiệp. Bảy ngày, một tấm bằng, một khoản tiền tiết kiệm nhỏ, và rất nhiều lựa chọn.</p>
-    ${canResume ? '<button class="btn" type="button" id="resume">Chơi tiếp</button><button class="btn alt" type="button" id="fresh">Bắt đầu tuần mới</button>'
+    <p class="lead">Bản chơi thử: tám tuần đầu tiên sau khi tốt nghiệp, từ 16/11/2026 đến 10/1/2027. Một tấm bằng, một khoản tiết kiệm nhỏ, và tháng lương đầu tiên.</p>
+    ${canResume ? '<button class="btn" type="button" id="resume">Chơi tiếp</button><button class="btn alt" type="button" id="fresh">Chơi lại từ đầu</button>'
                 : '<button class="btn" type="button" id="fresh">Bắt đầu</button>'}
   </section>`;
-  if (canResume) $('#resume').addEventListener('click', () => { S = saved; resume(); });
+  if (canResume) $('#resume').addEventListener('click', () => { S = saved; migrate(); resume(); });
   $('#fresh').addEventListener('click', renderSetup);
 }
 
+// Bản lưu của bản chơi thử 7 ngày (v6): bổ sung dữ liệu mới để chơi tiếp sang ngày 8
+function migrate(){
+  if ((S.v || 6) >= 7) return;
+  S.habit = S.habit || {}; S.feed = S.feed || []; S.evLast = S.evLast || {}; S.opt = S.opt || {}; S.fast = null;
+  for (const k of Object.keys(S.once || {})) if (S.once[k] === true && S.evLast[k] === undefined) S.evLast[k] = S.day;
+  S.appliedList = S.appliedList || [S.applied].filter(k => k && k !== 'loren');
+  S.g0 = S.g0 || S.w0; S.m0 = S.m0 || { day:1, ...S.w0, stat:{} };
+  if (S.flags.loanTung && !S.tungDue) S.tungDue = 15;
+  if (S.backupDay) S.flags.bkUsed = true;
+  if (S.phase === 'end' && S.day < LAST_DAY) S.phase = 'week';
+  S.v = 7; save();
+}
 function resume(){
-  if (S.phase === 'end') return renderWeek();
+  if (S.phase === 'end' || S.phase === 'week') return renderWeek();
   if (S.cur) renderScene(); else advance();
 }
 
@@ -129,6 +141,7 @@ function openProfile(){
   if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
 }
 $('#btnProfile').addEventListener('click', openProfile);
+$('#btnHabit').addEventListener('click', openHabits);
 const soundLabel = () => { $('#btnSound').textContent = SFX.on ? '🔊 Âm thanh' : '🔇 Tắt tiếng'; $('#btnSound').setAttribute('aria-pressed', String(SFX.on)); };
 soundLabel(); $('#btnSound').addEventListener('click', () => { SFX.toggle(); soundLabel(); if (SFX.on) SFX.play('pop'); });
 $('#phoneFab').addEventListener('click', openPhone);

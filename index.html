@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Life &amp; Career Simulation: Tuần đầu tiên</title>
+<title>Life &amp; Career Simulation: Những tuần đầu tiên</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/giao-dien.css">
 <link rel="stylesheet" href="css/nhan-vat-dien-thoai.css">
 <link rel="stylesheet" href="css/animation.css">
+<link rel="stylesheet" href="css/ngay.css">
 </head>
 <body>
 <div id="app">
@@ -22,6 +23,7 @@
   <main id="stage" aria-live="polite"></main>
   <footer class="foot" id="foot" hidden>
     <button class="ghost" id="btnProfile" type="button">🪪 Hồ sơ</button>
+    <button class="ghost" id="btnHabit" type="button">🧭 Nếp sinh hoạt</button>
     <button class="ghost" id="btnSound" type="button">🔊 Âm thanh</button>
     <button class="ghost" id="btnRestart" type="button">Chơi lại từ đầu</button>
   </footer>
@@ -36,12 +38,14 @@
 <script src="js/loi/vong-lap-ngay.js"></script>
 <script src="js/he-thong/giac-ngu-nang-luong.js"></script>
 <script src="js/he-thong/tai-chinh.js"></script>
+<script src="js/loi/lich.js"></script>
 <script src="js/he-thong/chi-so-an-uong-cv.js"></script>
 <script src="js/loi/xep-lich-ngay.js"></script>
 <script src="js/canh/canh-chung.js"></script>
 <script src="js/canh/canh-tim-viec.js"></script>
 <script src="js/canh/canh-di-lam.js"></script>
 <script src="js/canh/canh-doi-song.js"></script>
+<script src="js/loi/nep-sinh-hoat.js"></script>
 <script src="js/su-kien/su-kien.js"></script>
 <script src="js/su-kien/gia-canh-nho-va.js"></script>
 <script src="js/hinh-anh/cham-nhan-vat.js"></script>
@@ -52,6 +56,7 @@
 <script src="js/hinh-anh/trang-tri-canh.js"></script>
 <script src="js/he-thong/dien-thoai.js"></script>
 <script src="js/he-thong/gap-go.js"></script>
+<script src="js/su-kien/moc-thoi-gian.js"></script>
 <script src="js/giao-dien/man-choi.js"></script>
 <script src="js/giao-dien/tong-ket-tuan.js"></script>
 <script src="js/giao-dien/mo-dau-ho-so.js"></script>

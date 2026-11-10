@@ -20,7 +20,7 @@ SC.apply = () => ({
   choices: ['hotay','banhmi','cudem'].map(k => {
     const c = COMPANIES[k];
     return { icon:c.icon, label:`${c.name}`, desc:c.desc, hints:[c.type, `💰 ${fmtTr(c.salary)}/tháng`], fx:() => {
-      S.applied = k; S.ivDay = 2; memo(`Nộp hồ sơ vào ${c.name}`);
+      S.applied = k; S.ivDay = 2; (S.appliedList = S.appliedList || []).push(k); memo(`Nộp hồ sơ vào ${c.name}`);
       return 'Bạn bấm “Nộp hồ sơ”. Màn hình hiện dòng chữ “Cảm ơn bạn đã quan tâm”. Giờ thì chờ.'; } };
   }),
 });
@@ -87,6 +87,8 @@ function setJob(k, salary, start){
   memo(`Nhận việc ở ${COMPANIES[k].name}, lương ${fmtTr(salary)}`);
 }
 
+// Lời mời phỏng vấn gấp của Lò Rèn chỉ đến một lần, sau lần trượt đầu tiên
+function backup(){ if (!S.flags.bkUsed) { S.flags.bkUsed = true; S.backupDay = S.day + 1; } }
 SC.iv_result = () => {
   const c = co(), k = S.applied;
   const hrScore = S.iv.hr + (S.soft >= 35 ? 1 : 0) - (S.iv.late ? 1 : 0) + cvHR();
@@ -94,23 +96,23 @@ SC.iv_result = () => {
   if (techOK && hrOK) {
     return { icon:'📱', title:'Kết quả phỏng vấn',
       html: P('Hai giờ chiều, điện thoại reo. Bạn bắt máy bằng giọng chuyên nghiệp nhất có thể.',
-              `“Chúc mừng em! Bên chị muốn mời em về làm Fresher Developer, lương ${fmtTr(c.salary)} một tháng. Thứ Tư em bắt đầu đi làm được không?”`),
+              `“Chúc mừng em! Bên chị muốn mời em về làm Fresher Developer, lương ${fmtTr(c.salary)} một tháng. ${dayInfo(nextWorkStart()).dow} em bắt đầu đi làm được không?”`),
       choices: [
         { icon:'🤝', label:'“Dạ em đồng ý ạ!”', hints:[`💰 ${fmtTr(c.salary)}`], fx:() => {
-          setJob(k, c.salary, 3); S.mood += 15;
+          setJob(k, c.salary, nextWorkStart()); S.mood += 15;
           return { text:'Bạn cảm ơn rối rít, cúp máy, rồi hét lên một tiếng. Hàng xóm đập tường. Không sao, hôm nay bạn có việc rồi.', meExpr:'happy' }; } },
         { icon:'📈', label:`“Em mong được ${fmtTr(c.salary + 1e6)} ạ.”`, hints:['🎲 Thương lượng nhẹ'], fx:() => {
-          if (chance(.55 + (S.soft - 30) / 100)) { setJob(k, c.salary + 1e6, 3); S.mood += 18; S.soft += 1;
+          if (chance(.55 + (S.soft - 30) / 100)) { setJob(k, c.salary + 1e6, nextWorkStart()); S.mood += 18; S.soft += 1;
             return { text:'Đầu dây bên kia im lặng ba giây. “Ừ, được em.” Bạn vừa kiếm thêm 12 triệu một năm bằng một câu nói.', meExpr:'happy' }; }
-          setJob(k, c.salary, 3); S.mood += 10; S.soft += 1;
+          setJob(k, c.salary, nextWorkStart()); S.mood += 10; S.soft += 1;
           return '“Mức này là mức chung cho Fresher em ạ.” Bạn vẫn nhận lời với mức cũ. Ít nhất bạn đã thử.'; } },
         { icon:'🎰', label:`“Em mong được ${fmtTr(c.salary + 2e6)} ạ.”`, hints:['🎲 Rủi ro cao'], fx:() => {
           const r = Math.random();
-          if (r < .3) { setJob(k, c.salary + 2e6, 3); S.mood += 20; memo('Thương lượng lương thành công rực rỡ');
+          if (r < .3) { setJob(k, c.salary + 2e6, nextWorkStart()); S.mood += 20; memo('Thương lượng lương thành công rực rỡ');
             return { text:'Chị HR xin phép hỏi lại cấp trên, mười phút sau gọi lại: “Được em nhé.” Bạn không tin vào tai mình.', meExpr:'happy' }; }
-          if (r < .7) { setJob(k, c.salary + 1e6, 3); S.mood += 12;
+          if (r < .7) { setJob(k, c.salary + 1e6, nextWorkStart()); S.mood += 12;
             return { text:'“Bên chị chỉ có thể tăng thêm 1 triệu thôi em.” Bạn đồng ý. Thương lượng thành công một nửa vẫn là thành công.', meExpr:'happy' }; }
-          S.backupDay = 3; S.applied = k; S.mood -= 12; memo(`Mất offer ở ${c.name} vì đòi lương cao`);
+          backup(); S.applied = k; S.mood -= 12; memo(`Mất offer ở ${c.name} vì đòi lương cao`);
           return { text:'Chị HR nói sẽ “trao đổi lại với cấp trên”. Một tiếng sau, email đến: “Bên chị rất tiếc…” Bạn nhìn trần nhà rất lâu.', meExpr:'sad' }; } },
       ] };
   }
@@ -118,7 +120,7 @@ SC.iv_result = () => {
                : !techOK ? 'phần kỹ thuật chưa đạt yêu cầu' : 'chưa thực sự phù hợp với văn hóa công ty';
   const hint = !techOK ? 'Gợi ý cho lần sau: ôn phỏng vấn và viết lại CV giúp ích nhiều cho phần kỹ thuật.'
                        : 'Gợi ý cho lần sau: mỗi loại công ty thích một kiểu câu trả lời khác nhau.';
-  const fail = () => { S.backupDay = 3; memo(`Trượt phỏng vấn ở ${c.name}`); };
+  const fail = () => { backup(); memo(`Trượt phỏng vấn ở ${c.name}`); };
   return { icon:'📧', title:'Kết quả phỏng vấn',
     html: P(`Ba giờ chiều, email đến: “Cảm ơn em đã tham gia phỏng vấn. Rất tiếc, ở thời điểm hiện tại em ${reason}…”`, `<span class="tip">${hint}</span>`),
     choices: [
@@ -138,7 +140,7 @@ SC.bk_call = () => ({
     { icon:'🛵', label:'Đi luôn, còn nước còn tát', fx:() => { S.queue.unshift({ id:'bk_offer' }); S.applied = 'loren';
       return 'Bạn mặc vội chiếc sơ mi duy nhất còn phẳng và phóng xe ra đường.'; } },
     { icon:'🙅', label:'Cảm ơn anh, em muốn tìm thêm', fx:() => { S.queue.unshift({ id:'activity', arg:'morning' }); memo('Từ chối lời mời phỏng vấn gấp');
-      return 'Bạn quyết định không vội. Có thể đó là lựa chọn khôn ngoan. Cũng có thể không. Tuần sau sẽ biết.'; } },
+      return 'Bạn quyết định không vội. Có thể đó là lựa chọn khôn ngoan. Cũng có thể không. Thứ Hai tới sẽ có đợt tin tuyển dụng mới.'; } },
   ],
 });
 
@@ -147,13 +149,34 @@ SC.bk_offer = () => ({
   html: P('Văn phòng nằm trên tầng 3, ngay trên một tiệm sửa xe máy. Buổi phỏng vấn kéo dài 15 phút, trong đó 11 phút anh giám đốc kể về tầm nhìn “trở thành kỳ lân công nghệ của phố Lò Rèn”.',
           '“Ngày mai em đi làm luôn nhé, lương 8 triệu.”'),
   choices: [
-    { icon:'🤝', label:'Nhận lời', hints:['💰 8 triệu'], fx:() => { setJob('loren', 8e6, 4); S.mood += 10;
+    { icon:'🤝', label:'Nhận lời', hints:['💰 8 triệu'], fx:() => { setJob('loren', 8e6, nextWorkStart()); S.mood += 10;
       return { text:'Anh giám đốc bắt tay bạn rất chặt. Dưới tầng, tiếng máy nén khí của tiệm sửa xe vang lên như một lời chúc mừng.', meExpr:'happy' }; } },
     { icon:'📈', label:'“Em xin 9 triệu được không ạ?”', hints:['🎲 Năm ăn năm thua'], fx:() => {
-      if (chance(.5)) { setJob('loren', 9e6, 4); S.mood += 14; return { text:'Anh giám đốc vỗ đùi: “Được! Anh thích người dám nói.”', meExpr:'happy' }; }
-      setJob('loren', 8e6, 4); S.mood += 6; return 'Anh giám đốc cười: “Cứ làm đi, tháng sau anh xem xét.” Câu này thường có nghĩa là không, nhưng bạn vẫn có việc.'; } },
+      if (chance(.5)) { setJob('loren', 9e6, nextWorkStart()); S.mood += 14; return { text:'Anh giám đốc vỗ đùi: “Được! Anh thích người dám nói.”', meExpr:'happy' }; }
+      setJob('loren', 8e6, nextWorkStart()); S.mood += 6; return 'Anh giám đốc cười: “Cứ làm đi, tháng sau anh xem xét.” Câu này thường có nghĩa là không, nhưng bạn vẫn có việc.'; } },
     { icon:'🙅', label:'Từ chối, tìm tiếp', fx:() => { S.mood -= 3; memo('Từ chối offer ở Lò Rèn');
       return 'Bạn cảm ơn và ra về. Tiệm sửa xe bên dưới vẫn bận rộn, chỉ có bạn là chưa.'; } },
   ],
 });
 
+
+/* ----- Tìm việc tiếp: mỗi thứ Hai có đợt tin mới, không nộp lại nơi đã trượt ----- */
+function reapplyList(){
+  const used = S.appliedList || [];
+  return Object.keys(COMPANIES).filter(k => k !== 'loren' && !used.includes(k)).slice(0, 3);
+}
+SC.reapply = () => {
+  const list = reapplyList();
+  return { icon:'📮', title:'Đợt tin tuyển dụng mới',
+    html: P('Thứ Hai, các trang tuyển dụng có đợt tin mới.', 'Những nơi đã từng trượt thì không nhận lại hồ sơ, nên bạn chỉ xem các công ty chưa nộp.',
+            S.cv && S.cv.honest < 6 ? '<span class="tip">CV hiện tại có vài chỗ nói quá. Có thể sửa lại CV trong giờ rảnh.</span>' : ''),
+    choices: [ ...list.map(k => { const c = COMPANIES[k];
+        return { icon:c.icon, label:c.name, desc:c.desc, hints:[c.type, `💰 ${fmtTr(c.salary)}/tháng`], fx:() => {
+          S.applied = k; (S.appliedList = S.appliedList || []).push(k); S.ivDay = S.day + 1; S.iv = null; S.prep = 0; memo(`Nộp hồ sơ vào ${c.name}`);
+          return `Bạn nộp hồ sơ. Buổi trưa, HR bên ${c.name} gọi: “Sáng mai 9 giờ em qua phỏng vấn nhé.”`; } }; }),
+      { icon:'⏸️', label:'Tuần này chưa nộp đâu cả', fx:() => { S.mood -= 2; return 'Bạn đóng máy. Tuần sau tính tiếp.'; } } ] };
+};
+ACTS.push({ id:'cv', icon:'📄', label:'Sửa lại CV cho chỉn chu', slots:['morning','afternoon','evening'], cond:() => !S.job && S.day > 1 && S.cv && (S.cv.stand < 6 || S.cv.honest < 10),
+  hints:['📄 Nổi bật 6/10','✅ Trung thực 10/10','⚡ −12'],
+  fx:() => { setCV(6, 10, ['Đồ án app đặt trà sữa','JavaScript','Git'], []); S.energy -= 12; S.soft += 1; memo('Sửa lại CV trước khi nộp tiếp');
+    return 'Bạn viết lại CV: gọn, có số liệu, có đường link đồ án. Những từ khóa nói quá đã được xóa.'; } });

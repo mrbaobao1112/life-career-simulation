@@ -18,7 +18,8 @@ function todayLine(){
   if (d === S.ivDay) return `Hôm nay: phỏng vấn ở ${co().name} lúc 9 giờ.`;
   if (isWorkday() && d === S.job.start) return `Hôm nay: ngày đầu tiên đi làm ở ${co().name}.`;
   if (isWorkday()) return `Hôm nay: một ngày làm việc ở ${co().name}.`;
-  if (d >= 6) return 'Hôm nay là cuối tuần. Không có lịch gì, và đó chính là lịch.';
+  if (isHoliday(d)) return 'Hôm nay nghỉ Tết Dương lịch. Cả thành phố ngủ nướng.';
+  if (isWeekend(d)) return 'Hôm nay là cuối tuần. Không có lịch gì, và đó chính là lịch.';
   if (d === S.backupDay) return 'Hôm nay chưa có lịch gì. Điện thoại vẫn im lặng.';
   if (!S.job && d > 1) return 'Hôm nay không có lịch phỏng vấn nào. Thời gian thì nhiều, tiền thì không.';
   return '';
@@ -28,7 +29,7 @@ function nutrWord(){ return foodProfile().label.toLowerCase(); }
 const SC = {};
 
 SC.wake = () => {
-  const d = S.day, di = DAYS[d];
+  const d = S.day, di = dayInfo(d);
   const lines = [`<div class="quote">Lịch bóc hôm nay: “${di.quote}”</div>`];
   if (d === 1) lines.push(P('Sáng thứ Hai đầu tiên sau lễ tốt nghiệp. Tấm bằng đã treo trên tường, còn việc làm thì chưa thấy đâu.', bgLine()));
   else lines.push(P(sleepLine(S.sleep), S.flags.hangoverToday ? 'Đầu bạn nặng như vừa cài lại hệ điều hành. Đây là tác dụng phụ của bia hơi tối qua.' : '', todayLine()));
@@ -46,6 +47,6 @@ SC.wake = () => {
       S.energy += 15; S.mood += 4; S.queue = S.queue.filter(r => r.id !== 'activity');
       return 'Bạn mở mắt lúc 11 giờ 40. Buổi sáng đã trôi qua, nhẹ nhàng như chưa từng tồn tại.'; } },
   ];
-  return { icon:'⏰', title:`${di.dow}, ${di.date}/11`, html: lines.join(''), choices };
+  return { icon:'⏰', title:`${di.dow}, ${fmtD(d)}`, html: lines.join(''), choices };
 };
 

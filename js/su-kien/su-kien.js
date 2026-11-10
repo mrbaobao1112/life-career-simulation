@@ -1,6 +1,10 @@
 /* =========================================================
    SỰ KIỆN
    ========================================================= */
+// Số ngày chờ trước khi một sự kiện có thể xảy ra lại. Sự kiện không có trong bảng này chỉ xảy ra một lần.
+const EV_CD = { coffee_run:6, tung_drink:5, linh_study:6, family_job:6, phone:30, tung_borrow:21, mom_food:14, linh_check:7 };
+// Tùng hẹn trả "cuối tháng": cuối tháng này, hoặc cuối tháng sau nếu đã sát ngày
+function lendTung(amount){ S.flags.loanTung = amount; const e = monthEnd(); S.tungDue = e - S.day >= 5 ? e : monthEnd(e + 1); }
 const EVENTS = {
   traffic: { build:() => ({ icon:'🛵', title:'Tắc đường ở ngã tư Cầu Mây',
     html: P('Ngã tư Cầu Mây giờ cao điểm: hàng nghìn chiếc xe máy, một chú cảnh sát, và không ai trong số đó di chuyển.', morningLine()),
@@ -46,7 +50,7 @@ const EVENTS = {
     ] }) },
 
   noodle: { build:() => ({ icon:'🩺', title:'Dạ dày gửi đơn khiếu nại',
-    html: P(`Sau ${S.stat.miTom} gói mì tôm, cơ thể bạn bắt đầu có ý kiến: hơi mệt, da hơi xấu, và bạn thèm rau một cách khó hiểu.`),
+    html: P(`Sau ${W('miTom')} gói mì tôm trong tuần, cơ thể bạn bắt đầu có ý kiến: hơi mệt, da hơi xấu, và bạn thèm rau một cách khó hiểu.`),
     choices: [{ icon:'🥦', label:'Hứa ngày mai ăn uống tử tế', hints:['❤️ −3'], fx:() => { S.health -= 3; note('Ăn mì tôm nhiều, cơ thể bắt đầu phản đối.');
       return 'Lời hứa đã được ghi nhận. Cơ thể sẽ theo dõi.'; } }] }) },
 
@@ -96,7 +100,7 @@ const EVENTS = {
         return 'Linh gửi “ok” kèm dấu chấm. Dấu chấm đó nặng hơn bạn tưởng.'; } },
     ] }) },
 
-  family_job: { ctx:['evening'], chance:.5, cond:() => !S.job && S.day >= 2 && S.day <= 6, build:() => ({ icon:'👪', title:'Bố mẹ hỏi chuyện việc làm',
+  family_job: { ctx:['evening'], chance:.5, cond:() => !S.job && S.day >= 2, build:() => ({ icon:'👪', title:'Bố mẹ hỏi chuyện việc làm',
     html: P(S.bg === 'nha' ? 'Bữa tối, bố đặt đũa xuống: “Thế bao giờ con đi làm?” Cả nhà quay sang nhìn bạn. Cả con mèo cũng quay sang.'
                            : 'Mẹ gọi điện: “Thế bao giờ con đi làm? Con bác Tư đi làm ngân hàng rồi đấy.”'),
     choices: [
@@ -141,12 +145,12 @@ const EVENTS = {
         return 'Bạn mở cửa sổ, bật quạt. Muỗi rất cảm kích quyết định này.'; } },
     ] }) },
 
-  tung_borrow: { ctx:['evening'], chance:.35, cond:() => S.bg === 'ghep' && S.day >= 3, build:() => ({ icon:'💰', title:'Tùng hỏi vay tiền',
+  tung_borrow: { ctx:['evening'], chance:.35, cond:() => S.bg === 'ghep' && S.day >= 3 && !S.flags.loanTung, build:() => ({ icon:'💰', title:'Tùng hỏi vay tiền',
     html: P('Tùng ngồi xuống cạnh bạn, giọng nghiêm túc hiếm thấy: “Cho tao mượn 300 nghìn, cuối tháng tao trả. Lần này khác thật.”'),
     choices: [
-      { icon:'🤝', label:'Cho mượn', cost:300000, hints:['🤝 +Tùng'], fx:() => { rel('tung',6); S.flags.loanTung = 300000; memo('Cho Tùng mượn 300 nghìn');
+      { icon:'🤝', label:'Cho mượn', cost:300000, hints:['🤝 +Tùng'], fx:() => { rel('tung',6); lendTung(300000); memo('Cho Tùng mượn 300 nghìn');
         return 'Tùng ôm bạn một cái rất chặt. Bạn ghi vào điện thoại: “Tùng nợ 300k”. Lần thứ ba trong năm.'; } },
-      { icon:'🤏', label:'Cho mượn 100 nghìn thôi', cost:100000, fx:() => { rel('tung',2); S.flags.loanTung = 100000;
+      { icon:'🤏', label:'Cho mượn 100 nghìn thôi', cost:100000, fx:() => { rel('tung',2); lendTung(100000);
         return 'Tùng nhận và bảo: “Thôi cũng được, đủ tiền xăng.”'; } },
       { icon:'🙅', label:'Từ chối khéo', fx:() => { rel('tung',-4);
         return 'Tùng bảo “không sao”. Tối đó cậu ấy rửa bát rất to tiếng.'; } },
