@@ -94,6 +94,7 @@ const avKey = th => (THREADS[th] && THREADS[th].av) || th;
 let talkIdx = 0;
 function renderScene(){
   const ref = S.cur;
+  stageStop();                                             // chuyển cảnh: dừng mọi hoạt cảnh và lịch nhân vật của cảnh trước
   current = buildScene(ref);
   const ty = sceneType(ref);
   updateHUD();
@@ -172,7 +173,7 @@ function choose(i){
     : livePanel(ref, { bg, npc, title:current.title }, { bg, npc, actId:ch.actId, meExpr:out.meExpr, npcExpr:nExpr, meAnim:fx.anim });
   S.cur = null; save();
   if (out.silent || (!out.text && !chips.length)) return advance();
-  updateHUD();
+  stageStop(); updateHUD();
   $('#stage').innerHTML = `<article class="scene result">
     ${live ? live.html : `<div class="panel">${panelSVG(bg, npc, nExpr, out.meExpr, current.title, { meAnim: fx.anim, npcAnim: npcReact(nExpr) })}</div>`}
     <header class="sh"><span class="si" aria-hidden="true">${current.icon || '📝'}</span><h2>${current.title}</h2></header>

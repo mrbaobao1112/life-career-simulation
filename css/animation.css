@@ -2,6 +2,7 @@
 .cb{transform-box:fill-box;transform-origin:50% 100%}
 .cb .cb-armL,.cb .cb-armR,.cb .cb-head,.cb .cb-eye,.cb .cb-torso,.cb .cb-alarm{transform-box:fill-box}
 .cb .cb-armL{transform-origin:80% 3%}.cb .cb-armR{transform-origin:20% 3%}
+.cb-say{display:none}
 .cb .cb-head{transform-origin:50% 100%}.cb .cb-eye{transform-origin:50% 50%}.cb .cb-torso{transform-origin:50% 100%}
 .cb .cb-alarm{transform-origin:50% 50%}
 .cb .cb-front{display:none}

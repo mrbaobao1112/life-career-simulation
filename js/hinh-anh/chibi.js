@@ -25,8 +25,10 @@ function armsSVG(L){
 function bodySVG(L){
   const o = L.outfit, c = o.color, sk = L.skin, dk = shade(c === '#FFFFFF' ? '#D8DEE6' : c, -.2);
   const pants = { pajama:c, shirt:'#3A4A5E', blazer:'#2E3646', tee:'#4A6FA5', jersey:'#2E3A59', hoodie:'#3B4252', polo:'#5C5146', cardigan:'#6B5B73' }[o.kind] || '#3A4A5E';
-  let s = `<g class="cb-legL"><rect x="45" y="118" width="12" height="17" rx="5" fill="${pants}"/><ellipse cx="50" cy="136" rx="8" ry="4" fill="#3A3A44"/></g>
-    <g class="cb-legR"><rect x="63" y="118" width="12" height="17" rx="5" fill="${pants}"/><ellipse cx="70" cy="136" rx="8" ry="4" fill="#3A3A44"/></g>
+  // Mỗi chân gồm đùi và bắp chân (kèm giày) để gập gối được khi bước và khi ngồi; lúc đứng yên trông như một khối liền
+  const leg = (cls, x, sx) => `<g class="${cls}"><rect x="${x}" y="118" width="12" height="10" rx="5" fill="${pants}"/><g class="cb-shin"><rect x="${x}" y="125" width="12" height="10" rx="5" fill="${pants}"/><ellipse cx="${sx}" cy="136" rx="8" ry="4" fill="#3A3A44"/></g></g>`;
+  let s = `${leg('cb-legL', 45, 50)}
+    ${leg('cb-legR', 63, 70)}
     <g class="cb-backarms">${armsSVG(L)}</g>
     
     <path class="cb-torso" d="M35 99 Q35 88 47 88 L73 88 Q85 88 85 99 L87 124 Q60 130 33 124Z" fill="${c}" stroke="${dk}" stroke-width="1.2"/>`;
@@ -70,6 +72,7 @@ function faceSVG(expr, sk, o = {}){
   if (o.g === 'nu') s += ['happy','tired'].includes(expr)
     ? `<path d="M37 59 L33 56 M83 59 L87 56" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>`
     : ['sick','drunk'].includes(expr) ? '' : `<path d="M37.5 54 L33 50.5 M39 51 L35.5 47 M82.5 54 L87 50.5 M81 51 L84.5 47" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>`;
+  s += `<g class="cb-say"><ellipse cx="60" cy="75.5" rx="11" ry="8" fill="${sk}"/><ellipse class="cb-lips" cx="60" cy="76" rx="5.5" ry="4.5" fill="${mc}"/></g>`;
   if (o.dark) s += `<path d="M37 68 Q44 71 51 68 M69 68 Q76 71 83 68" stroke="#8E6FA6" stroke-opacity=".6" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
   return s;
 }

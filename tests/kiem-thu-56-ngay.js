@@ -129,5 +129,18 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   check('Mỗi địa điểm có tư thế riêng', kinds === '["idle","seat","idle","idle","run","idle","shop","wait"]', kinds);
   w.eval('window.matchMedia = () => ({ matches:true })'); w.close(); }
 
+// 9. Động tác và dọn dẹp (v10): mỗi trạng thái có động tác; chuyển cảnh thì không còn lệnh hẹn giờ nào của cảnh cũ
+{ const w = mk(); start(w, 'tro'); const d = w.document;
+  w.eval(`window.matchMedia = () => ({ matches:false }); S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.slot = 'morning'; const box = document.querySelector('#stage'); box.innerHTML = '<div class="panel stage">' + stageSVG('x') + '</div>'; stageMount(box, 'work', {});`);
+  const r = JSON.parse(w.eval(`JSON.stringify({ timers:stageTimers.size, states:[...document.querySelectorAll('.stage .actor')].map(e => e.dataset.state + '/' + e.querySelector('.cb').getAttribute('class')), parts:['cb-legL','cb-shin','cb-say','cb-lips'].map(c => document.querySelectorAll('.stage .actor .' + c).length), desks:document.querySelectorAll('.stage .desk .scr.on').length })`));
+  check('Năm người đang ở trạng thái làm việc với động tác gõ phím, màn hình sáng', r.states.length === 5 && r.states.every(s => s === 'work/cb cb-idle act-type') && r.desks === 5, r.states[0]);
+  check('Nhân vật có đủ khớp chân và miệng nói', r.parts.join() === '5,10,5,5', r.parts.join());
+  check('Sân khấu đang chạy có lệnh hẹn giờ, dừng thì hủy sạch', r.timers > 0 && w.eval('stageStop(), stageTimers.size') === 0, r.timers + ' lệnh');
+  const acts = w.eval(`Object.values(STATE_ACT).filter(Boolean).join()`);
+  const css = require('fs').readFileSync(require('path').join(__dirname, '..', 'css', 'dong-tac.css'), 'utf8');
+  const missing = [...new Set(acts.split(',').concat(['act-run','act-sitdown','act-standup','act-ride','act-getoff','act-eat','act-phone','act-sleep']))].filter(a => !css.includes('.' + a));
+  check('Mọi động tác được dùng đều có định nghĩa trong dong-tac.css', missing.length === 0, missing.join());
+  w.eval('window.matchMedia = () => ({ matches:true })'); w.close(); }
+
 console.log(fail ? `\n${fail} mục KHÔNG đạt` : '\nTất cả đều đạt');
 process.exit(fail ? 1 : 0);

@@ -1,35 +1,48 @@
 /* =========================================================
-   v8: SÂN KHẤU SỐNG – thử nghiệm với một ngày đi làm ở công ty
-   Văn phòng được vẽ thành một sân khấu: mỗi nhân vật có vị trí, đi lại được, ngồi gõ phím,
-   đi lấy nước, sang bàn nhau trò chuyện theo "lịch riêng" của mình.
-   Luật chơi không đổi: sân khấu chỉ thay phần hình minh họa của các cảnh ở công ty.
+   SÂN KHẤU SỐNG – văn phòng công ty (v10)
+   Mỗi nhân vật có vị trí, trạng thái và lịch riêng. Đổi trạng thái thì có động tác chuyển tiếp:
+   đứng dậy → đi → tới nơi → quay mặt → nói / uống → quay về → ngồi xuống → làm việc.
+   Các động tác nằm ở css/dong-tac.css. Luật chơi không đổi: sân khấu chỉ là phần hình của cảnh.
    ========================================================= */
 const STAGE = {
-  W:360, H:210,
-  SPEED:62,                 // tốc độ đi bộ (đơn vị hình mỗi giây)
-  AMBIENT:[1600, 3600],     // khoảng nghỉ giữa hai hoạt động của đồng nghiệp (mili giây)
+  W:360, H:250,
+  SPEED:60,                 // tốc độ đi bộ (đơn vị hình mỗi giây)
+  STEP:27,                  // chiều dài một bước chân, tính cho nhân vật cỡ 1 (nhân với cỡ thật)
+  LANES:[197, 206],         // hai hàng trên lối đi giữa hai dãy bàn: người đi ngược chiều thì tránh sang hàng kia
   SIT_UP:10,                // người ngồi được nâng lên chừng này để lộ vai trên mặt bàn
-  AISLE_Y:171,              // lối đi giữa hai dãy bàn
-  DOOR:{ x:22, y:171 }, WATER:{ x:318, y:171 }, BOARD:{ x:64, y:171 },
-  SEAT:{ dung:{ x:112, y:141, row:'back' }, mai:{ x:190, y:141, row:'back' }, boss:{ x:268, y:141, row:'back' },
-         me:{ x:128, y:207, row:'front' }, phong:{ x:236, y:207, row:'front' } },
-  SCALE:{ back:.42, aisle:.46, front:.5 },
+  EDGE:47,                  // từ ghế bước sang phải chừng này là ra khỏi bàn
+  MAX_AWAY:2,               // nhiều nhất chừng này đồng nghiệp rời bàn cùng lúc
+  BEAT_GAP:[9000, 15000],   // khoảng nghỉ giữa hai việc riêng của một người (mili giây)
+  DOOR:{ x:26 }, WATER:{ x:328 }, BOARD:{ x:70 },
+  SEAT:{ dung:{ x:104, y:160, row:'back' }, mai:{ x:186, y:160, row:'back' }, boss:{ x:268, y:160, row:'back' },
+         me:{ x:118, y:252, row:'front' }, phong:{ x:246, y:252, row:'front' } },
 };
-// Lịch riêng của từng đồng nghiệp: mỗi buổi họ hay làm gì khi không gõ phím
+// Nhân vật càng ở gần phía trước càng lớn một chút (tạo chiều sâu)
+const stageDepth = y => Math.round((.52 + Math.max(0, Math.min(102, y - 150)) * .00108) * 1000) / 1000;
+// Lịch riêng của từng đồng nghiệp: thứ tự các việc xen giữa những quãng ngồi làm việc
 const OFFICE_ROUTINE = {
-  boss:  { morning:['board','type','chat'], afternoon:['meeting','type','board'], greet:'Chào em!', bye:'Về nhé cả nhà!' },
-  dung:  { morning:['type','type','water'], afternoon:['type','stretch','chat'], greet:'…', bye:'Về.' },
-  mai:   { morning:['chat','water','type'], afternoon:['water','chat','stretch'], greet:'Em đến rồi à!', bye:'Mai gặp nhé!' },
-  phong: { morning:['type','chat','stretch'], afternoon:['water','chat','type'], greet:'Ông đến rồi!', bye:'Về thôi ông!' },
+  boss:  { first:9000,  morning:['board','chat:dung','meeting'], afternoon:['meeting','board','chat:mai'], greet:'Chào em!', bye:'Về cẩn thận nhé!' },
+  dung:  { first:6000,  morning:['water','chat:phong'], afternoon:['chat:mai','water'], greet:'…', bye:'Ừ, về đi em.' },
+  mai:   { first:2500,  morning:['water','chat:phong','chat:boss'], afternoon:['chat:dung','water'], greet:'Em đến rồi à!', bye:'Mai gặp nhé!' },
+  phong: { first:12500, morning:['chat:mai','water'], afternoon:['water','chat:dung'], greet:'Ông đến rồi!', bye:'Về thôi ông!' },
 };
-// Những câu ngắn đồng nghiệp nói với nhau
-const OFFICE_CHAT = [['Trưa ăn gì?','Bún chả!'], ['Deploy chưa?','Chiều nhé.'], ['Bug kia sao rồi?','Đang xem…'], ['Cà phê không?','Đi!'], ['Họp mấy giờ?','Ba giờ.'], ['Review giúp tớ.','Ok, gửi đi.']];
+// Các đoạn trao đổi ngắn giữa đồng nghiệp: người đến hỏi nói trước, hai người lần lượt nói
+const OFFICE_CHAT = [
+  ['Trưa ăn gì?', 'Bún chả!', 'Chốt.'],
+  ['Deploy chưa?', 'Chiều nhé.', 'Ok, tớ chờ.'],
+  ['Bug kia sao rồi?', 'Đang xem…', 'Cần thì gọi nhé.', 'Ừ.'],
+  ['Review giúp tớ.', 'Gửi link đi.', 'Gửi rồi đó.'],
+  ['Họp mấy giờ?', 'Ba giờ.'],
+  ['Cuối tuần đi đâu?', 'Ngủ.', 'Kế hoạch hay đấy.'],
+];
 // Khi không có sự kiện nào, một đồng nghiệp vẫn ghé qua bàn nói một câu
 const OFFICE_DROPBY = { mai:['Chiều chị test bản của em nhé.','Có bánh ở pantry đấy em.'], phong:['Ông ơi, task này khó quá.','Tí đi trà đá không ông?'], dung:['Code hôm qua ổn đấy.','Có gì cứ hỏi anh.'], boss:['Tiến độ ổn chứ em?','Cố lên em nhé.'] };
 const COLLEAGUES = ['dung','mai','boss','phong'];
+// Mỗi trạng thái ứng với một động tác
+const STATE_ACT = { work:'act-type', think:'act-think', read:'act-read', sip:'act-sip', walk:'act-walk', talk:'act-talk', listen:'act-listen', laugh:'act-laugh', drink:'act-drink', rest:'', meeting:'', leave:'act-walk' };
 
 const stageOn = () => !(S.opt && S.opt.stage === false);
-// Cảnh nào dùng sân khấu: ban ngày ở công ty, và người xuất hiện (nếu có) là đồng nghiệp trong team
+// Cảnh nào dùng sân khấu văn phòng
 function stageFor(ref, sc){
   if (!S || !stageOn() || !S.job || !isWorkday() || S.day < S.job.start) return false;
   if (ref.id === 'cut') return true;
@@ -43,73 +56,122 @@ function stageFor(ref, sc){
 function stageBg(){
   const co_ = S.job ? S.job.co : 'hotay';
   const wall = { hotay:'#E3ECF6', banhmi:'#FFF0D8', cudem:'#ECE6F7', loren:'#EFE6D8' }[co_] || '#E6EEF5';
-  const sign = [CO_COLOR[co_] || '#2F6FD1', COMPANIES[co_].name];
-  return `<rect width="360" height="210" fill="${wall}"/><rect y="132" width="360" height="78" fill="#C9D1DB"/><rect y="130" width="360" height="3" fill="#B4BDC9"/>
-    <rect x="6" y="50" width="32" height="82" rx="2" fill="#8C6E54"/><rect x="10" y="54" width="24" height="74" rx="1" fill="#A98463"/><circle cx="30" cy="94" r="2" fill="#F2D27A"/>
-    <rect x="50" y="18" width="66" height="46" rx="3" fill="#fff" stroke="#B9C2CC" stroke-width="2"/><rect x="57" y="25" width="12" height="10" fill="#F6C85F"/><rect x="74" y="25" width="12" height="10" fill="#9FD3B4"/><rect x="91" y="25" width="12" height="10" fill="#F7A1A8"/><rect x="57" y="42" width="12" height="10" fill="#9FC2F2"/><rect x="74" y="42" width="12" height="10" fill="#F6C85F"/>
-    ${win(140, 16, 96, 44)}
-    <rect x="252" y="16" width="${Math.max(70, sign[1].length * 6.4 + 14)}" height="20" rx="4" fill="${sign[0]}"/>${T(252 + Math.max(70, sign[1].length * 6.4 + 14) / 2, 30, sign[1], '#fff', 10)}
-    <rect x="322" y="84" width="26" height="48" rx="3" fill="#EEF3F8" stroke="#B9C2CC" stroke-width="1.5"/><rect x="326" y="70" width="18" height="16" rx="6" fill="#9FD0F5" opacity=".85"/><rect x="331" y="100" width="8" height="5" rx="1" fill="#4A90D9"/>
-    <ellipse cx="300" cy="126" rx="9" ry="5" fill="#B5603F"/><path d="M300 124 Q292 104 296 96 M300 124 Q306 100 304 92 M300 124 Q312 110 314 102" stroke="#2F8257" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  const sign = [CO_COLOR[co_] || '#2F6FD1', COMPANIES[co_].name], sw = Math.max(70, sign[1].length * 6.4 + 14);
+  const sky = SKY[S.slot] || SKY.morning, night = S.slot === 'evening' || S.slot === 'night', rain = S.flags.rainDay === S.day;
+  const hour = { morning:9, noon:12, afternoon:14.5, evening:19, night:22 }[S.slot] || 9, ha = hour % 12 * 30, ma = hour % 1 * 360;
+  const hand = (deg, len, w) => `<path d="M132 34 L${(132 + Math.sin(deg * Math.PI / 180) * len).toFixed(1)} ${(34 - Math.cos(deg * Math.PI / 180) * len).toFixed(1)}" stroke="#2B2321" stroke-width="${w}" stroke-linecap="round"/>`;
+  return `<rect width="360" height="250" fill="${wall}"/><rect y="150" width="360" height="100" fill="#C9D1DB"/><rect y="148" width="360" height="3" fill="#B4BDC9"/>
+    <rect x="6" y="60" width="38" height="90" rx="2" fill="#6F563F"/><rect x="10" y="64" width="30" height="86" fill="#3B3F4A"/>
+    <g class="door"><rect x="10" y="64" width="30" height="86" rx="1" fill="#A98463"/><rect x="14" y="70" width="22" height="30" rx="1" fill="#B8926F"/><circle cx="35" cy="110" r="2.2" fill="#F2D27A"/></g>
+    <rect x="52" y="20" width="62" height="46" rx="3" fill="#fff" stroke="#B9C2CC" stroke-width="2"/><rect x="59" y="27" width="12" height="10" fill="#F6C85F"/><rect x="75" y="27" width="12" height="10" fill="#9FD3B4"/><rect x="91" y="27" width="12" height="10" fill="#F7A1A8"/><rect x="59" y="44" width="12" height="10" fill="#9FC2F2"/><rect x="75" y="44" width="12" height="10" fill="#F6C85F"/>
+    <g class="env"><circle cx="132" cy="34" r="12" fill="#fff" stroke="#8B6B4A" stroke-width="2.5"/>${hand(ha, 5.5, 2)}${hand(ma, 8, 1.5)}<path class="sec" style="transform-origin:132px 34px" d="M132 34 V25" stroke="#E5484D" stroke-width="1"/><circle cx="132" cy="34" r="1.3" fill="#2B2321"/></g>
+    <clipPath id="stWin"><rect x="158" y="18" width="88" height="46" rx="2"/></clipPath>
+    <g class="env" clip-path="url(#stWin)"><rect x="158" y="18" width="88" height="46" fill="${rain ? '#9AA7B8' : sky}"/><circle cx="226" cy="31" r="6.5" fill="${night ? '#FFF3B0' : '#FFF7D1'}" opacity="${rain ? .3 : 1}"/>
+      <g class="cloud"><ellipse cx="170" cy="30" rx="13" ry="5" fill="#fff" opacity=".9"/><ellipse cx="179" cy="27" rx="8" ry="5" fill="#fff" opacity=".9"/></g><g class="cloud c2"><ellipse cx="168" cy="42" rx="10" ry="4" fill="#fff" opacity=".75"/></g>
+      <path d="M158 56 L176 44 L192 54 L212 42 L230 52 L246 46 V64 H158Z" fill="${night ? '#3B456E' : '#9BB7A6'}" opacity=".75"/>
+      ${rain ? `<g class="winrain">${Array.from({ length:16 }, (_, i) => `<path d="M${160 + i * 6} ${10 + (i * 17) % 40} l-3 9" stroke="#E3F0FF" stroke-width="1.1" opacity=".8"/>`).join('')}</g>` : ''}</g>
+    <rect x="158" y="18" width="88" height="46" rx="2" fill="none" stroke="#fff" stroke-width="4.5"/><path d="M202 18 V64" stroke="#fff" stroke-width="3.5"/>
+    <rect x="${352 - sw}" y="20" width="${sw}" height="20" rx="4" fill="${sign[0]}"/>${T(352 - sw / 2, 34, sign[1], '#fff', 10)}
+    <rect x="318" y="100" width="28" height="50" rx="3" fill="#EEF3F8" stroke="#B9C2CC" stroke-width="1.5"/><rect x="322" y="84" width="20" height="18" rx="7" fill="#9FD0F5" opacity=".85"/><rect x="328" y="117" width="8" height="5" rx="1" fill="#4A90D9"/>`;
 }
-function deskSVG(x, y, screen){
-  // bàn làm việc: nhân vật ngồi phía sau, mặt bàn che phần thân dưới
-  return `<rect x="${x - 34}" y="${y - 27}" width="68" height="6" rx="2" fill="#8C6E54"/><rect x="${x - 31}" y="${y - 21}" width="62" height="24" fill="#A98463"/>
-    <rect x="${x + 12}" y="${y - 39}" width="18" height="12" rx="1.5" fill="#2B3240"/><rect x="${x + 14}" y="${y - 37}" width="14" height="8" fill="${screen}"/><rect x="${x + 9}" y="${y - 28}" width="24" height="2" rx="1" fill="#59606C"/>`;
+function chairSVG(x, y){ return `<rect x="${x - 17}" y="${y - 50}" width="34" height="40" rx="7" fill="#4A5568"/><rect x="${x - 13}" y="${y - 46}" width="26" height="32" rx="5" fill="#5B6779"/>`; }
+function deskSVG(who){
+  // bàn làm việc: nhân vật ngồi phía sau, mặt bàn che phần thân dưới; trên bàn có màn hình và cốc nước
+  const z = STAGE.SEAT[who], x = z.x, y = z.y, big = z.row === 'front' ? 1.12 : 1;
+  return `<g class="desk" data-desk="${who}" transform="translate(${x} ${y}) scale(${big})"><rect x="-40" y="-27" width="80" height="6" rx="2" fill="#8C6E54"/><rect x="-37" y="-21" width="74" height="27" fill="#A98463"/><rect x="-37" y="-21" width="74" height="3" fill="#00000018"/>
+    <rect x="20" y="-43" width="20" height="14" rx="1.5" fill="#2B3240"/><rect x="22" y="-41" width="16" height="10" fill="#1E2A3A"/>
+    <g class="scr"><rect class="ln" x="24" y="-39.5" width="11" height="1.6" fill="#7CE0A3"/><rect class="ln l2" x="24" y="-36.5" width="8" height="1.6" fill="#9FC2F2"/><rect class="ln l3" x="24" y="-33.5" width="12" height="1.6" fill="#F6C85F"/></g>
+    <rect x="27" y="-29" width="6" height="2.5" fill="#59606C"/><rect x="18" y="-28" width="24" height="2" rx="1" fill="#59606C"/>
+    <g class="cup"><rect x="-34" y="-36" width="8" height="9" rx="1.5" fill="#fff" stroke="#B9C2CC"/><path d="M-26 -34 q4 2 0 5" stroke="#B9C2CC" fill="none"/></g></g>`;
 }
 function actorSVG(who, expr, look, id){
   const me = who === 'me'; look = look || (me ? playerLook() : NPC[who].look);
   const body = chibi(look, expr || (me ? playerExpr() : NPC[who] ? defaultNpcExpr(who) : 'neutral'), me ? { dark:darkCircles() } : {});
   return `<g class="actor snap" data-who="${id || who}" ${me ? '' : `data-npc="${who}"`} role="button" aria-label="${me ? esc(S.name) : NPC[who] ? NPC[who].name : 'Người qua đường'}"><g class="sc"><g class="flip"><g class="cb cb-idle">${body}</g></g></g></g>`;
 }
+const PROP_SVG = {
+  cup:'<rect x="87" y="107" width="10" height="11" rx="2" fill="#fff" stroke="#B9C2CC" stroke-width="1.2"/>',
+  paper:'<rect x="80" y="98" width="19" height="24" rx="1.5" fill="#fff" stroke="#B9C2CC" stroke-width="1.2"/><path d="M84 104 h11 M84 109 h11 M84 114 h7" stroke="#9AA7B6" stroke-width="1.4"/>',
+  phone:'<rect x="87" y="104" width="9" height="15" rx="2" fill="#2B3240"/>',
+};
 function stageSVG(label){
-  const Z = STAGE.SEAT, sc = ['#9FC2F2','#B8E0C2','#F7D9A0'];
-  return `<svg viewBox="0 0 360 210" role="img" aria-label="${esc(label || 'Văn phòng')}">${stageBg()}${S.slot === 'afternoon' ? '<rect width="360" height="210" fill="#FF8A4C" opacity=".06"/>' : S.slot === 'evening' ? '<rect width="360" height="210" fill="#121836" opacity=".34"/><path d="M96 0 L150 0 L196 210 L50 210Z" fill="#FFF3B0" opacity=".13"/>' : ''}
-    <g class="L-back"></g>${deskSVG(Z.dung.x, Z.dung.y, sc[0])}${deskSVG(Z.mai.x, Z.mai.y, sc[1])}${deskSVG(Z.boss.x, Z.boss.y, sc[2])}
-    <g class="L-aisle"></g><g class="L-front"></g>${deskSVG(Z.me.x, Z.me.y, sc[1])}${deskSVG(Z.phong.x, Z.phong.y, sc[0])}<g class="L-say"></g></svg>`;
+  const Z = STAGE.SEAT, back = ['dung','mai','boss'], front = ['me','phong'];
+  const tint = S.slot === 'afternoon' ? '<rect width="360" height="250" fill="#FF8A4C" opacity=".06" pointer-events="none"/>'
+    : S.slot === 'evening' ? '<rect width="360" height="250" fill="#121836" opacity=".34" pointer-events="none"/><path d="M96 0 L150 0 L196 250 L50 250Z" fill="#FFF3B0" opacity=".13" pointer-events="none"/>' : '';
+  return `<svg viewBox="0 0 360 250" role="img" aria-label="${esc(label || 'Văn phòng')}">${stageBg()}
+    ${back.map(k => chairSVG(Z[k].x, Z[k].y)).join('')}<g class="L-back"></g>${back.map(deskSVG).join('')}
+    <g class="L-aisle"></g>${front.map(k => chairSVG(Z[k].x, Z[k].y)).join('')}<g class="L-front"></g>${front.map(deskSVG).join('')}${tint}<g class="L-say"></g></svg>`;
+}
+function bikeSVG(){
+  const wheel = x => `<g class="wheel"><circle cx="${x}" cy="0" r="9" fill="#2B2B2B"/><circle cx="${x}" cy="0" r="4.5" fill="#9AA3AF"/><path d="M${x - 8} 0 H${x + 8} M${x} -8 V8" stroke="#D5DAE1" stroke-width="1.4"/></g>`;
+  return `${wheel(-20)}${wheel(22)}<path d="M-22 -6 Q-4 -24 16 -12 L26 -4 L-18 -2Z" fill="#E5484D"/><rect x="-16" y="-17" width="24" height="6" rx="3" fill="#2B2B2B"/><path d="M18 -12 L24 -30 M20 -30 H29" stroke="#3A3F4B" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="27" cy="-22" r="3.5" fill="#FFF3B0"/>`;
 }
 function streetSVG(){
   return `<svg viewBox="0 0 360 210" role="img" aria-label="Đường trước công ty"><g transform="translate(0 15)">${bgSVG('street')}</g><rect y="0" width="360" height="16" fill="${SKY[S.slot] || SKY.morning}"/><rect y="190" width="360" height="20" fill="#7A8290"/>
-    <rect x="318" y="96" width="42" height="64" fill="#5D6B7E"/><rect x="326" y="112" width="26" height="48" rx="2" fill="#A98463"/>${T(339, 108, 'Công ty', '#fff', 8)}
-    <g class="L-aisle"></g>${S.flags.rainDay === S.day ? rainSVG() : ''}<g class="L-say"></g></svg>`;
+    <rect x="312" y="80" width="48" height="80" fill="#5D6B7E"/><rect x="322" y="106" width="30" height="54" rx="2" fill="#3B3F4A"/><g class="door"><rect x="322" y="106" width="30" height="54" rx="2" fill="#A98463"/></g>${T(337, 98, 'Công ty', '#fff', 8)}
+    <g class="L-back"></g><g class="L-aisle"></g>${S.flags.rainDay === S.day ? rainSVG() : ''}<g class="L-say"></g></svg>`;
 }
 
-/* ----- Đạo diễn: điều khiển các nhân vật trên sân khấu đang hiện ----- */
-let stageRun = 0;                                             // mỗi lần dựng sân khấu mới, các hoạt cảnh cũ tự dừng
-// Phần lõi dùng chung cho mọi địa điểm: đặt nhân vật, cho đi lại, nói, phản ứng
+/* ----- Phần lõi dùng chung cho mọi địa điểm: đặt nhân vật, cho đi lại, nói, phản ứng ----- */
+let stageRun = 0;
+const stageTimers = new Set();
+// Dừng hẳn sân khấu đang chạy: mọi hoạt cảnh tự thoát, mọi lệnh hẹn giờ bị hủy
+function stageStop(){ stageRun++; stageTimers.forEach(clearTimeout); stageTimers.clear(); }
 function stageCore(root){
-  const run = ++stageRun, svg = root.querySelector('svg'), A = {}, still = reduceMotion();
+  stageStop();
+  const run = stageRun, svg = root.querySelector('svg'), A = {}, still = reduceMotion(), office = svg.getAttribute('viewBox') === '0 0 360 250';
   const alive = () => run === stageRun && !!window.document && !!document.body && document.body.contains(svg);
-  const wait = ms => new Promise(r => setTimeout(() => r(alive()), ms));
+  const later = (fn, ms) => { const id = setTimeout(() => { stageTimers.delete(id); if (alive()) fn(); }, ms); stageTimers.add(id); return id; };
+  const wait = ms => new Promise(r => { const id = setTimeout(() => { stageTimers.delete(id); r(alive()); }, ms); stageTimers.add(id); });
   const layer = n => svg.querySelector('.L-' + n);
+  const scaleOf = a => a.s || (office ? stageDepth(a.y) : .5);
   const place = (a, x, y, lay) => {
-    a.x = x; a.y = y; if (lay && a.lay !== lay) { a.lay = lay; layer(lay === 'aisle' ? 'aisle' : lay).appendChild(a.el); }
-    const s = a.s || STAGE.SCALE[a.lay] || .46;
-    a.el.querySelector('.sc').setAttribute('transform', `${a.rot ? `rotate(${a.rot}) ` : ''}translate(${-60 * s} ${-140 * s + (a.dy || 0)}) scale(${s})`);
-    a.el.style.transform = `translate(${x}px, ${y}px)`;
+    a.x = x; a.y = y; if (lay && a.lay !== lay) { a.lay = lay; layer(lay).appendChild(a.el); }
+    const s = scaleOf(a);
+    a.el.querySelector('.sc').setAttribute('transform', `${a.rot ? `rotate(${a.rot}) ` : ''}translate(-60 ${-140 + (a.dy || 0) / s})`);
+    a.el.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
   };
-  const act = (a, name) => { const cb = a.el.querySelector('.cb'); cb.setAttribute('class', 'cb cb-idle' + (name ? ' ' + name : '')); a.act = name; };
+  const cbOf = a => a.el.querySelector('.cb');
+  const act = (a, name) => { cbOf(a).setAttribute('class', 'cb cb-idle' + (name ? ' ' + name : '')); a.act = name; };
   const add = (who, x, y, lay, name, expr, x2 = {}) => {
     const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'g'); tmp.innerHTML = actorSVG(who, expr, x2.look, x2.id);
     const a = A[x2.id || who] = { who, id:x2.id || who, el:tmp.firstChild, busy:false, s:x2.s, rot:x2.rot, dy:x2.dy }; place(a, x, y, lay); act(a, name); return a;
   };
   const snap = (a, x, y, lay) => { a.el.classList.add('snap'); place(a, x, y, lay); void a.el.getBoundingClientRect(); };
-  const walk = async (a, x, y) => {
+  const face = (a, left) => { a.left = !!left; a.el.classList.toggle('left', !!left); };
+  // Trượt một đoạn ngắn không bước chân (kéo ghế ngồi vào, nhích sang bên)
+  const slide = async (a, x, y, ms = 300) => {
     if (still) { snap(a, x, y); return alive(); }
-    const d = Math.hypot(x - a.x, y - a.y), ms = Math.max(120, d / STAGE.SPEED * 1000);
-    a.el.classList.toggle('left', x < a.x); a.el.classList.remove('snap'); a.el.style.transitionDuration = ms + 'ms';
-    act(a, 'act-walk'); place(a, x, y);
-    const ok = await wait(ms); if (ok) act(a, ''); return ok;
+    a.el.classList.remove('snap'); a.el.classList.add('ease'); a.el.style.transitionDuration = ms + 'ms'; place(a, x, y);
+    const ok = await wait(ms); a.el.classList.remove('ease'); return ok;
   };
-  const face = (a, left) => a.el.classList.toggle('left', !!left);
+  // Đi bộ: số bước tính theo quãng đường để chân không "trượt"; đổi hướng thì quay người trước
+  const walk = async (a, x, y, o = {}) => {
+    if (still) { snap(a, x, y); return alive(); }
+    const d = Math.hypot(x - a.x, y - a.y); if (d < 1.5) return alive();
+    if (Math.abs(x - a.x) > 2 && (x < a.x) !== !!a.left) { face(a, x < a.x); if (!await wait(170)) return false; }
+    const sp = a.speed || STAGE.SPEED, ms = Math.max(160, d / sp * 1000), stepLen = STAGE.STEP * scaleOf(a) * (sp > 95 ? 1.5 : 1);
+    a.tx = x; a.el.classList.remove('snap'); a.el.style.transitionDuration = ms + 'ms';
+    act(a, o.act || (sp > 95 ? 'act-walk act-run' : 'act-walk')); cbOf(a).style.setProperty('--step', Math.round(stepLen * 2 / sp * 1000) + 'ms');
+    place(a, x, y);
+    const ok = await wait(ms); a.tx = null; if (ok && !o.keep) act(a, ''); return ok;
+  };
   const say = (a, text, ms = 1500) => {
     if (!alive()) return Promise.resolve(false);
-    const s = a.s || STAGE.SCALE[a.lay] || .46, w = Math.max(22, text.length * 4.9 + 12), x = Math.min(STAGE.W - w - 3, Math.max(3, a.x - w / 2)), y = Math.max(3, a.y - 140 * s - 17);
+    const s = scaleOf(a), W = office ? STAGE.W : 360, w = Math.max(22, text.length * 4.9 + 12), x = Math.min(W - w - 3, Math.max(3, a.x - w / 2)), y = Math.max(3, a.y - 140 * s - 17 + (a.dy || 0));
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'say');
     g.innerHTML = `<rect x="${x}" y="${y}" width="${w}" height="15" rx="7" fill="#fff" stroke="#B9C2CC"/><path d="M${a.x - 3} ${y + 14.5} L${a.x} ${y + 19} L${a.x + 3} ${y + 14.5}Z" fill="#fff" stroke="#B9C2CC" stroke-width=".8"/><rect x="${a.x - 3.4}" y="${y + 13}" width="6.8" height="2" fill="#fff"/><text x="${x + w / 2}" y="${y + 10.6}" text-anchor="middle" font-size="8.6" font-weight="600" fill="#1B2230" font-family="Be Vietnam Pro,Arial,sans-serif">${esc(text)}</text>`;
-    layer('say').appendChild(g); setTimeout(() => g.remove(), ms); return wait(still ? 0 : ms);
+    layer('say').appendChild(g); later(() => g.remove(), ms); return wait(still ? 0 : ms);
   };
-  const react = (a, anim) => { if (still) return; const cb = a.el.querySelector('.cb'); cb.classList.remove('anim-' + anim); void cb.getBoundingClientRect(); cb.classList.add('anim-' + anim); setTimeout(() => cb.classList.remove('anim-' + anim), 1200); };
+  // Phản ứng một lần (vẫy, gật, nhảy…) chồng lên động tác đang làm, xong thì tự gỡ
+  const react = (a, anim, ms = 1200) => { if (still) return; const cb = cbOf(a); cb.classList.remove('anim-' + anim); void cb.getBoundingClientRect(); cb.classList.add('anim-' + anim); later(() => cb.classList.remove('anim-' + anim), ms); };
+  // Cầm một món đồ trong tay phải (cốc, tài liệu, điện thoại); gọi không tham số để bỏ xuống
+  const hold = (a, kind) => {
+    a.el.querySelectorAll('.prop').forEach(p => p.remove()); a.holding = kind || null;
+    if (!kind) return;
+    a.el.querySelectorAll('.cb-armR').forEach(arm => { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'prop'); g.innerHTML = PROP_SVG[kind]; arm.appendChild(g); });
+  };
+  const door = open => { const d = svg.querySelector('.door'); if (d) d.classList.toggle('open', !!open); };
   // chạm vào ai thì người đó phản ứng (chỉ để cho vui, không ảnh hưởng chỉ số)
   svg.addEventListener('click', e => {
     const el = e.target.closest('.actor'); if (!el) return;
@@ -117,106 +179,240 @@ function stageCore(root){
     react(a, a.who === 'me' ? pick(['wave','jump','cheer']) : pick(['hop','nod','wave']));
     say(a, a.who === 'me' ? playerQuip() : pick(NPC_QUIP[a.who] || ['…','Chào!','Hử?']), 1500); SFX.play(a.who === 'me' ? 'hop' : 'talk');
   });
-  return { run, svg, A, still, alive, wait, layer, place, act, add, snap, walk, face, say, react };
+  return { run, svg, A, still, alive, wait, later, layer, place, act, add, snap, slide, walk, face, say, react, hold, door };
 }
-function stageMount(root, mode, o = {}){
-  const { svg, A, still, alive, wait, layer, place, act, add, snap, walk, face, say, react } = stageCore(root);
-  // rời ghế ra lối đi, và quay về ghế
-  const stand = a => { const z = STAGE.SEAT[a.who]; snap(a, z.x + 30, STAGE.AISLE_Y + (z.row === 'front' ? 3 : -2), 'aisle'); act(a, ''); };
-  const sit = a => { const z = STAGE.SEAT[a.who]; snap(a, z.x, z.y - STAGE.SIT_UP, z.row); face(a, false); act(a, 'act-type'); };
-  const goSit = async a => { const z = STAGE.SEAT[a.who]; if (!await walk(a, z.x + 30, STAGE.AISLE_Y + (z.row === 'front' ? 3 : -2))) return false; sit(a); return true; };
-  const seatAll = (skip = []) => COLLEAGUES.forEach(k => { if (!skip.includes(k)) { const z = STAGE.SEAT[k]; add(k, z.x, z.y - STAGE.SIT_UP, z.row, 'act-type'); } });
 
-  /* ----- Hoạt động riêng của đồng nghiệp ----- */
-  const doing = {
-    type: async a => wait(1200),
-    stretch: async a => { react(a, 'stretch'); return wait(1500); },
-    water: async a => { stand(a); if (!await walk(a, STAGE.WATER.x, STAGE.WATER.y)) return; act(a, 'act-drink'); if (!await wait(2600)) return; return goSit(a); },
-    board: async a => { stand(a); if (!await walk(a, STAGE.BOARD.x, STAGE.BOARD.y)) return; face(a, false); act(a, 'act-talk'); if (!await wait(2200)) return; return goSit(a); },
-    meeting: async a => { stand(a); await say(a, 'Chị đi họp nhé.', 1300); if (!await walk(a, STAGE.DOOR.x, STAGE.DOOR.y)) return; a.el.classList.add('gone'); if (!await wait(7000)) return; a.el.classList.remove('gone'); return goSit(a); },
-    chat: async a => {
-      const others = COLLEAGUES.filter(k => k !== a.who && A[k] && !A[k].busy && A[k].act === 'act-type'); if (!others.length) return wait(800);
-      const b = A[pick(others)], z = STAGE.SEAT[b.who], line = pick(OFFICE_CHAT); b.busy = true;
-      stand(a);
-      if (await walk(a, z.x - 30, STAGE.AISLE_Y + (z.row === 'front' ? 3 : -2))) {
-        face(a, false); act(a, 'act-talk'); act(b, 'act-talk'); face(b, true);
-        if (await say(a, line[0], 1500)) await say(b, line[1], 1400);
-        if (alive()) { act(b, 'act-type'); face(b, false); }
+/* ----- Đạo diễn văn phòng ----- */
+function stageMount(root, mode, o = {}){
+  const C = stageCore(root), { svg, A, still, alive, wait, later, act, add, snap, slide, walk, face, say, react, hold, door } = C;
+  const Z = STAGE.SEAT, rnd = (a, b) => a + Math.random() * (b - a);
+  const seatY = who => Z[who].y - STAGE.SIT_UP;
+  const deskOf = a => svg.querySelector(`.desk[data-desk="${a.who}"]`);
+  const screen = (a, on) => { const d = deskOf(a); if (d) d.querySelector('.scr').classList.toggle('on', !!on && !still); };
+  const deskCup = (a, show) => { const d = deskOf(a); if (d) d.querySelector('.cup').style.display = show ? '' : 'none'; };
+  // Đổi trạng thái: động tác đổi theo, màn hình chỉ chạy khi đang gõ
+  const setState = (a, st) => { a.state = st; a.el.dataset.state = st; act(a, STATE_ACT[st] || ''); screen(a, st === 'work'); };
+  const away = () => COLLEAGUES.filter(k => A[k] && A[k].lay === 'aisle').length;
+  // Chọn hàng đi để không đi xuyên qua người đang đứng hoặc đang đi trên lối
+  const lane = (a, x) => {
+    const lo = Math.min(a.x, x) - 24, hi = Math.max(a.x, x) + 24;
+    for (const y of STAGE.LANES) { const hit = Object.values(A).some(b => b !== a && b.lay === 'aisle' && !b.el.classList.contains('gone') && Math.abs((b.ty ?? b.y) - y) < 6 && Math.max(b.x, b.tx ?? b.x) > lo && Math.min(b.x, b.tx ?? b.x) < hi); if (!hit) return y; }
+    return STAGE.LANES[1];
+  };
+  const go = async (a, x) => { const y = lane(a, x); a.ty = y; setState(a, 'walk'); const ok = await walk(a, x, y, { keep:true }); a.ty = null; return ok; };
+  const spots = {};
+  const take = (name, a) => { if (spots[name] && spots[name] !== a) return false; spots[name] = a; return true; };
+  const free = a => Object.keys(spots).forEach(k => { if (spots[k] === a) delete spots[k]; });
+
+  // Chu kỳ làm việc tại bàn: gõ một lúc, dừng nghĩ, nhấp ngụm nước, đọc tài liệu, vươn vai
+  const workLoop = async a => {
+    const my = a.loop = (a.loop || 0) + 1, on = () => alive() && a.loop === my && a.lay !== 'aisle';
+    setState(a, 'work'); if (still) return;
+    while (on()) {
+      if (!await wait(rnd(2600, 5200)) || !on()) return;
+      const r = Math.random();
+      if (r < .4) { setState(a, 'think'); if (!await wait(rnd(1400, 2400)) || !on()) return; }
+      else if (r < .58) { deskCup(a, false); hold(a, 'cup'); setState(a, 'sip'); const ok = await wait(2400) && on(); hold(a); deskCup(a, true); if (!ok) return; }
+      else if (r < .7) { hold(a, 'paper'); setState(a, 'read'); const ok = await wait(rnd(2400, 3400)) && on(); hold(a); if (!ok) return; }
+      else if (r < .8) { setState(a, 'rest'); react(a, 'stretch', ANIM.WAKE_MS); if (!await wait(ANIM.WAKE_MS + 100) || !on()) return; }
+      if (on()) setState(a, 'work');
+    }
+  };
+  const stopWork = a => { a.loop = (a.loop || 0) + 1; if (a.holding) { hold(a); deskCup(a, true); } };
+  // Đứng dậy rời bàn: nhún người đứng lên, nhích ra mép bàn rồi mới bước ra lối đi
+  const standUp = async a => {
+    stopWork(a); setState(a, 'rest'); const z = Z[a.who];
+    if (still) { snap(a, z.x + STAGE.EDGE, STAGE.LANES[0], 'aisle'); return alive(); }
+    act(a, 'act-standup'); if (!await wait(340)) return false;
+    if (!await slide(a, z.x + STAGE.EDGE, seatY(a.who), 300)) return false;
+    snap(a, a.x, a.y, 'aisle'); return true;
+  };
+  // Về bàn ngồi xuống: đi tới mép bàn, lách vào ghế, nhún người ngồi xuống rồi làm việc tiếp
+  const sitDown = async a => {
+    const z = Z[a.who]; free(a);
+    if (still) { snap(a, z.x, seatY(a.who), z.row); face(a, false); workLoop(a); return alive(); }
+    setState(a, 'walk'); a.ty = seatY(a.who); const ok = await walk(a, z.x + STAGE.EDGE, seatY(a.who), { keep:true }); a.ty = null; if (!ok) return false;
+    snap(a, a.x, a.y, z.row); face(a, true);
+    if (!await slide(a, z.x, seatY(a.who), 300)) return false;
+    face(a, false); act(a, 'act-sitdown'); if (!await wait(340)) return false;
+    workLoop(a); return true;
+  };
+  const seat = (who, expr) => { const a = add(who, Z[who].x, seatY(who), Z[who].row, '', expr); a.state = 'work'; return a; };
+  const seatAll = (skip = []) => COLLEAGUES.forEach(k => { if (!skip.includes(k)) workLoop(seat(k)); });
+  // Hai người trao đổi theo lượt: người nói mấp máy miệng và ra tay, người nghe nhìn và gật đầu
+  const converse = async (a, b, lines, o2 = {}) => {
+    let ok = true;
+    for (let i = 0; i < lines.length && ok; i++) {
+      const sp = i % 2 ? b : a, li = i % 2 ? a : b;
+      setState(sp, 'talk'); setState(li, 'listen'); SFX.play('talk');
+      ok = await say(sp, lines[i], Math.max(1300, lines[i].length * 95));
+      if (ok) ok = await wait(220);
+    }
+    if (ok && o2.laugh) { setState(a, 'laugh'); setState(b, 'laugh'); ok = await wait(1000); }
+    return ok;
+  };
+
+  /* ----- Việc riêng của đồng nghiệp ----- */
+  const beats = {
+    water: async a => {
+      if (!take('water', a)) return;
+      if (!await standUp(a)) return; deskCup(a, false); hold(a, 'cup');
+      if (!await go(a, STAGE.WATER.x - 14)) return; face(a, false);
+      setState(a, 'rest'); if (!await wait(700)) return;                 // hứng nước
+      setState(a, 'drink'); if (!await wait(2600)) return;
+      free(a); if (!await sitDown(a)) return; hold(a); deskCup(a, true);
+    },
+    board: async a => {
+      if (!take('board', a)) return;
+      if (!await standUp(a)) return; if (!await go(a, STAGE.BOARD.x)) return;
+      face(a, false); setState(a, 'think'); if (!await wait(2600)) return;
+      free(a); await sitDown(a);
+    },
+    meeting: async a => {
+      if (!take('door', a)) return;
+      if (!await standUp(a)) return; hold(a, 'paper'); setState(a, 'talk'); if (!await say(a, 'Chị đi họp nhé.', 1300)) return;
+      if (!await go(a, STAGE.DOOR.x)) return; door(true); if (!await wait(320)) return;
+      a.el.classList.add('gone'); a.state = 'meeting'; door(false); free(a);
+      if (!await wait(9000)) return;
+      if (!take('door', a)) { if (!await wait(2500)) return; take('door', a); }
+      door(true); if (!await wait(320)) return; a.el.classList.remove('gone'); later(() => door(false), 700); free(a);
+      if (!await sitDown(a)) return; hold(a);
+    },
+    chat: async (a, withWho) => {
+      const b = A[withWho]; if (!b || b.busy || b.lay === 'aisle' || b.state === 'meeting' || !take('chat:' + withWho, a)) return;
+      b.busy = true;
+      const zb = Z[withWho], bx = zb.row === 'back' ? zb.x - 46 : zb.x + 52;
+      if (await standUp(a) && await go(a, bx)) {
+        face(a, zb.x < a.x); stopWork(b); face(b, a.x < zb.x);
+        await converse(a, b, pick(OFFICE_CHAT), { laugh: Math.random() < .35 });
+        if (alive()) { face(b, false); workLoop(b); }
       }
-      b.busy = false; if (alive()) return goSit(a);
+      b.busy = false; free(a); if (alive()) await sitDown(a);
     },
   };
-  const ambient = async () => {
-    while (await wait(STAGE.AMBIENT[0] + Math.random() * (STAGE.AMBIENT[1] - STAGE.AMBIENT[0]))) {
-      const free = COLLEAGUES.filter(k => A[k] && !A[k].busy && A[k].act === 'act-type' && !A[k].el.classList.contains('gone')); if (!free.length) continue;
-      const a = A[pick(free)], list = (OFFICE_ROUTINE[a.who][S.slot] || ['type']);
-      a.busy = true; doing[pick(list)](a).then(() => { a.busy = false; });
+  // Người điều phối: mỗi người có lịch riêng, lần lượt làm từng việc, không quá MAX_AWAY người rời bàn cùng lúc
+  const director = async () => {
+    if (still) return;
+    const t0 = Date.now(), plan = {};
+    COLLEAGUES.forEach(k => { if (A[k]) plan[k] = { i:0, at:OFFICE_ROUTINE[k].first, list:OFFICE_ROUTINE[k][S.slot] || [] }; });
+    while (await wait(900)) {
+      if (away() >= STAGE.MAX_AWAY) continue;
+      const now = Date.now() - t0;
+      const k = COLLEAGUES.find(k => plan[k] && plan[k].list.length && now >= plan[k].at && !A[k].busy && A[k].lay !== 'aisle' && A[k].state !== 'meeting'); if (!k) continue;
+      const p = plan[k], [name, arg] = p.list[p.i % p.list.length].split(':'), a = A[k];
+      p.i++; p.at = now + rnd(...STAGE.BEAT_GAP); a.busy = true;
+      beats[name](a, arg).then(() => { a.busy = false; free(a); });
     }
   };
 
   /* ----- Các phân cảnh ----- */
-  const Z = STAGE.SEAT;
   if (mode === 'work' || mode === 'visit') {
-    if (S.slot === 'evening') { if (S.day % 2) seatAll(['mai','boss','phong']); }      // tối OT: văn phòng vắng, thỉnh thoảng còn anh Dũng
+    const night = S.slot === 'evening', guest = mode === 'visit' && !Z[o.npc];
+    if (night) { if (S.day % 2) workLoop(seat('dung')); }             // tối OT: văn phòng vắng, thỉnh thoảng còn anh Dũng
     else seatAll(mode === 'visit' ? [o.npc] : []);
-    const me = add('me', Z.me.x, Z.me.y - STAGE.SIT_UP, 'front', mode === 'visit' ? 'act-talk' : 'act-type', o.meExpr);
+    const me = seat('me', o.meExpr);
     if (o.meAnim) react(me, o.meAnim);
-    if (mode === 'visit') {                                   // một đồng nghiệp đến bàn bạn trao đổi
-      const v = add(o.npc, Z[o.npc] ? Z[o.npc].x + 30 : STAGE.DOOR.x, STAGE.AISLE_Y, 'aisle', '', o.npcExpr); v.busy = true;
-      if (still) { snap(v, Z.me.x + 46, STAGE.AISLE_Y + 4); face(v, true); }
-      else (async () => { if (!await walk(v, Z.me.x + 46, STAGE.AISLE_Y + 4)) return; face(v, true); act(v, 'act-talk'); if (o.line) say(v, o.line, 1800); })();
-    } else if (o.dropby && !still) {                          // không có sự kiện: vẫn có người ghé qua nói một câu
-      (async () => { if (!await wait(2600)) return; const k = pick(COLLEAGUES.filter(x => A[x] && !A[x].busy)); if (!k) return; const v = A[k]; v.busy = true; stand(v);
-        if (await walk(v, Z.me.x + 46, STAGE.AISLE_Y + 4)) { face(v, true); act(v, 'act-talk'); react(me, 'nod'); await say(v, pick(OFFICE_DROPBY[k]), 2200); if (alive()) await goSit(v); }
-        v.busy = false; })();
+    if (mode === 'visit') {                                            // một người đến bàn bạn trao đổi
+      const from = guest ? STAGE.DOOR.x : Z[o.npc].x + STAGE.EDGE, spot = Z.me.x + 54;
+      const v = add(o.npc, still ? spot : from, STAGE.LANES[1], 'aisle', '', o.npcExpr); v.busy = true; v.state = 'rest';
+      setState(me, 'listen'); face(me, false);
+      if (still) face(v, true);
+      else (async () => {
+        if (guest) { door(true); later(() => door(false), 900); }
+        if (!await go(v, spot)) return; face(v, true);
+        setState(v, 'talk'); if (!await wait(1900)) return;
+        // trong lúc người chơi đọc và chọn: hai bên lần lượt nói, nghe
+        while (alive()) { setState(v, 'listen'); setState(me, 'talk'); if (!await wait(rnd(1500, 2300))) return; setState(me, 'listen'); setState(v, 'talk'); if (!await wait(rnd(1700, 2600))) return; }
+      })();
+    } else {
+      workLoop(me);
+      if (o.dropby && !still) (async () => {                           // không có sự kiện: vẫn có người ghé qua nói một câu
+        if (!await wait(5200)) return;
+        const k = pick(COLLEAGUES.filter(x => A[x] && !A[x].busy && A[x].lay !== 'aisle')); if (!k || away() >= STAGE.MAX_AWAY) return;
+        const v = A[k]; v.busy = true;
+        if (await standUp(v) && await go(v, Z.me.x + 54)) {
+          face(v, true); stopWork(me); face(me, false);
+          await converse(v, me, [pick(OFFICE_DROPBY[k]), pick(['Dạ vâng ạ.', 'Ok!', 'Em cảm ơn ạ.'])]);
+          if (alive()) { workLoop(me); }
+        }
+        if (alive()) await sitDown(v); v.busy = false;
+      })();
     }
-    if (!still) ambient();
+    if (!night) director();
+    return { done:null };
   }
-  else if (mode === 'arrive') {
+  if (mode === 'arrive') {
     seatAll();
-    const me = add('me', still ? Z.me.x : -14, still ? Z.me.y - STAGE.SIT_UP : STAGE.AISLE_Y, still ? 'front' : 'aisle', still ? 'act-type' : '');
-    if (still) return { done:Promise.resolve(false) };
+    if (still) { workLoop(seat('me')); return { done:Promise.resolve(false) }; }
+    const me = add('me', STAGE.DOOR.x, STAGE.LANES[0], 'aisle', ''); me.el.classList.add('gone'); me.state = 'rest';
     return { done:(async () => {
-      if (!await walk(me, 70, STAGE.AISLE_Y)) return false;
-      react(me, 'wave'); SFX.play('talk');
-      for (const k of ['dung','mai','boss','phong']) { const a = A[k]; if (S.lateToday && k === 'boss') { react(a, 'shake'); say(a, 'Muộn rồi đấy em.', 1500); } else { react(a, k === 'dung' ? 'nod' : 'wave'); say(a, OFFICE_ROUTINE[k].greet, 1300); } if (!await wait(420)) return false; }
-      if (!await wait(700)) return false;
-      if (!await goSit(me)) return false;
-      ambient(); return wait(900);
+      if (!await wait(350)) return false;
+      door(true); SFX.play('pop'); if (!await wait(330)) return false; me.el.classList.remove('gone');
+      if (!await go(me, 84)) return false; door(false);
+      setState(me, 'rest'); react(me, 'wave'); SFX.play('talk');
+      // đồng nghiệp ngẩng lên nhìn rồi chào, từng người một
+      for (const k of ['dung','mai','boss','phong']) {
+        const a = A[k]; stopWork(a); setState(a, 'listen'); face(a, k !== 'phong');
+        later(() => { if (S.lateToday && k === 'boss') { react(a, 'shake'); say(a, 'Muộn rồi đấy em.', 1500); } else { react(a, k === 'dung' ? 'nod' : 'wave'); say(a, OFFICE_ROUTINE[k].greet, 1300); } }, 260);
+        later(() => { face(a, false); workLoop(a); }, 1900);
+        if (!await wait(480)) return false;
+      }
+      if (!await wait(900)) return false;
+      if (!await sitDown(me)) return false;
+      director(); return wait(1500);
     })() };
   }
-  else if (mode === 'leave') {
-    seatAll(); const me = add('me', Z.me.x, Z.me.y - STAGE.SIT_UP, 'front', 'act-type');
+  if (mode === 'leave') {
+    seatAll(); const me = seat('me'); workLoop(me);
     if (still) return { done:Promise.resolve(false) };
+    const exit = async (a, line) => {
+      a.busy = true; if (!await standUp(a)) return false;
+      face(a, false); setState(a, 'rest'); react(a, 'wave'); if (line) say(a, line, 1300); if (!await wait(900)) return false;
+      if (!await go(a, STAGE.DOOR.x)) return false; door(true); if (!await wait(300)) return false; a.el.classList.add('gone'); later(() => door(false), 500); return true;
+    };
     return { done:(async () => {
-      if (!await wait(600)) return false;
-      for (const k of ['mai','phong','boss','dung']) { const a = A[k];
-        (async () => { stand(a); react(a, 'wave'); say(a, OFFICE_ROUTINE[k].bye, 1200); if (!await wait(650)) return; if (await walk(a, STAGE.DOOR.x, STAGE.DOOR.y)) a.el.classList.add('gone'); })();
-        if (!await wait(900)) return false; }
-      if (o.stay) { say(me, 'Mình ở lại thêm…', 1800); return wait(2600); }      // tối nay OT: mọi người về, bạn ở lại
-      stand(me); react(me, 'stretch'); if (!await wait(1100)) return false;
-      if (!await walk(me, STAGE.DOOR.x, STAGE.DOOR.y)) return false; me.el.classList.add('gone'); return wait(350);
+      if (!await wait(900)) return false;
+      exit(A.mai, OFFICE_ROUTINE.mai.bye); if (!await wait(1500)) return false;
+      exit(A.phong, OFFICE_ROUTINE.phong.bye); if (!await wait(2600)) return false;
+      if (o.stay) {                                                    // tối nay OT: mọi người về, bạn ở lại
+        exit(A.boss, 'Cảm ơn em ở lại nhé!'); if (!await wait(2400)) return false;
+        stopWork(me); setState(me, 'rest'); react(me, 'stretch', ANIM.WAKE_MS); if (!await wait(ANIM.WAKE_MS)) return false; workLoop(me); return wait(1600);
+      }
+      // bạn đứng dậy, chào những người còn lại, rồi ra về
+      if (!await standUp(me)) return false; face(me, false); setState(me, 'rest'); react(me, 'stretch', ANIM.WAKE_MS); if (!await wait(ANIM.WAKE_MS)) return false;
+      react(me, 'wave'); say(me, 'Em về trước ạ!', 1400);
+      for (const k of ['boss','dung']) { const a = A[k]; stopWork(a); setState(a, 'listen'); later(() => { react(a, k === 'dung' ? 'nod' : 'wave'); say(a, OFFICE_ROUTINE[k].bye, 1300); }, 500); later(() => workLoop(a), 2200); }
+      if (!await wait(1900)) return false;
+      if (!await go(me, STAGE.DOOR.x)) return false; door(true); if (!await wait(300)) return false; me.el.classList.add('gone'); later(() => door(false), 400);
+      return wait(600);
     })() };
   }
-  else if (mode === 'street') {
-    // đi xe máy tới, xuống xe, đi bộ vào cửa công ty (hoặc ngược lại lúc về)
-    const gY = 176, me = add('me', 0, gY, 'aisle', ''); me.s = .4; place(me, 0, gY);
-    const bike = document.createElementNS('http://www.w3.org/2000/svg', 'g'); bike.setAttribute('class', 'actor snap'); bike.innerHTML = `<g transform="scale(1.5)">${moto(-11, -4, '#E5484D').replace(/<circle cx="3" cy="-22"[^>]*>/, '')}</g>`;
-    layer('aisle').appendChild(bike);
-    const setB = (x, ms) => { bike.classList.toggle('snap', !ms); bike.style.transitionDuration = (ms || 0) + 'ms'; bike.style.transform = `translate(${x}px, ${gY + 2}px)`; };
-    const ride = async (from, to, ms) => { me.el.classList.add('snap'); me.el.style.transform = `translate(${from}px, ${gY - 6}px)`; setB(from); void bike.getBoundingClientRect(); act(me, 'act-ride');
-      me.el.classList.toggle('left', to < from); me.el.classList.remove('snap'); me.el.style.transitionDuration = ms + 'ms'; me.el.style.transform = `translate(${to}px, ${gY - 6}px)`; setB(to, ms); return wait(ms); };
+  if (mode === 'street') {
+    // đi xe máy tới, giảm tốc, dừng, xuống xe, đi bộ vào cửa công ty (lúc về thì ngược lại)
+    const gY = 178, me = add('me', -60, gY - 13, 'back', 'act-ride', null, { s:.5 });
+    const bike = document.createElementNS('http://www.w3.org/2000/svg', 'g'); bike.setAttribute('class', 'bike snap'); bike.innerHTML = `<g transform="scale(1.25)">${bikeSVG()}</g>`;
+    C.layer('aisle').appendChild(bike);
+    const setB = (x, ms) => { bike.classList.toggle('snap', !ms); bike.style.transitionDuration = (ms || 0) + 'ms'; bike.style.transform = `translate(${x}px, ${gY}px)`; };
+    const both = (x, ms, curve) => { [me.el, bike].forEach(el => { el.classList.remove('snap'); el.style.transitionDuration = ms + 'ms'; el.style.transitionTimingFunction = curve; }); C.place(me, x - 3, gY - 13); bike.style.transform = `translate(${x}px, ${gY}px)`; };
+    const moving = on => { svg.classList.toggle('moving', on); };
     if (still) return { done:Promise.resolve(false) };
     if (o.dir === 'in') return { done:(async () => {
-      SFX.play('pop'); if (!await ride(-30, 150, 1500)) return false;
-      act(me, ''); me.el.classList.add('snap'); me.x = 168; me.y = gY; me.el.style.transform = `translate(168px, ${gY}px)`; void me.el.getBoundingClientRect();
-      if (!await wait(350)) return false;
-      return walk(me, 338, gY);
+      setB(-60); snap(me, -63, gY - 13); SFX.play('pop'); if (!await wait(60)) return false;
+      moving(true); both(150, 2000, 'cubic-bezier(.15,.6,.3,1)'); if (!await wait(2000)) return false;       // giảm tốc dần rồi dừng
+      moving(false); if (!await wait(350)) return false;
+      me.el.style.transitionTimingFunction = ''; snap(me, 178, gY, 'aisle'); act(me, 'act-getoff'); if (!await wait(430)) return false;   // xuống xe
+      act(me, ''); if (!await wait(150)) return false;
+      if (!await walk(me, 326, gY - 2)) return false; door(true); if (!await wait(320)) return false; me.el.classList.add('gone'); return wait(250);
     })() };
     return { done:(async () => {
-      setB(150); me.x = 338; me.y = gY; me.el.classList.add('snap'); me.el.style.transform = `translate(338px, ${gY}px)`; void me.el.getBoundingClientRect();
-      if (!await walk(me, 168, gY)) return false; if (!await wait(300)) return false;
-      return ride(150, -40, 1500);
+      setB(150); snap(me, 336, gY - 2, 'aisle'); act(me, ''); me.el.classList.add('gone');
+      door(true); if (!await wait(320)) return false; me.el.classList.remove('gone');
+      if (!await walk(me, 178, gY)) return false; door(false); if (!await wait(250)) return false;
+      snap(me, 147, gY - 13, 'back'); face(me, true); act(me, 'act-ride act-getoff'); if (!await wait(450)) return false;                 // lên xe
+      bike.style.transform = `translate(150px, ${gY}px) scaleX(-1)`; if (!await wait(60)) return false;
+      moving(true); [me.el, bike].forEach(el => { el.classList.remove('snap'); el.style.transitionDuration = '1700ms'; el.style.transitionTimingFunction = 'cubic-bezier(.6,0,.9,.5)'; });
+      C.place(me, -57, gY - 13); bike.style.transform = `translate(-60px, ${gY}px) scaleX(-1)`;
+      return wait(1700);
     })() };
   }
   return { done:null };
@@ -228,8 +424,7 @@ function stagePanel(ref, sc, o = {}){
   const visit = sc.npc && !!NPC[sc.npc];
   const html = `<div class="panel stage">${stageSVG(sc.title)}</div>`;
   const mount = root => {
-    const line = sc.talk && sc.talk.length ? '…' : '';
-    if (visit) stageMount(root, 'visit', { npc:sc.npc, npcExpr:o.npcExpr || sc.npcExpr, meExpr:o.meExpr, meAnim:o.meAnim, line });
+    if (visit) stageMount(root, 'visit', { npc:sc.npc, npcExpr:o.npcExpr || sc.npcExpr, meExpr:o.meExpr, meAnim:o.meAnim });
     else stageMount(root, 'work', { meExpr:o.meExpr, meAnim:o.meAnim, dropby: ref && ref.id === 'task' && S.slot === 'morning' && !o.result });
   };
   return { html, mount };
