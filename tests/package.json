@@ -5,6 +5,7 @@
   "scripts": {
     "test": "node kiem-thu-he-thong.js && node kiem-thu-tai-chinh.js && node kiem-thu-56-ngay.js && node choi-ngau-nhien.js 20",
     "56-ngay": "node kiem-thu-56-ngay.js",
+    "van-phong": "node kiem-thu-van-phong.js",
     "he-thong": "node kiem-thu-he-thong.js",
     "ngau-nhien": "node choi-ngau-nhien.js 40",
     "can-bang": "node can-bang-chien-luoc.js",

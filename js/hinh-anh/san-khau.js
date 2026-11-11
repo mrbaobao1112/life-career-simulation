@@ -13,30 +13,19 @@ const STAGE = {
   EDGE:47,                  // từ ghế bước sang phải chừng này là ra khỏi bàn
   MAX_AWAY:2,               // nhiều nhất chừng này đồng nghiệp rời bàn cùng lúc
   BEAT_GAP:[9000, 15000],   // khoảng nghỉ giữa hai việc riêng của một người (mili giây)
-  DOOR:{ x:26 }, WATER:{ x:328 }, BOARD:{ x:70 },
+  DOOR:{ x:26 }, WATER:{ x:354 }, BOARD:{ x:70 },     // WATER: người lấy nước đứng lệch về bên phải, không chắn lối vào bàn cuối
   SEAT:{ dung:{ x:104, y:160, row:'back' }, mai:{ x:186, y:160, row:'back' }, boss:{ x:268, y:160, row:'back' },
          me:{ x:118, y:252, row:'front' }, phong:{ x:246, y:252, row:'front' } },
 };
 // Nhân vật càng ở gần phía trước càng lớn một chút (tạo chiều sâu)
 const stageDepth = y => Math.round((.52 + Math.max(0, Math.min(102, y - 150)) * .00108) * 1000) / 1000;
-// Lịch riêng của từng đồng nghiệp: thứ tự các việc xen giữa những quãng ngồi làm việc
+// Câu chào lúc bạn đến và lúc ra về của từng người (lịch và câu trò chuyện nằm ở tinh-cach.js và lich-van-phong.js)
 const OFFICE_ROUTINE = {
-  boss:  { first:9000,  morning:['board','chat:dung','meeting'], afternoon:['meeting','board','chat:mai'], greet:'Chào em!', bye:'Về cẩn thận nhé!' },
-  dung:  { first:6000,  morning:['water','chat:phong'], afternoon:['chat:mai','water'], greet:'…', bye:'Ừ, về đi em.' },
-  mai:   { first:2500,  morning:['water','chat:phong','chat:boss'], afternoon:['chat:dung','water'], greet:'Em đến rồi à!', bye:'Mai gặp nhé!' },
-  phong: { first:12500, morning:['chat:mai','water'], afternoon:['water','chat:dung'], greet:'Ông đến rồi!', bye:'Về thôi ông!' },
+  boss:  { greet:'Chào em!', bye:'Về cẩn thận nhé!' },
+  dung:  { greet:'…', bye:'Ừ, về đi em.' },
+  mai:   { greet:'Em đến rồi à!', bye:'Mai gặp nhé!' },
+  phong: { greet:'Ông đến rồi!', bye:'Về thôi ông!' },
 };
-// Các đoạn trao đổi ngắn giữa đồng nghiệp: người đến hỏi nói trước, hai người lần lượt nói
-const OFFICE_CHAT = [
-  ['Trưa ăn gì?', 'Bún chả!', 'Chốt.'],
-  ['Deploy chưa?', 'Chiều nhé.', 'Ok, tớ chờ.'],
-  ['Bug kia sao rồi?', 'Đang xem…', 'Cần thì gọi nhé.', 'Ừ.'],
-  ['Review giúp tớ.', 'Gửi link đi.', 'Gửi rồi đó.'],
-  ['Họp mấy giờ?', 'Ba giờ.'],
-  ['Cuối tuần đi đâu?', 'Ngủ.', 'Kế hoạch hay đấy.'],
-];
-// Khi không có sự kiện nào, một đồng nghiệp vẫn ghé qua bàn nói một câu
-const OFFICE_DROPBY = { mai:['Chiều chị test bản của em nhé.','Có bánh ở pantry đấy em.'], phong:['Ông ơi, task này khó quá.','Tí đi trà đá không ông?'], dung:['Code hôm qua ổn đấy.','Có gì cứ hỏi anh.'], boss:['Tiến độ ổn chứ em?','Cố lên em nhé.'] };
 const COLLEAGUES = ['dung','mai','boss','phong'];
 // Mỗi trạng thái ứng với một động tác
 const STATE_ACT = { work:'act-type', think:'act-think', read:'act-read', sip:'act-sip', walk:'act-walk', talk:'act-talk', listen:'act-listen', laugh:'act-laugh', drink:'act-drink', rest:'', meeting:'', leave:'act-walk' };
@@ -151,10 +140,10 @@ function stageCore(root){
     const d = Math.hypot(x - a.x, y - a.y); if (d < 1.5) return alive();
     if (Math.abs(x - a.x) > 2 && (x < a.x) !== !!a.left) { face(a, x < a.x); if (!await wait(170)) return false; }
     const sp = a.speed || STAGE.SPEED, ms = Math.max(160, d / sp * 1000), stepLen = STAGE.STEP * scaleOf(a) * (sp > 95 ? 1.5 : 1);
-    a.tx = x; a.el.classList.remove('snap'); a.el.style.transitionDuration = ms + 'ms';
+    a.tx = x; a.fx = a.x; a.el.classList.remove('snap'); a.el.style.transitionDuration = ms + 'ms';      // fx → tx: quãng đường đang đi, để người khác biết mà tránh
     act(a, o.act || (sp > 95 ? 'act-walk act-run' : 'act-walk')); cbOf(a).style.setProperty('--step', Math.round(stepLen * 2 / sp * 1000) + 'ms');
     place(a, x, y);
-    const ok = await wait(ms); a.tx = null; if (ok && !o.keep) act(a, ''); return ok;
+    const ok = await wait(ms); a.tx = null; a.fx = null; if (ok && !o.keep) act(a, ''); return ok;
   };
   const say = (a, text, ms = 1500) => {
     if (!alive()) return Promise.resolve(false);
@@ -185,6 +174,7 @@ function stageCore(root){
 /* ----- Đạo diễn văn phòng ----- */
 function stageMount(root, mode, o = {}){
   const C = stageCore(root), { svg, A, still, alive, wait, later, act, add, snap, slide, walk, face, say, react, hold, door } = C;
+  const cbOf = a => a.el.querySelector('.cb');
   const Z = STAGE.SEAT, rnd = (a, b) => a + Math.random() * (b - a);
   const seatY = who => Z[who].y - STAGE.SIT_UP;
   const deskOf = a => svg.querySelector(`.desk[data-desk="${a.who}"]`);
@@ -194,23 +184,48 @@ function stageMount(root, mode, o = {}){
   const setState = (a, st) => { a.state = st; a.el.dataset.state = st; act(a, STATE_ACT[st] || ''); screen(a, st === 'work'); };
   const away = () => COLLEAGUES.filter(k => A[k] && A[k].lay === 'aisle').length;
   // Chọn hàng đi để không đi xuyên qua người đang đứng hoặc đang đi trên lối
-  const lane = (a, x) => {
-    const lo = Math.min(a.x, x) - 24, hi = Math.max(a.x, x) + 24;
-    for (const y of STAGE.LANES) { const hit = Object.values(A).some(b => b !== a && b.lay === 'aisle' && !b.el.classList.contains('gone') && Math.abs((b.ty ?? b.y) - y) < 6 && Math.max(b.x, b.tx ?? b.x) > lo && Math.min(b.x, b.tx ?? b.x) < hi); if (!hit) return y; }
-    return STAGE.LANES[1];
+  const lane = (a, x, strict) => {
+    const lo = Math.min(a.x, x) - 24, hi = Math.max(a.x, x) + 24, dir = Math.sign(x - a.x), fast = (a.speed || STAGE.SPEED) > STAGE.SPEED;
+    for (const y of STAGE.LANES) {
+      const hit = Object.values(A).some(b => {
+        if (b === a || b.lay !== 'aisle' || b.el.classList.contains('gone') || Math.abs((b.ty ?? b.y) - y) >= 6) return false;
+        const b0 = b.fx ?? b.x, moving = b.fx != null && Math.abs(b.x - b0) > 2;
+        // người đi cùng chiều, đã ở phía trước một quãng thì không vướng (cùng tốc độ nên không đuổi kịp)
+        if (moving && !fast && dir && Math.sign(b.x - b0) === dir && (b0 - a.x) * dir >= 30) return false;
+        return Math.max(b.x, b0) > lo && Math.min(b.x, b0) < hi; });
+      if (!hit) return y;
+    }
+    return strict ? null : STAGE.LANES[1];
   };
-  const go = async (a, x) => { const y = lane(a, x); a.ty = y; setState(a, 'walk'); const ok = await walk(a, x, y, { keep:true }); a.ty = null; return ok; };
+  // Chờ đến khi có một hàng trống rồi mới đi (không chen vào khi cả hai hàng đang có người)
+  const laneWait = async (a, x) => { for (let i = 0; i < 16; i++) { const y = lane(a, x, true); if (y != null) return y; setState(a, 'rest'); if (!await wait(300)) return null; } return alive() ? lane(a, x) : null; };
+  // Lối rẽ ở cột x có đang vướng người không (người đứng đó, hoặc người đang đi ngang qua)
+  const colBusy = (a, x) => Object.values(A).some(b => b !== a && b.lay === 'aisle' && !b.el.classList.contains('gone') && Math.max(b.x, b.fx ?? b.x) > x - 20 && Math.min(b.x, b.fx ?? b.x) < x + 20 && Math.abs(b.y - a.y) > 4);
+  const colWait = async (a, x) => { for (let i = 0; i < 14 && colBusy(a, x); i++) { setState(a, 'rest'); if (!await wait(280)) return false; } return alive(); };
+  // Đi tới x: bước thẳng ra lối đi trước (nếu đang ở mép bàn), rồi đi dọc theo một hàng. Không đi chéo qua lối.
+  const go = async (a, x) => {
+    if (!STAGE.LANES.some(l => Math.abs(a.y - l) < 3)) { if (!await colWait(a, a.x)) return false; const y0 = lane(a, a.x); a.ty = y0; setState(a, 'walk'); const ok0 = await walk(a, a.x, y0, { keep:true }); a.ty = null; if (!ok0) return false; }
+    const y = await laneWait(a, x); if (y == null) return false;
+    if (Math.abs(a.y - y) > 3) { a.ty = y; setState(a, 'walk'); const ok1 = await walk(a, a.x, y, { keep:true }); if (!ok1) return false; }      // đổi hàng trước khi đi
+    a.ty = y; setState(a, 'walk'); const ok = await walk(a, x, y, { keep:true }); a.ty = null; return ok; };
   const spots = {};
   const take = (name, a) => { if (spots[name] && spots[name] !== a) return false; spots[name] = a; return true; };
   const free = a => Object.keys(spots).forEach(k => { if (spots[k] === a) delete spots[k]; });
+  // Mỗi người chỉ do một việc điều khiển tại một thời điểm: việc khác muốn dùng người này phải chờ
+  const begin = (a, tag) => { if (a.owner) { STAGE_DEBUG.conflicts++; STAGE_DEBUG.log.push(`${a.who}: ${a.owner} / ${tag}`); return false; } a.owner = tag; a.busy = true; a.el.dataset.owner = tag; return true; };
+  const end = a => { a.owner = null; a.busy = false; a.el.dataset.owner = ''; free(a); };
+  const D = officeDay();
 
   // Chu kỳ làm việc tại bàn: gõ một lúc, dừng nghĩ, nhấp ngụm nước, đọc tài liệu, vươn vai
   const workLoop = async a => {
     const my = a.loop = (a.loop || 0) + 1, on = () => alive() && a.loop === my && a.lay !== 'aisle';
     setState(a, 'work'); if (still) return;
     while (on()) {
-      if (!await wait(rnd(2600, 5200)) || !on()) return;
-      const r = Math.random();
+      cbOf(a).classList.toggle('fast', !!a.focusMode);
+      const fo = personaOf(a.who).focus;
+      if (!await wait(rnd(2600, 5200) * (.7 + fo * .9)) || !on()) return;
+      if (a.focusMode) continue;                               // đang chạy việc gấp: không nghỉ giữa chừng
+      const r = Math.random() / (1.15 - fo * .5);
       if (r < .4) { setState(a, 'think'); if (!await wait(rnd(1400, 2400)) || !on()) return; }
       else if (r < .58) { deskCup(a, false); hold(a, 'cup'); setState(a, 'sip'); const ok = await wait(2400) && on(); hold(a); deskCup(a, true); if (!ok) return; }
       else if (r < .7) { hold(a, 'paper'); setState(a, 'read'); const ok = await wait(rnd(2400, 3400)) && on(); hold(a); if (!ok) return; }
@@ -231,6 +246,8 @@ function stageMount(root, mode, o = {}){
   const sitDown = async a => {
     const z = Z[a.who]; free(a);
     if (still) { snap(a, z.x, seatY(a.who), z.row); face(a, false); workLoop(a); return alive(); }
+    if (Math.abs(a.x - (z.x + STAGE.EDGE)) > 8 && !await go(a, z.x + STAGE.EDGE)) return false;       // đi dọc lối đi tới ngang bàn mình rồi mới rẽ vào
+    if (!await colWait(a, z.x + STAGE.EDGE)) return false;                                             // chờ nếu lối rẽ vào bàn đang vướng người
     setState(a, 'walk'); a.ty = seatY(a.who); const ok = await walk(a, z.x + STAGE.EDGE, seatY(a.who), { keep:true }); a.ty = null; if (!ok) return false;
     snap(a, a.x, a.y, z.row); face(a, true);
     if (!await slide(a, z.x, seatY(a.who), 300)) return false;
@@ -238,7 +255,9 @@ function stageMount(root, mode, o = {}){
     workLoop(a); return true;
   };
   const seat = (who, expr) => { const a = add(who, Z[who].x, seatY(who), Z[who].row, '', expr); a.state = 'work'; return a; };
-  const seatAll = (skip = []) => COLLEAGUES.forEach(k => { if (!skip.includes(k)) workLoop(seat(k)); });
+  const awaySign = k => { const z = Z[k], g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('pointer-events', 'none'); g.setAttribute('class', 'away-sign');
+    g.innerHTML = `<rect x="${z.x - 25}" y="${z.y - 48}" width="50" height="14" rx="3" fill="#FFF7D6" stroke="#C9B36A"/><text x="${z.x}" y="${z.y - 38}" text-anchor="middle" font-size="8" font-weight="700" fill="#7A5C00" font-family="Be Vietnam Pro,Arial,sans-serif">Nghỉ phép</text>`; C.layer('say').appendChild(g); };
+  const seatAll = (skip = []) => COLLEAGUES.forEach(k => { if (D.absent.includes(k)) { awaySign(k); return; } if (!skip.includes(k)) workLoop(seat(k)); });
   // Hai người trao đổi theo lượt: người nói mấp máy miệng và ra tay, người nghe nhìn và gật đầu
   const converse = async (a, b, lines, o2 = {}) => {
     let ok = true;
@@ -254,6 +273,7 @@ function stageMount(root, mode, o = {}){
 
   /* ----- Việc riêng của đồng nghiệp ----- */
   const beats = {
+    stretch: async a => { stopWork(a); setState(a, 'rest'); react(a, 'stretch', ANIM.WAKE_MS); if (!await wait(ANIM.WAKE_MS + 200)) return; workLoop(a); },
     water: async a => {
       if (!take('water', a)) return;
       if (!await standUp(a)) return; deskCup(a, false); hold(a, 'cup');
@@ -272,49 +292,118 @@ function stageMount(root, mode, o = {}){
       if (!take('door', a)) return;
       if (!await standUp(a)) return; hold(a, 'paper'); setState(a, 'talk'); if (!await say(a, 'Chị đi họp nhé.', 1300)) return;
       if (!await go(a, STAGE.DOOR.x)) return; door(true); if (!await wait(320)) return;
-      a.el.classList.add('gone'); a.state = 'meeting'; door(false); free(a);
+      a.el.classList.add('gone'); a.state = 'meeting'; a.el.dataset.state = 'meeting'; door(false); free(a);
       if (!await wait(9000)) return;
       if (!take('door', a)) { if (!await wait(2500)) return; take('door', a); }
       door(true); if (!await wait(320)) return; a.el.classList.remove('gone'); later(() => door(false), 700); free(a);
       if (!await sitDown(a)) return; hold(a);
     },
+    // sang bàn một đồng nghiệp trao đổi: nội dung và việc có cười hay không tùy tính cách hai người
     chat: async (a, withWho) => {
-      const b = A[withWho]; if (!b || b.busy || b.lay === 'aisle' || b.state === 'meeting' || !take('chat:' + withWho, a)) return;
-      b.busy = true;
-      const zb = Z[withWho], bx = zb.row === 'back' ? zb.x - 46 : zb.x + 52;
+      const b = A[withWho]; if (!b || b.owner || b.lay === 'aisle' || b.state === 'meeting' || !take('chat:' + withWho, a)) return;
+      begin(b, 'chat-partner');
+      const zb = Z[withWho], bx = zb.row === 'back' ? zb.x - 58 : zb.x + 52, t = pairChat(a.who, withWho);
       if (await standUp(a) && await go(a, bx)) {
         face(a, zb.x < a.x); stopWork(b); face(b, a.x < zb.x);
-        await converse(a, b, pick(OFFICE_CHAT), { laugh: Math.random() < .35 });
+        await converse(a, b, t.lines, { laugh:t.fun });
         if (alive()) { face(b, false); workLoop(b); }
       }
-      b.busy = false; free(a); if (alive()) await sitDown(a);
+      end(b); free(a); if (alive()) await sitDown(a);
+    },
+    // chủ động sang bàn nhân vật chính bắt chuyện: câu nói tùy quan hệ, công việc và chuyện vừa xảy ra
+    visit: async a => {
+      const me = A.me; if (!me || me.owner || me.lay === 'aisle' || mode !== 'work' || S.slot === 'evening') return;
+      const t = pickTalk(a.who); if (!t) return;
+      begin(me, 'visited');
+      if (await standUp(a) && await go(a, Z.me.x + 54)) {
+        face(a, true); stopWork(me); face(me, false);
+        const ok = await converse(a, me, t.lines, { laugh:t.fun });
+        if (ok) chatBond(a.who);
+        if (alive()) workLoop(me);
+      }
+      end(me); if (alive()) await sitDown(a);
     },
   };
-  // Người điều phối: mỗi người có lịch riêng, lần lượt làm từng việc, không quá MAX_AWAY người rời bàn cùng lúc
+
+  /* ----- Sự kiện văn phòng: chèn lên lịch, xong thì mọi người làm tiếp lịch đang dở ----- */
+  const waitFree = async list => { for (let i = 0; i < 40; i++) { if (list.every(k => !A[k].owner && A[k].lay !== 'aisle')) return true; if (!await wait(400)) return false; } return false; };
+  const runEvent = async (ev, resume) => {
+    const P = ev.who.filter(k => A[k]); if (!P.length) { ev.phase = 'done'; D.done.push('event'); return; }
+    if (!resume) { ev.phase = 'starting'; if (!await waitFree(P)) { if (alive()) ev.phase = 'pending'; return; } ev.phase = 'running'; ev.started = D.elapsed; STAGE_DEBUG.log.push('event-start:' + ev.id); }
+    const left = () => Math.max(700, ev.dur - (D.elapsed - ev.started));
+    const finish = () => { ev.phase = 'done'; D.done.push('event'); D.quiet = false; STAGE_DEBUG.log.push('event-done:' + ev.id); };
+    P.forEach(k => begin(A[k], 'event:' + ev.id));
+    if (ev.id === 'meeting') {                                         // họp đột xuất: chị Hạnh gọi vài người ra phòng họp
+      if (!resume) {
+        const boss = A.boss; stopWork(boss); setState(boss, 'talk'); if (!await say(boss, 'Cả nhà họp nhanh nhé!', 1500)) return;
+        const outs = [];
+        for (const k of P.slice().sort((x, y) => Z[x].x - Z[y].x)) { const a = A[k];             // người ngồi gần cửa đi trước, để không dồn nhau ở cửa
+          outs.push((async () => { if (!await standUp(a)) return; if (k === 'boss') hold(a, 'paper'); if (!await go(a, STAGE.DOOR.x)) return; door(true); if (!await wait(280)) return; a.el.classList.add('gone'); a.state = 'meeting'; a.el.dataset.state = 'meeting'; later(() => door(false), 400); })());
+          if (!await wait(1900)) return; }
+        await Promise.all(outs); if (!alive()) return;            // chờ mọi người ra hẳn khỏi phòng rồi mới tính giờ họp
+      } else P.forEach(k => { const a = A[k]; stopWork(a); snap(a, STAGE.DOOR.x, STAGE.LANES[0], 'aisle'); a.el.classList.add('gone'); a.state = 'meeting'; a.el.dataset.state = 'meeting'; screen(a, false); });
+      if (!await wait(left())) return;
+      for (const k of P) { const a = A[k]; door(true); if (!await wait(300)) return; a.el.classList.remove('gone'); a.state = 'rest';
+        (async () => { if (await sitDown(a)) { hold(a); end(a); } })(); later(() => door(false), 600); if (!await wait(1700)) return; }
+      finish();
+    } else if (ev.id === 'hotfix') {                                   // lỗi khẩn cấp: một người chạy sang báo, người kia sửa gấp
+      const F = A[P[0]], R = A[P[1]]; if (!R) { end(F); finish(); return; }
+      const zf = Z[F.who], rx = zf.row === 'back' ? zf.x - 58 : zf.x + 52; D.quiet = true;
+      if (!resume) {
+        R.speed = 96; const ok = await standUp(R) && await go(R, rx); R.speed = null; if (!ok) return;
+        face(R, zf.x < R.x); stopWork(F); face(F, R.x < zf.x);
+        if (!await converse(R, F, ['Production lỗi rồi!', F.who === 'dung' ? 'Để anh xem.' : 'Để chị xem.'])) return;
+      } else { stopWork(R); snap(R, rx, STAGE.LANES[0], 'aisle'); face(R, zf.x < R.x); stopWork(F); }
+      face(F, false); F.focusMode = true; workLoop(F); setState(R, 'think');
+      if (!await wait(left())) return;
+      F.focusMode = false; stopWork(F); setState(F, 'talk'); if (!await say(F, 'Xong.', 1100)) return;
+      setState(R, 'laugh'); setState(F, 'listen'); say(R, 'Cứu tinh!', 1200); if (!await wait(1300)) return;
+      workLoop(F); end(F); if (await sitDown(R)) end(R);
+      finish();
+    } else {                                                           // chạy hạn chót: cả phòng cắm mặt làm, chị Hạnh đi một vòng xem
+      D.quiet = true; const boss = A.boss, rest = P.filter(k => k !== 'boss');
+      if (!resume && boss) { stopWork(boss); setState(boss, 'talk'); rest.forEach(k => { stopWork(A[k]); setState(A[k], 'listen'); }); if (!await say(boss, 'Chiều nay chốt bản demo nhé!', 1700)) return; }
+      rest.forEach(k => { A[k].focusMode = true; workLoop(A[k]); });
+      if (boss) {
+        if (!resume) (async () => { if (!await standUp(boss)) return; for (const k of rest) { const z = Z[k]; if (!await go(boss, z.row === 'back' ? z.x - 58 : z.x + 52)) return; face(boss, z.x < boss.x); setState(boss, 'think'); if (!await wait(1300)) return; } await sitDown(boss); })();
+        else { boss.focusMode = true; workLoop(boss); }
+      }
+      if (!await wait(left())) return;
+      for (let i = 0; i < 20 && boss && boss.lay === 'aisle'; i++) if (!await wait(400)) return;
+      P.forEach(k => { const a = A[k]; a.focusMode = false; stopWork(a); setState(a, 'rest'); react(a, 'stretch', ANIM.WAKE_MS); });
+      if (rest[0]) say(A[rest[0]], 'Phù, xong!', 1300);
+      if (!await wait(ANIM.WAKE_MS + 200)) return;
+      P.forEach(k => { workLoop(A[k]); end(A[k]); });
+      finish();
+    }
+  };
+  // Người điều phối: đọc lịch của ngày, cho từng người làm việc riêng, chèn sự kiện khi đến lúc
   const director = async () => {
     if (still) return;
-    const t0 = Date.now(), plan = {};
-    COLLEAGUES.forEach(k => { if (A[k]) plan[k] = { i:0, at:OFFICE_ROUTINE[k].first, list:OFFICE_ROUTINE[k][S.slot] || [] }; });
+    const ev = D.event;
+    if (ev && ev.phase === 'starting') ev.phase = 'pending';
+    if (ev && ev.phase === 'running') runEvent(ev, true);              // quay lại cảnh giữa lúc sự kiện đang diễn ra
     while (await wait(900)) {
-      if (away() >= STAGE.MAX_AWAY) continue;
-      const now = Date.now() - t0;
-      const k = COLLEAGUES.find(k => plan[k] && plan[k].list.length && now >= plan[k].at && !A[k].busy && A[k].lay !== 'aisle' && A[k].state !== 'meeting'); if (!k) continue;
-      const p = plan[k], [name, arg] = p.list[p.i % p.list.length].split(':'), a = A[k];
-      p.i++; p.at = now + rnd(...STAGE.BEAT_GAP); a.busy = true;
-      beats[name](a, arg).then(() => { a.busy = false; free(a); });
+      D.elapsed += 900; const now = D.elapsed;
+      if (ev && ev.phase === 'pending' && now >= ev.at) { runEvent(ev, false); continue; }
+      if (D.quiet || (ev && ev.phase === 'starting') || away() >= STAGE.MAX_AWAY) continue;
+      const k = COLLEAGUES.find(k => A[k] && D.plans[k] && D.plans[k].list.length && now >= D.plans[k].at && !A[k].owner && A[k].lay !== 'aisle' && A[k].state !== 'meeting'); if (!k) continue;
+      const p = D.plans[k], [name, arg] = p.list[p.i % p.list.length].split(':'), a = A[k];
+      p.i++; p.at = now + rnd(...STAGE.BEAT_GAP) * p.gap;
+      if (begin(a, name)) beats[name](a, arg).then(() => end(a));
     }
   };
 
   /* ----- Các phân cảnh ----- */
   if (mode === 'work' || mode === 'visit') {
     const night = S.slot === 'evening', guest = mode === 'visit' && !Z[o.npc];
-    if (night) { if (S.day % 2) workLoop(seat('dung')); }             // tối OT: văn phòng vắng, thỉnh thoảng còn anh Dũng
+    if (night) { if (S.day % 2 && !D.absent.includes('dung')) workLoop(seat('dung')); }   // tối OT: văn phòng vắng, thỉnh thoảng còn anh Dũng
     else seatAll(mode === 'visit' ? [o.npc] : []);
     const me = seat('me', o.meExpr);
     if (o.meAnim) react(me, o.meAnim);
-    if (mode === 'visit') {                                            // một người đến bàn bạn trao đổi
+    if (mode === 'visit') {                                            // một người đến bàn bạn trao đổi (cảnh có lựa chọn)
       const from = guest ? STAGE.DOOR.x : Z[o.npc].x + STAGE.EDGE, spot = Z.me.x + 54;
-      const v = add(o.npc, still ? spot : from, STAGE.LANES[1], 'aisle', '', o.npcExpr); v.busy = true; v.state = 'rest';
+      const v = add(o.npc, still ? spot : from, STAGE.LANES[1], 'aisle', '', o.npcExpr); v.state = 'rest'; begin(v, 'scene'); begin(me, 'scene');
       setState(me, 'listen'); face(me, false);
       if (still) face(v, true);
       else (async () => {
@@ -324,20 +413,7 @@ function stageMount(root, mode, o = {}){
         // trong lúc người chơi đọc và chọn: hai bên lần lượt nói, nghe
         while (alive()) { setState(v, 'listen'); setState(me, 'talk'); if (!await wait(rnd(1500, 2300))) return; setState(me, 'listen'); setState(v, 'talk'); if (!await wait(rnd(1700, 2600))) return; }
       })();
-    } else {
-      workLoop(me);
-      if (o.dropby && !still) (async () => {                           // không có sự kiện: vẫn có người ghé qua nói một câu
-        if (!await wait(5200)) return;
-        const k = pick(COLLEAGUES.filter(x => A[x] && !A[x].busy && A[x].lay !== 'aisle')); if (!k || away() >= STAGE.MAX_AWAY) return;
-        const v = A[k]; v.busy = true;
-        if (await standUp(v) && await go(v, Z.me.x + 54)) {
-          face(v, true); stopWork(me); face(me, false);
-          await converse(v, me, [pick(OFFICE_DROPBY[k]), pick(['Dạ vâng ạ.', 'Ok!', 'Em cảm ơn ạ.'])]);
-          if (alive()) { workLoop(me); }
-        }
-        if (alive()) await sitDown(v); v.busy = false;
-      })();
-    }
+    } else workLoop(me);
     if (!night) director();
     return { done:null };
   }
@@ -352,7 +428,7 @@ function stageMount(root, mode, o = {}){
       setState(me, 'rest'); react(me, 'wave'); SFX.play('talk');
       // đồng nghiệp ngẩng lên nhìn rồi chào, từng người một
       for (const k of ['dung','mai','boss','phong']) {
-        const a = A[k]; stopWork(a); setState(a, 'listen'); face(a, k !== 'phong');
+        const a = A[k]; if (!a) continue; stopWork(a); setState(a, 'listen'); face(a, k !== 'phong');
         later(() => { if (S.lateToday && k === 'boss') { react(a, 'shake'); say(a, 'Muộn rồi đấy em.', 1500); } else { react(a, k === 'dung' ? 'nod' : 'wave'); say(a, OFFICE_ROUTINE[k].greet, 1300); } }, 260);
         later(() => { face(a, false); workLoop(a); }, 1900);
         if (!await wait(480)) return false;
@@ -366,7 +442,7 @@ function stageMount(root, mode, o = {}){
     seatAll(); const me = seat('me'); workLoop(me);
     if (still) return { done:Promise.resolve(false) };
     const exit = async (a, line) => {
-      a.busy = true; if (!await standUp(a)) return false;
+      if (!a || !begin(a, 'leave')) return false; if (!await standUp(a)) return false;
       face(a, false); setState(a, 'rest'); react(a, 'wave'); if (line) say(a, line, 1300); if (!await wait(900)) return false;
       if (!await go(a, STAGE.DOOR.x)) return false; door(true); if (!await wait(300)) return false; a.el.classList.add('gone'); later(() => door(false), 500); return true;
     };
@@ -381,7 +457,7 @@ function stageMount(root, mode, o = {}){
       // bạn đứng dậy, chào những người còn lại, rồi ra về
       if (!await standUp(me)) return false; face(me, false); setState(me, 'rest'); react(me, 'stretch', ANIM.WAKE_MS); if (!await wait(ANIM.WAKE_MS)) return false;
       react(me, 'wave'); say(me, 'Em về trước ạ!', 1400);
-      for (const k of ['boss','dung']) { const a = A[k]; stopWork(a); setState(a, 'listen'); later(() => { react(a, k === 'dung' ? 'nod' : 'wave'); say(a, OFFICE_ROUTINE[k].bye, 1300); }, 500); later(() => workLoop(a), 2200); }
+      for (const k of ['boss','dung']) { const a = A[k]; if (!a) continue; stopWork(a); setState(a, 'listen'); later(() => { react(a, k === 'dung' ? 'nod' : 'wave'); say(a, OFFICE_ROUTINE[k].bye, 1300); }, 500); later(() => workLoop(a), 2200); }
       if (!await wait(1900)) return false;
       if (!await go(me, STAGE.DOOR.x)) return false; door(true); if (!await wait(300)) return false; me.el.classList.add('gone'); later(() => door(false), 400);
       return wait(600);
@@ -425,7 +501,7 @@ function stagePanel(ref, sc, o = {}){
   const html = `<div class="panel stage">${stageSVG(sc.title)}</div>`;
   const mount = root => {
     if (visit) stageMount(root, 'visit', { npc:sc.npc, npcExpr:o.npcExpr || sc.npcExpr, meExpr:o.meExpr, meAnim:o.meAnim });
-    else stageMount(root, 'work', { meExpr:o.meExpr, meAnim:o.meAnim, dropby: ref && ref.id === 'task' && S.slot === 'morning' && !o.result });
+    else stageMount(root, 'work', { meExpr:o.meExpr, meAnim:o.meAnim });
   };
   return { html, mount };
 }

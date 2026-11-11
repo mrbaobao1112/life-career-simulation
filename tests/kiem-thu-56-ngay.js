@@ -99,7 +99,7 @@ for (const bg of ['tro', 'ghep', 'nha']) {
 
 // 7. Sân khấu văn phòng (v8): cảnh ở công ty có đủ 5 nhân vật; tắt đi thì về hình tĩnh; phân cảnh không chặn đường
 { const w = mk(); start(w, 'tro'); const d = w.document;
-  w.eval(`S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; S.job = { co:'hotay', salary:10000000, start:3 }; S.deck = shuffle(TASKS.map(t => t.id)); S.day = 8; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);
+  w.eval(`S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; S.job = { co:'hotay', salary:10000000, start:3 }; S.deck = shuffle(TASKS.map(t => t.id)); OFFICE_BAL.ABSENT = 0; S.day = 8; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);
   d.querySelector('#stage .choice').click();                                   // thức dậy
   const id1 = w.eval('S.cur.id'), actors = d.querySelectorAll('.panel.stage svg .actor').length;
   check('Ngày đi làm: cảnh task hiện trên sân khấu với 5 nhân vật', id1 === 'task' && actors === 5 && !w.errs.length, `cảnh ${id1}, ${actors} nhân vật ${w.errs[0] || ''}`);
@@ -131,7 +131,7 @@ for (const bg of ['tro', 'ghep', 'nha']) {
 
 // 9. Động tác và dọn dẹp (v10): mỗi trạng thái có động tác; chuyển cảnh thì không còn lệnh hẹn giờ nào của cảnh cũ
 { const w = mk(); start(w, 'tro'); const d = w.document;
-  w.eval(`window.matchMedia = () => ({ matches:false }); S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.slot = 'morning'; const box = document.querySelector('#stage'); box.innerHTML = '<div class="panel stage">' + stageSVG('x') + '</div>'; stageMount(box, 'work', {});`);
+  w.eval(`window.matchMedia = () => ({ matches:false }); S.job = { co:'hotay', salary:1e7, start:3 }; OFFICE_BAL.ABSENT = 0; S.day = 9; S.slot = 'morning'; const box = document.querySelector('#stage'); box.innerHTML = '<div class="panel stage">' + stageSVG('x') + '</div>'; stageMount(box, 'work', {});`);
   const r = JSON.parse(w.eval(`JSON.stringify({ timers:stageTimers.size, states:[...document.querySelectorAll('.stage .actor')].map(e => e.dataset.state + '/' + e.querySelector('.cb').getAttribute('class')), parts:['cb-legL','cb-shin','cb-say','cb-lips'].map(c => document.querySelectorAll('.stage .actor .' + c).length), desks:document.querySelectorAll('.stage .desk .scr.on').length })`));
   check('Năm người đang ở trạng thái làm việc với động tác gõ phím, màn hình sáng', r.states.length === 5 && r.states.every(s => s === 'work/cb cb-idle act-type') && r.desks === 5, r.states[0]);
   check('Nhân vật có đủ khớp chân và miệng nói', r.parts.join() === '5,10,5,5', r.parts.join());
@@ -141,6 +141,31 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   const missing = [...new Set(acts.split(',').concat(['act-run','act-sitdown','act-standup','act-ride','act-getoff','act-eat','act-phone','act-sleep']))].filter(a => !css.includes('.' + a));
   check('Mọi động tác được dùng đều có định nghĩa trong dong-tac.css', missing.length === 0, missing.join());
   w.eval('window.matchMedia = () => ({ matches:true })'); w.close(); }
+
+// 10. Tính cách, lịch động, xin nghỉ phép (v11)
+{ const w = mk(); start(w, 'tro'); const d = w.document;
+  w.eval(`S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.slot = 'morning'; S.stat.workDays = 5;`);
+  const r = JSON.parse(w.eval(`(() => { const n = k => { let v = 0, c = 0; for (let i = 0; i < 300; i++) { const p = officePlan(k, COLLEAGUES); c += p.list.length; v += p.list.filter(b => b === 'visit' || b.startsWith('chat')).length; } return [c / 300, v / 300]; };
+    const two = [0, 1].map(() => { OFFICE_DAY = null; return JSON.stringify(officeDay().plans); });
+    return JSON.stringify({ mai:n('mai'), dung:n('dung'), khac: two[0] !== two[1] }); })()`));
+  check('Chị Mai (hòa đồng) chủ động giao tiếp nhiều hơn hẳn anh Dũng (ít nói)', r.mai[1] > r.dung[1] * 3 && r.mai[0] > r.dung[0], `Mai ${r.mai[1].toFixed(1)} lần/buổi, Dũng ${r.dung[1].toFixed(1)} lần/buổi`);
+  check('Lịch của hai ngày không giống hệt nhau', r.khac);
+  const t = JSON.parse(w.eval(`(() => { S.lateToday = true; let late = 0; for (let i = 0; i < 30; i++) { lastTalk = {}; if (/sớm hơn/.test(pickTalk('boss').lines[0])) late++; } const a = late >= 12 ? 'Mai đến sớm hơn nhé em. (' + late + '/30 lần)' : 'chỉ ' + late + '/30 lần'; S.lateToday = false; S.rel.boss = 80; lastTalk = {}; const b = []; for (let i = 0; i < 12; i++) b.push(pickTalk('boss').lines[0]); S.rel.boss = 30; lastTalk = {}; const c = []; for (let i = 0; i < 12; i++) c.push(pickTalk('boss').lines[0]); return JSON.stringify({ a, b:[...new Set(b)], c:[...new Set(c)] }); })()`));
+  check('Câu nói phụ thuộc chuyện vừa xảy ra và độ thân', /sớm hơn/.test(t.a) && t.b.some(x => /yên tâm/.test(x)) && t.c.some(x => /chủ động hơn/.test(x)) && !t.c.some(x => /yên tâm/.test(x)), t.a);
+  const b0 = w.eval('S.rel.mai = 50; S.flags.chatBond = null; for (let i = 0; i < 10; i++) chatBond("mai"); S.rel.mai');
+  check('Trò chuyện làm thân hơn rất nhẹ, có giới hạn mỗi ngày', b0 === 53, 'từ 50 lên ' + b0);
+  const ev = JSON.parse(w.eval(`JSON.stringify((() => { const D = officeForce('meeting', 3000); return { id:D.event.id, who:D.event.who, phase:D.event.phase, plans:Object.keys(D.plans).length }; })())`));
+  check('Sự kiện văn phòng được chèn vào ngày, có danh sách người tham gia', ev.id === 'meeting' && ev.who[0] === 'boss' && ev.who.length === 3 && ev.phase === 'pending' && ev.plans === 4, JSON.stringify(ev));
+  // xin nghỉ phép: thứ Ba 24/11 xin nghỉ thứ Tư 25/11
+  const lv = JSON.parse(w.eval(`(() => { S.day = 9; S.unfinished = null; S.bugs = []; S.leave = null; S.leaveUsed = null; S.flags.leaveAsked = 0; const m0 = S.money, r0 = S.rel.boss, can = canAskLeave(); askLeave(); const ok = isWorkday(10) === false && isWorkday(11) === true;
+    S.day = 10; S.flags.leaveAsked = 0; const again = canAskLeave(); askLeave(); const second = !!(S.leave && S.leave[11]); const pay = payFor(25).days;
+    return JSON.stringify({ can, ok, again, second, money:S.money === m0, rel:r0 - S.rel.boss, msgs:S.phone.threads.boss.length, pay }); })()`));
+  check('Xin nghỉ phép qua điện thoại: được duyệt, ngày mai không phải đi làm', lv.can && lv.ok && lv.msgs >= 2, JSON.stringify(lv));
+  check('Mỗi tháng chỉ một ngày phép; tiền và ngày công tính lương không đổi', lv.again && !lv.second && lv.money && lv.pay === 9, `lần hai: ${lv.second ? 'được' : 'bị từ chối'}, ngày công ${lv.pay}`);
+  w.eval(`S.day = 9; S.leave = { 10:true }; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);
+  const q = w.eval(`JSON.stringify([S.cur, ...S.queue].map(r => r.id))`);
+  check('Ngày nghỉ phép: không có cảnh công ty, có giờ rảnh buổi sáng', !/task|standup|cut/.test(q) && /activity/.test(q) && !w.errs.length, q + (w.errs[0] || ''));
+  w.close(); }
 
 console.log(fail ? `\n${fail} mục KHÔNG đạt` : '\nTất cả đều đạt');
 process.exit(fail ? 1 : 0);

@@ -100,6 +100,7 @@ function liveMount(root, spec){
     const inScene = spec.npc === 'family' ? ['mom','dad'] : spec.npc && NPC[spec.npc] ? [spec.npc] : [];
     for (const [who, plan] of Object.entries(cast)) {
       if (inScene.includes(who) || spec.pose === 'table') continue;
+      if ((S.day * 7 + who.length * 13 + SLOTS.indexOf(S.slot) * 5) % 10 < 2) continue;      // có buổi người này đi vắng
       const opts = plan[S.slot] || plan.evening, [spot, name] = opts[(S.day + who.length) % opts.length];
       if (spot === 'bed') { if (['sleep','wake','film'].includes(spec.pose)) continue; others.push(lie(who, { color:'#F6C85F' })); continue; }
       if (['tableL','tableR'].includes(spot) && ['eat','study'].includes(spec.pose) && spot === 'tableL') continue;
@@ -127,9 +128,27 @@ function liveMount(root, spec){
         (async () => { if (!await wait(i * 350)) return; if (!await walk(a, P.talkNpc.x + i * 44)) return; face(a, true); act(a, i ? '' : 'act-talk'); })(); });
     } else {                                                   // rảnh rỗi: tự đi lại trong phòng
       me = mk('me', P.mid.x, GY, '', spec.meExpr);
-      if (!still) (async () => { while (await wait(rnd(...LIVE.WANDER))) { if (me.busyTap) continue; if (Math.random() < .3) { react(me, pick(['stretch','nod'])); continue; } if (!await walk(me, rnd(126, 196))) return; } })();
+      if (!still) (async () => { while (await wait(rnd(...LIVE.WANDER))) { if (me.chatting) continue; if (Math.random() < .3) { react(me, pick(['stretch','nod'])); continue; } if (!await walk(me, rnd(126, 196))) return; } })();
     }
     if (spec.meAnim && me && !me.rot) react(me, spec.meAnim);
+    // người ở cùng chủ động đến bắt chuyện: ai hòa đồng thì hay sang, câu nói tùy hoàn cảnh của bạn
+    if (!still && me && !me.rot && !['talk','table','clean','wake'].includes(spec.pose)) (async () => {
+      while (await wait(rnd(5200, 9500))) {
+        const a = others.filter(x => x.home && !x.busy && !x.rot).find(x => Math.random() < personaOf(x.who).social * .7); if (!a || me.chatting) continue;
+        const t = pickTalk(a.who); if (!t) continue;
+        a.busy = true; me.chatting = true; const back = { x:a.x, y:a.y, act:a.act }, mine = me.act;
+        if (await walk(a, me.x + (a.x < me.x ? -46 : 46), GY)) {
+          face(a, me.x < a.x); face(me, a.x < me.x);
+          act(a, 'act-talk'); act(me, 'act-listen'); SFX.play('talk');
+          if (await say(a, t.lines[0], Math.max(1400, t.lines[0].length * 95))) {
+            act(a, 'act-listen'); act(me, 'act-talk');
+            if (await say(me, t.lines[1], 1400)) { if (t.fun) { act(a, 'act-laugh'); act(me, 'act-laugh'); await wait(1000); } chatBond(a.who); }
+          }
+          if (alive()) { act(me, mine); face(me, false); if (await walk(a, back.x, back.y)) { act(a, back.act); face(a, false); } }
+        }
+        a.busy = false; me.chatting = false;
+      }
+    })();
     // người ở cùng thỉnh thoảng đổi việc
     if (!still) (async () => { while (await wait(rnd(4200, 7600))) { const a = pick(others.filter(x => x.home && !x.busy)); if (!a) continue; const [spot, name] = pick(a.home.opts); if (spot === 'bed' || spot === a.home.spot) continue;
       if (['tableL'].includes(spot) && ['eat','study','game'].includes(spec.pose)) continue;

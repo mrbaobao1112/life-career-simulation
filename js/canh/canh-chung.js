@@ -18,6 +18,7 @@ function todayLine(){
   if (d === S.ivDay) return `Hôm nay: phỏng vấn ở ${co().name} lúc 9 giờ.`;
   if (isWorkday() && d === S.job.start) return `Hôm nay: ngày đầu tiên đi làm ở ${co().name}.`;
   if (isWorkday()) return `Hôm nay: một ngày làm việc ở ${co().name}.`;
+  if (S.leave && S.leave[d]) return 'Hôm nay bạn nghỉ phép. Văn phòng vẫn chạy, chỉ là không có bạn.';
   if (isHoliday(d)) return 'Hôm nay nghỉ Tết Dương lịch. Cả thành phố ngủ nướng.';
   if (isWeekend(d)) return 'Hôm nay là cuối tuần. Không có lịch gì, và đó chính là lịch.';
   if (d === S.backupDay) return 'Hôm nay chưa có lịch gì. Điện thoại vẫn im lặng.';

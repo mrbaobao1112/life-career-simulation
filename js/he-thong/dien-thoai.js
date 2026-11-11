@@ -82,3 +82,24 @@ function replyMsg(th, i){
   save(); updateHUD(); openThread(th, diffChips(before, snap()));
 }
 
+
+/* ----- Xin nghỉ phép: nhắn chị Hạnh từ hôm trước, mỗi tháng một ngày ----- */
+const LEAVE = { PER_MONTH:1, REL_COST:1 };     // số ngày phép mỗi tháng trong thời gian thử việc; xin nghỉ làm chị Hạnh hơi kém vui
+// Có thể xin nghỉ ngày mai không (đã đi làm, mai là ngày làm việc, chưa xin rồi)
+function canAskLeave(){ const d = S.day + 1; return !!S.job && S.day >= S.job.start && d <= LAST_DAY && !isDayOff(d) && d >= S.job.start && !(S.leave && S.leave[d]) && !(S.flags.leaveAsked === S.day); }
+function askLeave(){
+  if (!canAskLeave()) return;
+  const d = S.day + 1, mk = monthKey(d), used = (S.leaveUsed || {})[mk] || 0, before = snap();
+  S.flags.leaveAsked = S.day;
+  pushMsg('boss', 'me', `Chị ơi, mai (${fmtD(d)}) em xin nghỉ phép một ngày ạ.`);
+  let resp;
+  if (used >= LEAVE.PER_MONTH) { resp = 'Tháng này em nghỉ một ngày rồi mà. Ráng thêm nhé em.'; rel('boss', -LEAVE.REL_COST); }
+  else if (S.unfinished || (S.bugs || []).some(b => b.due <= d)) { resp = 'Mai còn việc đang dở, em xử lý xong đã nhé.'; }
+  else if (reviewDay(d)) { resp = 'Mai chị có buổi nhận xét với em, em sắp xếp hôm khác nhé.'; }
+  else { S.leave = { ...(S.leave || {}), [d]:true }; S.leaveUsed = { ...(S.leaveUsed || {}), [mk]:used + 1 }; rel('boss', -LEAVE.REL_COST);
+    resp = 'Ok em, nghỉ ngơi cho khỏe nhé.'; memo(`Xin nghỉ phép ngày ${fmtD(d)}`); note(`Đã xin nghỉ phép ngày mai (${fmtD(d)}).`); }
+  pushMsg('boss', 'boss', resp); clampAll(); save(); updateHUD();
+  openThread('boss', diffChips(before, snap()));
+}
+// Ngày d có phải ngày chị Hạnh nhận xét không (không cho nghỉ đúng ngày đó)
+function reviewDay(d){ return !!S.job && !S.flags.review && d >= BAL.REVIEW_DAY && dayInfo(d).wd === 5; }
