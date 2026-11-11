@@ -45,3 +45,47 @@
   .stage .actor{transition:none}
   .act-walk,.act-walk *,.act-type *,.act-talk *,.act-drink *,.act-ride,.stage .say{animation:none!important}
 }
+
+/* ---------- v9: động tác cho nhà và các địa điểm khác ---------- */
+.act-eat .cb-front .cb-armR{animation:eatUp 1.3s ease-in-out infinite}
+.act-eat .cb-head{animation:eatNod 1.3s ease-in-out infinite}
+@keyframes eatUp{0%,35%,100%{transform:rotate(0)}55%,75%{transform:rotate(-80deg) translate(-2px,-3px)}}
+@keyframes eatNod{0%,50%,100%{transform:rotate(0)}65%{transform:rotate(4deg) translateY(1.5px)}}
+
+.act-read .cb-front .cb-armL{transform:rotate(-42deg)}
+.act-read .cb-front .cb-armR{transform:rotate(42deg)}
+.act-read .cb-head{animation:readNod 4.2s ease-in-out infinite}
+@keyframes readNod{0%,100%{transform:rotate(3deg) translateY(2px)}50%{transform:rotate(-2deg) translateY(2px)}}
+
+.act-game .cb-front .cb-armL{animation:gameTap .18s linear infinite}
+.act-game .cb-front .cb-armR{animation:gameTap .18s linear infinite .09s}
+.act-game{animation:gameLean 1.6s ease-in-out infinite}
+@keyframes gameTap{50%{transform:translate(1.5px,-3px)}}
+@keyframes gameLean{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg)}70%{transform:rotate(3deg)}}
+
+.act-phone .cb-front .cb-armR{transform:rotate(-118deg) translate(-4px,-6px)}
+.act-phone .cb-head{animation:phoneTilt 2.6s ease-in-out infinite}
+@keyframes phoneTilt{0%,100%{transform:rotate(5deg)}50%{transform:rotate(2deg) translateY(1px)}}
+
+.act-sweep .cb-front .cb-armL,.act-sweep .cb-front .cb-armR{animation:sweepArm .7s ease-in-out infinite}
+.act-sweep .cb-legL{animation:legSwing .7s ease-in-out infinite}
+.act-sweep .cb-legR{animation:legSwing .7s ease-in-out infinite reverse}
+@keyframes sweepArm{0%,100%{transform:rotate(-26deg)}50%{transform:rotate(22deg)}}
+
+.act-cook .cb-front .cb-armL{animation:cookStir .9s ease-in-out infinite}
+.act-cook .cb-front .cb-armR{animation:cookStir .9s ease-in-out infinite .45s}
+@keyframes cookStir{0%,100%{transform:rotate(-30deg) translateY(-2px)}50%{transform:rotate(-55deg) translateY(-5px)}}
+
+.act-run{animation-duration:.26s!important;transform:rotate(7deg)}
+.act-run .cb-legL,.act-run .cb-legR,.act-run .cb-front .cb-armL,.act-run .cb-front .cb-armR{animation-duration:.26s!important}
+
+.act-sleep .cb-torso{animation:breathe 3.8s ease-in-out infinite}
+.stage .zz{animation:zzUp 2.6s ease-in infinite}
+.stage .zz.z2{animation-delay:1.3s}
+@keyframes zzUp{0%{opacity:0;transform:translate(0,6px)}30%{opacity:1}100%{opacity:0;transform:translate(8px,-12px)}}
+.stage .rain{animation:rainFall .5s linear infinite}
+@keyframes rainFall{to{transform:translate(-8px,24px)}}
+
+@media (prefers-reduced-motion: reduce){
+  .act-eat *,.act-read .cb-head,.act-game,.act-game *,.act-phone .cb-head,.act-sweep *,.act-cook *,.act-sleep *,.stage .zz,.stage .rain{animation:none!important}
+}

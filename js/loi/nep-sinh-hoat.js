@@ -203,7 +203,7 @@ function openHabits(){
     <p class="muted">Những việc thường ngày sẽ tự diễn ra theo nếp này. Thay đổi có hiệu lực từ lần kế tiếp, kể cả trong hôm nay.</p>
     ${['lunchWork','meal','bed','work','free'].map(row).join('')}
     <label class="hrow chk"><input type="checkbox" id="optDetail" ${S.opt && S.opt.detail ? 'checked' : ''}><span>Hiện chi tiết cộng trừ chỉ số trên từng lựa chọn</span></label>
-    <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Văn phòng sống: đồng nghiệp đi lại, làm việc, trò chuyện (thử nghiệm)</span></label>`;
+    <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Cảnh sống: nhân vật đi lại, làm việc, trò chuyện ở nhà, công ty và các nơi khác</span></label>`;
   const dlg = $('#dlg'); dlg.classList.remove('phone-dlg');
   $('#closeDlg').addEventListener('click', () => { closeDlg(); if (S && S.cur && S.phase === 'play') renderScene(); });
   $('#dlgBody').querySelectorAll('select[data-h]').forEach(s => s.addEventListener('change', () => {

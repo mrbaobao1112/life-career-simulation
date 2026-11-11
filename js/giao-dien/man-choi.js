@@ -115,7 +115,7 @@ function renderScene(){
       <p class="reply-lbl">Bạn trả lời:</p><div class="choices">${btns}</div></article>`;
   } else {
     const talk = current.talk || [];
-    const live = stageFor(ref, current) ? stagePanel(ref, current, { meExpr:current.meExpr }) : null;      // cảnh ở công ty: dùng sân khấu sống
+    const live = stageFor(ref, current) ? stagePanel(ref, current, { meExpr:current.meExpr }) : livePanel(ref, current);      // cảnh ở công ty: dùng sân khấu sống
     $('#stage').innerHTML = `${boardHTML()}<article class="scene">
       ${live ? live.html : `<div class="panel">${panelSVG(current.bg, current.npc, current.npcExpr, current.meExpr || (ty.t === 'random' && !current.meAnim ? 'panic' : undefined), current.title, { meAnim: current.meAnim || autoAnim(ref, ty), npcAnim: current.npcAnim, meExtras: current.meExtras || (ty.t === 'random' && !current.meAnim ? ['excl'] : undefined) })}</div>`}
       <header class="sh"><span class="si" aria-hidden="true">${current.icon || ''}</span><h2>${current.title}</h2></header>${typeHTML(ty)}
@@ -168,7 +168,8 @@ function choose(i){
   if (!nExpr && npc === 'family') { const d = S.rel.family - before.rel.family; nExpr = d > 0 ? 'happy' : d < 0 ? 'sad' : undefined; }
   const bg = out.bg || ch.bg || (current.kind === 'phone' ? 'home' : current.bg);
   const fx = resultFx(out, before);
-  const live = ref && stageFor(ref, { bg, npc }) ? stagePanel(ref, { bg, npc, title:current.title }, { meExpr:out.meExpr, meAnim:fx.anim, npcExpr:nExpr, result:true }) : null;
+  const live = !ref ? null : stageFor(ref, { bg, npc }) ? stagePanel(ref, { bg, npc, title:current.title }, { meExpr:out.meExpr, meAnim:fx.anim, npcExpr:nExpr, result:true })
+    : livePanel(ref, { bg, npc, title:current.title }, { bg, npc, actId:ch.actId, meExpr:out.meExpr, npcExpr:nExpr, meAnim:fx.anim });
   S.cur = null; save();
   if (out.silent || (!out.text && !chips.length)) return advance();
   updateHUD();

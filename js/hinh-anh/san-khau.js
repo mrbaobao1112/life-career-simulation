@@ -33,8 +33,10 @@ const stageOn = () => !(S.opt && S.opt.stage === false);
 function stageFor(ref, sc){
   if (!S || !stageOn() || !S.job || !isWorkday() || S.day < S.job.start) return false;
   if (ref.id === 'cut') return true;
-  if (!['morning','afternoon'].includes(S.slot) || sc.kind || sc.bg !== 'office') return false;
-  return !sc.npc || COLLEAGUES.includes(sc.npc);
+  if (sc.kind || sc.bg !== 'office') return false;
+  if (S.slot === 'evening') return ref.id === 'ot';
+  if (!['morning','noon','afternoon'].includes(S.slot)) return false;
+  return !sc.npc || !!NPC[sc.npc];
 }
 
 /* ----- Vẽ ----- */
@@ -55,26 +57,27 @@ function deskSVG(x, y, screen){
   return `<rect x="${x - 34}" y="${y - 27}" width="68" height="6" rx="2" fill="#8C6E54"/><rect x="${x - 31}" y="${y - 21}" width="62" height="24" fill="#A98463"/>
     <rect x="${x + 12}" y="${y - 39}" width="18" height="12" rx="1.5" fill="#2B3240"/><rect x="${x + 14}" y="${y - 37}" width="14" height="8" fill="${screen}"/><rect x="${x + 9}" y="${y - 28}" width="24" height="2" rx="1" fill="#59606C"/>`;
 }
-function actorSVG(who, expr){
-  const me = who === 'me', look = me ? playerLook() : NPC[who].look;
-  const body = chibi(look, expr || (me ? playerExpr() : defaultNpcExpr(who)), me ? { dark:darkCircles() } : {});
-  return `<g class="actor snap" data-who="${who}" ${me ? '' : `data-npc="${who}"`} role="button" aria-label="${me ? esc(S.name) : NPC[who].name}"><g class="sc"><g class="flip"><g class="cb cb-idle">${body}</g></g></g></g>`;
+function actorSVG(who, expr, look, id){
+  const me = who === 'me'; look = look || (me ? playerLook() : NPC[who].look);
+  const body = chibi(look, expr || (me ? playerExpr() : NPC[who] ? defaultNpcExpr(who) : 'neutral'), me ? { dark:darkCircles() } : {});
+  return `<g class="actor snap" data-who="${id || who}" ${me ? '' : `data-npc="${who}"`} role="button" aria-label="${me ? esc(S.name) : NPC[who] ? NPC[who].name : 'Người qua đường'}"><g class="sc"><g class="flip"><g class="cb cb-idle">${body}</g></g></g></g>`;
 }
 function stageSVG(label){
   const Z = STAGE.SEAT, sc = ['#9FC2F2','#B8E0C2','#F7D9A0'];
-  return `<svg viewBox="0 0 360 210" role="img" aria-label="${esc(label || 'Văn phòng')}">${stageBg()}${S.slot === 'afternoon' ? '<rect width="360" height="210" fill="#FF8A4C" opacity=".06"/>' : ''}
+  return `<svg viewBox="0 0 360 210" role="img" aria-label="${esc(label || 'Văn phòng')}">${stageBg()}${S.slot === 'afternoon' ? '<rect width="360" height="210" fill="#FF8A4C" opacity=".06"/>' : S.slot === 'evening' ? '<rect width="360" height="210" fill="#121836" opacity=".34"/><path d="M96 0 L150 0 L196 210 L50 210Z" fill="#FFF3B0" opacity=".13"/>' : ''}
     <g class="L-back"></g>${deskSVG(Z.dung.x, Z.dung.y, sc[0])}${deskSVG(Z.mai.x, Z.mai.y, sc[1])}${deskSVG(Z.boss.x, Z.boss.y, sc[2])}
     <g class="L-aisle"></g><g class="L-front"></g>${deskSVG(Z.me.x, Z.me.y, sc[1])}${deskSVG(Z.phong.x, Z.phong.y, sc[0])}<g class="L-say"></g></svg>`;
 }
 function streetSVG(){
   return `<svg viewBox="0 0 360 210" role="img" aria-label="Đường trước công ty"><g transform="translate(0 15)">${bgSVG('street')}</g><rect y="0" width="360" height="16" fill="${SKY[S.slot] || SKY.morning}"/><rect y="190" width="360" height="20" fill="#7A8290"/>
     <rect x="318" y="96" width="42" height="64" fill="#5D6B7E"/><rect x="326" y="112" width="26" height="48" rx="2" fill="#A98463"/>${T(339, 108, 'Công ty', '#fff', 8)}
-    <g class="L-aisle"></g><g class="L-say"></g></svg>`;
+    <g class="L-aisle"></g>${S.flags.rainDay === S.day ? rainSVG() : ''}<g class="L-say"></g></svg>`;
 }
 
 /* ----- Đạo diễn: điều khiển các nhân vật trên sân khấu đang hiện ----- */
 let stageRun = 0;                                             // mỗi lần dựng sân khấu mới, các hoạt cảnh cũ tự dừng
-function stageMount(root, mode, o = {}){
+// Phần lõi dùng chung cho mọi địa điểm: đặt nhân vật, cho đi lại, nói, phản ứng
+function stageCore(root){
   const run = ++stageRun, svg = root.querySelector('svg'), A = {}, still = reduceMotion();
   const alive = () => run === stageRun && !!window.document && !!document.body && document.body.contains(svg);
   const wait = ms => new Promise(r => setTimeout(() => r(alive()), ms));
@@ -82,13 +85,13 @@ function stageMount(root, mode, o = {}){
   const place = (a, x, y, lay) => {
     a.x = x; a.y = y; if (lay && a.lay !== lay) { a.lay = lay; layer(lay === 'aisle' ? 'aisle' : lay).appendChild(a.el); }
     const s = a.s || STAGE.SCALE[a.lay] || .46;
-    a.el.querySelector('.sc').setAttribute('transform', `translate(${-60 * s} ${-140 * s}) scale(${s})`);
+    a.el.querySelector('.sc').setAttribute('transform', `${a.rot ? `rotate(${a.rot}) ` : ''}translate(${-60 * s} ${-140 * s + (a.dy || 0)}) scale(${s})`);
     a.el.style.transform = `translate(${x}px, ${y}px)`;
   };
   const act = (a, name) => { const cb = a.el.querySelector('.cb'); cb.setAttribute('class', 'cb cb-idle' + (name ? ' ' + name : '')); a.act = name; };
-  const add = (who, x, y, lay, name, expr) => {
-    const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'g'); tmp.innerHTML = actorSVG(who, expr);
-    const a = A[who] = { who, el:tmp.firstChild, busy:false }; place(a, x, y, lay); act(a, name); return a;
+  const add = (who, x, y, lay, name, expr, x2 = {}) => {
+    const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'g'); tmp.innerHTML = actorSVG(who, expr, x2.look, x2.id);
+    const a = A[x2.id || who] = { who, id:x2.id || who, el:tmp.firstChild, busy:false, s:x2.s, rot:x2.rot, dy:x2.dy }; place(a, x, y, lay); act(a, name); return a;
   };
   const snap = (a, x, y, lay) => { a.el.classList.add('snap'); place(a, x, y, lay); void a.el.getBoundingClientRect(); };
   const walk = async (a, x, y) => {
@@ -107,19 +110,22 @@ function stageMount(root, mode, o = {}){
     layer('say').appendChild(g); setTimeout(() => g.remove(), ms); return wait(still ? 0 : ms);
   };
   const react = (a, anim) => { if (still) return; const cb = a.el.querySelector('.cb'); cb.classList.remove('anim-' + anim); void cb.getBoundingClientRect(); cb.classList.add('anim-' + anim); setTimeout(() => cb.classList.remove('anim-' + anim), 1200); };
+  // chạm vào ai thì người đó phản ứng (chỉ để cho vui, không ảnh hưởng chỉ số)
+  svg.addEventListener('click', e => {
+    const el = e.target.closest('.actor'); if (!el) return;
+    const a = A[el.dataset.who]; if (!a || a.rot) return;
+    react(a, a.who === 'me' ? pick(['wave','jump','cheer']) : pick(['hop','nod','wave']));
+    say(a, a.who === 'me' ? playerQuip() : pick(NPC_QUIP[a.who] || ['…','Chào!','Hử?']), 1500); SFX.play(a.who === 'me' ? 'hop' : 'talk');
+  });
+  return { run, svg, A, still, alive, wait, layer, place, act, add, snap, walk, face, say, react };
+}
+function stageMount(root, mode, o = {}){
+  const { svg, A, still, alive, wait, layer, place, act, add, snap, walk, face, say, react } = stageCore(root);
   // rời ghế ra lối đi, và quay về ghế
   const stand = a => { const z = STAGE.SEAT[a.who]; snap(a, z.x + 30, STAGE.AISLE_Y + (z.row === 'front' ? 3 : -2), 'aisle'); act(a, ''); };
   const sit = a => { const z = STAGE.SEAT[a.who]; snap(a, z.x, z.y - STAGE.SIT_UP, z.row); face(a, false); act(a, 'act-type'); };
   const goSit = async a => { const z = STAGE.SEAT[a.who]; if (!await walk(a, z.x + 30, STAGE.AISLE_Y + (z.row === 'front' ? 3 : -2))) return false; sit(a); return true; };
   const seatAll = (skip = []) => COLLEAGUES.forEach(k => { if (!skip.includes(k)) { const z = STAGE.SEAT[k]; add(k, z.x, z.y - STAGE.SIT_UP, z.row, 'act-type'); } });
-
-  // chạm vào ai thì người đó phản ứng (chỉ để cho vui, không ảnh hưởng chỉ số)
-  svg.addEventListener('click', e => {
-    const el = e.target.closest('.actor'); if (!el) return;
-    const a = A[el.dataset.who]; if (!a) return;
-    react(a, a.who === 'me' ? pick(['wave','jump','cheer']) : pick(['hop','nod','wave']));
-    say(a, a.who === 'me' ? playerQuip() : pick(NPC_QUIP[a.who] || ['…']), 1500); SFX.play(a.who === 'me' ? 'hop' : 'talk');
-  });
 
   /* ----- Hoạt động riêng của đồng nghiệp ----- */
   const doing = {
@@ -151,11 +157,12 @@ function stageMount(root, mode, o = {}){
   /* ----- Các phân cảnh ----- */
   const Z = STAGE.SEAT;
   if (mode === 'work' || mode === 'visit') {
-    seatAll(mode === 'visit' ? [o.npc] : []);
+    if (S.slot === 'evening') { if (S.day % 2) seatAll(['mai','boss','phong']); }      // tối OT: văn phòng vắng, thỉnh thoảng còn anh Dũng
+    else seatAll(mode === 'visit' ? [o.npc] : []);
     const me = add('me', Z.me.x, Z.me.y - STAGE.SIT_UP, 'front', mode === 'visit' ? 'act-talk' : 'act-type', o.meExpr);
     if (o.meAnim) react(me, o.meAnim);
     if (mode === 'visit') {                                   // một đồng nghiệp đến bàn bạn trao đổi
-      const v = add(o.npc, Z[o.npc].x + 30, STAGE.AISLE_Y, 'aisle', '', o.npcExpr); v.busy = true;
+      const v = add(o.npc, Z[o.npc] ? Z[o.npc].x + 30 : STAGE.DOOR.x, STAGE.AISLE_Y, 'aisle', '', o.npcExpr); v.busy = true;
       if (still) { snap(v, Z.me.x + 46, STAGE.AISLE_Y + 4); face(v, true); }
       else (async () => { if (!await walk(v, Z.me.x + 46, STAGE.AISLE_Y + 4)) return; face(v, true); act(v, 'act-talk'); if (o.line) say(v, o.line, 1800); })();
     } else if (o.dropby && !still) {                          // không có sự kiện: vẫn có người ghé qua nói một câu
@@ -218,7 +225,7 @@ function stageMount(root, mode, o = {}){
 /* ----- Ghép vào màn chơi ----- */
 // Trả về phần hình của cảnh, kèm việc cần làm sau khi hình đã nằm trên trang
 function stagePanel(ref, sc, o = {}){
-  const visit = sc.npc && COLLEAGUES.includes(sc.npc);
+  const visit = sc.npc && !!NPC[sc.npc];
   const html = `<div class="panel stage">${stageSVG(sc.title)}</div>`;
   const mount = root => {
     const line = sc.talk && sc.talk.length ? '…' : '';
