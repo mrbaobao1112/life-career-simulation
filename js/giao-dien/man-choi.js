@@ -115,13 +115,15 @@ function renderScene(){
       <p class="reply-lbl">Bạn trả lời:</p><div class="choices">${btns}</div></article>`;
   } else {
     const talk = current.talk || [];
+    const live = stageFor(ref, current) ? stagePanel(ref, current, { meExpr:current.meExpr }) : null;      // cảnh ở công ty: dùng sân khấu sống
     $('#stage').innerHTML = `${boardHTML()}<article class="scene">
-      <div class="panel">${panelSVG(current.bg, current.npc, current.npcExpr, current.meExpr || (ty.t === 'random' && !current.meAnim ? 'panic' : undefined), current.title, { meAnim: current.meAnim || autoAnim(ref, ty), npcAnim: current.npcAnim, meExtras: current.meExtras || (ty.t === 'random' && !current.meAnim ? ['excl'] : undefined) })}</div>
+      ${live ? live.html : `<div class="panel">${panelSVG(current.bg, current.npc, current.npcExpr, current.meExpr || (ty.t === 'random' && !current.meAnim ? 'panic' : undefined), current.title, { meAnim: current.meAnim || autoAnim(ref, ty), npcAnim: current.npcAnim, meExtras: current.meExtras || (ty.t === 'random' && !current.meAnim ? ['excl'] : undefined) })}</div>`}
       <header class="sh"><span class="si" aria-hidden="true">${current.icon || ''}</span><h2>${current.title}</h2></header>${typeHTML(ty)}
       ${current.html ? `<div class="st">${current.html}</div>` : ''}${first}
       ${talk.length ? '<div id="talk"></div>' : ''}
       <div id="rest" ${talk.length ? 'hidden' : ''}><div class="choices ${isAct ? 'tiles' : ''}">${btns}</div></div>${ff}</article>`;
     if (talk.length) { talkIdx = 0; showTalk(); }
+    if (live) { if (ref.id === 'cut') cutMount($('#stage'), ref, current); else live.mount($('#stage')); }
     armPanelSkip();
   }
   $('#stage').querySelectorAll('.choice').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
@@ -151,7 +153,7 @@ function choose(i){
   if (ref) {
     learnHabit(ref, ch);
     const daily = ['meal','bedtime','activity'].includes(ref.id);
-    const quiet = ['wake','dayReport','ffReport','monthReport','hangout_pick','plan'].includes(ref.id) || (out.silent && !daily && S.money === before.money);
+    const quiet = ['wake','dayReport','ffReport','monthReport','hangout_pick','plan','cut'].includes(ref.id) || (out.silent && !daily && S.money === before.money);
     if (!out.go && !quiet)
       feedAdd(ref, ch.icon || current.icon, ref.id === 'bedtime' ? feedText(ref, current, ch) : daily ? ch.label + '.' : current.title + '.', S.money - before.money);
   }
@@ -166,15 +168,17 @@ function choose(i){
   if (!nExpr && npc === 'family') { const d = S.rel.family - before.rel.family; nExpr = d > 0 ? 'happy' : d < 0 ? 'sad' : undefined; }
   const bg = out.bg || ch.bg || (current.kind === 'phone' ? 'home' : current.bg);
   const fx = resultFx(out, before);
+  const live = ref && stageFor(ref, { bg, npc }) ? stagePanel(ref, { bg, npc, title:current.title }, { meExpr:out.meExpr, meAnim:fx.anim, npcExpr:nExpr, result:true }) : null;
   S.cur = null; save();
   if (out.silent || (!out.text && !chips.length)) return advance();
   updateHUD();
   $('#stage').innerHTML = `<article class="scene result">
-    <div class="panel">${panelSVG(bg, npc, nExpr, out.meExpr, current.title, { meAnim: fx.anim, npcAnim: npcReact(nExpr) })}</div>
+    ${live ? live.html : `<div class="panel">${panelSVG(bg, npc, nExpr, out.meExpr, current.title, { meAnim: fx.anim, npcAnim: npcReact(nExpr) })}</div>`}
     <header class="sh"><span class="si" aria-hidden="true">${current.icon || '📝'}</span><h2>${current.title}</h2></header>
     <div class="st">${P(out.text)}</div>
     ${chips.length ? `<div class="chips">${chipsHTML(chips)}</div>` : ''}
     <button class="btn" type="button" id="next">Tiếp tục</button></article>`;
+  if (live) live.mount($('#stage'));
   const nb = $('#next'); nb.addEventListener('click', advance); nb.focus({ preventScroll:true });
   armPanelSkip(); if (fx.snd) SFX.play(fx.snd);
 }

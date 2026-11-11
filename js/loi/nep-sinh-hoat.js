@@ -46,6 +46,7 @@ function autoPick(ref, sc){
   const cheapest = () => { let best = -1; sc.choices.forEach((c, i) => { if (ok(c) && (best < 0 || (c.cost || 0) < (sc.choices[best].cost || 0))) best = i; }); return best; };
   switch (ref.id) {
     case 'wake': return fast ? 0 : -1;
+    case 'cut': return fast || !stageOn() || reduceMotion() ? 0 : -1;   // phân cảnh chỉ để xem: bỏ qua khi tua, khi tắt sân khấu, khi giảm chuyển động
     case 'meal': {
       const ctx = mealCtx(ref.arg); let k = h[ctx];
       if (!k || k === 'ask') { if (!fast) return -1; k = ctx === 'lunchWork' ? HABIT_DEF.lunchWork : MEAL_DEF[S.bg]; }
@@ -137,7 +138,7 @@ function runAuto(ref, sc, i){
   current = sc;
   const ch = sc.choices[i];
   const { before } = applyChoice(ch);
-  feedAdd(ref, ch.icon || sc.icon, feedText(ref, sc, ch), S.money - before.money);
+  if (ref.id !== 'cut') feedAdd(ref, ch.icon || sc.icon, feedText(ref, sc, ch), S.money - before.money);
   S.cur = null;
 }
 
@@ -201,12 +202,14 @@ function openHabits(){
   $('#dlgBody').innerHTML = `<div class="ph-head"><h2>Nếp sinh hoạt</h2><button class="ghost sm" type="button" id="closeDlg">Đóng</button></div>
     <p class="muted">Những việc thường ngày sẽ tự diễn ra theo nếp này. Thay đổi có hiệu lực từ lần kế tiếp, kể cả trong hôm nay.</p>
     ${['lunchWork','meal','bed','work','free'].map(row).join('')}
-    <label class="hrow chk"><input type="checkbox" id="optDetail" ${S.opt && S.opt.detail ? 'checked' : ''}><span>Hiện chi tiết cộng trừ chỉ số trên từng lựa chọn</span></label>`;
+    <label class="hrow chk"><input type="checkbox" id="optDetail" ${S.opt && S.opt.detail ? 'checked' : ''}><span>Hiện chi tiết cộng trừ chỉ số trên từng lựa chọn</span></label>
+    <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Văn phòng sống: đồng nghiệp đi lại, làm việc, trò chuyện (thử nghiệm)</span></label>`;
   const dlg = $('#dlg'); dlg.classList.remove('phone-dlg');
   $('#closeDlg').addEventListener('click', () => { closeDlg(); if (S && S.cur && S.phase === 'play') renderScene(); });
   $('#dlgBody').querySelectorAll('select[data-h]').forEach(s => s.addEventListener('change', () => {
     const k = s.dataset.h, v = s.value; if (v === '') return;
     h[k] = k === 'bed' && v !== 'ask' ? +v : v; save(); }));
   $('#optDetail').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.detail = e.target.checked; save(); });
+  $('#optStage').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.stage = e.target.checked; save(); });
   if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
 }
