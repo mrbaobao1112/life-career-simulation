@@ -17,6 +17,7 @@ const BADGES = [
 const midName = k => PEOPLE[k].name.replace(/^(Chị|Anh|Bố) /, m => m.toLowerCase());
 
 function renderWeek(){
+  stageStop();
   updateHUD();
   $('#bars').hidden = true;
   const w0 = S.w0, b = BAL.BG[S.bg];

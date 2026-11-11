@@ -1,6 +1,24 @@
 # Lịch sử phiên bản
 
-## v9: Sống ở mọi nơi (hiện tại)
+## v10: Động tác tự nhiên (hiện tại)
+Theo góp ý “nhân vật giống hình minh họa bị kéo đi trên nền”. Luật chơi, tài chính, sức khỏe và lưu game không đổi.
+- Sửa lỗi gốc: ở v8 và v9, động tác tay được gắn vào lớp tay đang bị ẩn nên tay gần như không cử động. Giờ mỗi động tác bật đúng lớp tay của nó.
+- Nhân vật có thêm khớp: đùi và bắp chân tách riêng, miệng mấp máy khi nói, tay cầm được cốc, tài liệu, điện thoại.
+- Bộ động tác tách ra file riêng `css/dong-tac.css`, mỗi động tác một khối: đi, chạy, ngồi xuống, đứng dậy, gõ phím, suy nghĩ, đọc, nói, nghe, cười, uống, nhấp ngụm nước, ăn, điện thoại, chơi game, quét dọn, nấu ăn, ngủ, ngồi xe máy, xuống xe.
+- Đi bộ: số bước tính theo quãng đường nên chân không còn trượt; gối gập khi nhấc chân, tay vung ngược nhịp, thân nhún mỗi bước, tăng giảm tốc ở hai đầu, đổi hướng thì quay người trước.
+- Ngồi và đứng: nhún người đứng dậy, lách ra mép bàn rồi mới bước đi; về thì lách vào ghế và ngồi xuống.
+- Làm việc là một chu kỳ: gõ, dừng nghĩ, nhấp ngụm nước, đọc tài liệu, vươn vai, gõ tiếp. Màn hình chỉ chạy chữ khi đang gõ.
+- Đồng nghiệp có trạng thái rõ ràng (làm việc, đi, nói, nghe, uống, họp, nghỉ) và lịch riêng theo thứ tự thay cho ngẫu nhiên. Trao đổi theo lượt: đi tới, quay mặt vào nhau, người nói ra tay, người nghe gật đầu, có lúc cùng cười, rồi về việc cũ.
+- Không đi xuyên qua nhau: lối đi có hai hàng, chỗ đứng được giữ trước, nhiều nhất hai đồng nghiệp rời bàn cùng lúc.
+- Môi trường: cửa mở khi có người ra vào, đồng hồ chỉ giờ theo buổi và có kim giây, mây trôi ngoài cửa sổ, mưa ngoài cửa sổ vào ngày mưa, cốc trên bàn được cầm lên đặt xuống, ghế sau mỗi bàn.
+- Bố cục: khung văn phòng cao hơn, nhân vật lớn hơn khoảng một phần tư, có chiều sâu (ở gần thì lớn hơn).
+- Xe máy: nhân vật ngồi co chân trên xe, bánh xe quay, giảm tốc rồi dừng, bước xuống xe, đi vào cửa; lúc về thì lên xe và tăng tốc dần.
+- Tan làm: chị Mai và Phong về trước; bạn đứng dậy, vươn vai, chào, những người còn lại chào đáp; rồi ra cửa.
+- Dọn dẹp: mọi lệnh hẹn giờ của một cảnh được hủy khi chuyển cảnh.
+
+Chưa làm: nút điện thoại nổi vẫn có thể che góc khung cảnh; ở nhà và nơi khác mới dùng động tác mới, chưa có trạng thái và lịch chặt chẽ như văn phòng; chạy, ăn, ngủ mới ở mức cơ bản.
+
+## v9: Sống ở mọi nơi
 Theo góp ý “nhiều phân cảnh vẫn chưa có animation”: mọi cảnh có hình giờ đều là cảnh sống. Luật chơi và con số không đổi.
 - Tách phần lõi của sân khấu (đặt nhân vật, đi lại, bong bóng thoại, phản ứng khi chạm) để mọi địa điểm dùng chung; mỗi địa điểm khai báo bằng dữ liệu.
 - Động tác mới dùng lại được: ăn, đọc, chơi game, nghe điện thoại, quét dọn, nấu ăn, chạy, ngủ.

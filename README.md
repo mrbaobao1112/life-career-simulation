@@ -66,9 +66,9 @@ Muốn sửa gì thì mở file nào:
 | Tin nhắn điện thoại | `js/he-thong/dien-thoai.js` |
 | Hình nhân vật, kiểu tóc, quần áo | `js/hinh-anh/chibi.js`, `js/hinh-anh/danh-muc-do.js` |
 | Tốc độ animation, âm thanh | `js/hinh-anh/animation-am-thanh.js` |
-| Văn phòng sống: vị trí bàn, lịch riêng và câu nói của đồng nghiệp | `js/hinh-anh/san-khau.js` |
+| Văn phòng sống: vị trí bàn, lịch riêng, các đoạn trao đổi của đồng nghiệp, tốc độ đi | `js/hinh-anh/san-khau.js` |
 | Cảnh sống ở nhà và nơi khác: chỗ đứng, tư thế theo việc, lịch của người ở cùng | `js/hinh-anh/dia-diem.js` |
-| Các động tác (đi, gõ phím, ăn, đọc, quét dọn…) | `css/san-khau.css` |
+| Các động tác (đi, ngồi, gõ phím, nghĩ, nói, nghe, cười, uống, đi xe…) | `css/dong-tac.css` |
 | Màu sắc, cỡ chữ | `css/giao-dien.css` |
 
 Các file dùng chung biến với nhau và được nạp lần lượt theo danh sách trong `index.html`. Khi thêm file mới, nhớ thêm một dòng `<script src="...">` vào đúng vị trí, và tránh đặt trùng tên biến với file khác.
