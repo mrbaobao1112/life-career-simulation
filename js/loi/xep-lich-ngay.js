@@ -77,7 +77,7 @@ function buildSlot(){
 
 function pushCommute(q){
   if (chance(.3)) q.push({ id:'ev', arg:'traffic' });
-  else if (chance(.15)) q.push({ id:'ev', arg:'rain' });
+  else if (chance(.15)) { q.push({ id:'ev', arg:'rain' }); S.flags.rainDay = S.day; }      // hôm nay mưa: các cảnh ngoài trời cũng có mưa
 }
 
 // Sự kiện có thời gian chờ: EV_CD[id] là số ngày phải chờ trước khi xảy ra lại; không ghi thì chỉ xảy ra một lần

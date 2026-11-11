@@ -14,7 +14,7 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 ## Tính năng hiện có
 
 - **Nếp sinh hoạt:** việc thường ngày (ăn, ngủ, họp đầu ngày, tắc đường) tự diễn ra theo nếp của nhân vật và hiện thành nhật ký trong ngày; người chơi chỉ quyết định việc đáng quyết định. Đổi nếp bất cứ lúc nào bằng nút “Nếp sinh hoạt”.
-- **Văn phòng sống (thử nghiệm):** trong ngày đi làm, văn phòng là một sân khấu: nhân vật đi xe máy tới, vào cửa, chào đồng nghiệp, ngồi gõ phím; đồng nghiệp tự đi lấy nước, sang bàn nhau trò chuyện, đi họp, rồi lần lượt ra về. Chạm vào ai thì người đó phản ứng. Bật tắt trong “Nếp sinh hoạt”.
+- **Cảnh sống:** mọi cảnh có hình đều chuyển động. Ở nhà: thức dậy từ trên giường, ăn, học, chơi game, quét dọn, người ở cùng (bố mẹ hoặc Tùng) có việc riêng theo buổi. Ở công ty: đi xe máy tới, chào đồng nghiệp, ngồi gõ phím, đồng nghiệp đi lại và trò chuyện, OT buổi tối vắng người. Ngoài đường: cà phê, trà đá, bia hơi, chạy bộ quanh hồ, thư viện, trung tâm thương mại, có người qua lại; trời mưa thì cảnh ngoài trời cũng mưa. Chạm vào ai thì người đó phản ứng. Bật tắt trong “Nếp sinh hoạt”.
 - **Qua nhanh và tua:** “Qua nhanh hôm nay” cho ngày tự trôi theo nếp; “Tua đến…” chạy nhiều ngày liền và dừng ở mốc tiếp theo hoặc khi có việc cần quyết định.
 - **Các mốc trong 8 tuần:** nhận xét của trưởng nhóm 27/11, Tùng trả nợ cuối tháng, hóa đơn ngày 1, lương ngày 10, tiền nhà ngày 16; tổng kết mỗi Chủ nhật và mỗi đầu tháng.
 - **Tìm việc tiếp:** người chưa có việc được nộp hồ sơ lại mỗi thứ Hai, vào các công ty chưa từng nộp.
@@ -67,6 +67,8 @@ Muốn sửa gì thì mở file nào:
 | Hình nhân vật, kiểu tóc, quần áo | `js/hinh-anh/chibi.js`, `js/hinh-anh/danh-muc-do.js` |
 | Tốc độ animation, âm thanh | `js/hinh-anh/animation-am-thanh.js` |
 | Văn phòng sống: vị trí bàn, lịch riêng và câu nói của đồng nghiệp | `js/hinh-anh/san-khau.js` |
+| Cảnh sống ở nhà và nơi khác: chỗ đứng, tư thế theo việc, lịch của người ở cùng | `js/hinh-anh/dia-diem.js` |
+| Các động tác (đi, gõ phím, ăn, đọc, quét dọn…) | `css/san-khau.css` |
 | Màu sắc, cỡ chữ | `css/giao-dien.css` |
 
 Các file dùng chung biến với nhau và được nạp lần lượt theo danh sách trong `index.html`. Khi thêm file mới, nhớ thêm một dòng `<script src="...">` vào đúng vị trí, và tránh đặt trùng tên biến với file khác.

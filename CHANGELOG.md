@@ -1,6 +1,20 @@
 # Lịch sử phiên bản
 
-## v8 (thử nghiệm): Văn phòng sống (hiện tại)
+## v9: Sống ở mọi nơi (hiện tại)
+Theo góp ý “nhiều phân cảnh vẫn chưa có animation”: mọi cảnh có hình giờ đều là cảnh sống. Luật chơi và con số không đổi.
+- Tách phần lõi của sân khấu (đặt nhân vật, đi lại, bong bóng thoại, phản ứng khi chạm) để mọi địa điểm dùng chung; mỗi địa điểm khai báo bằng dữ liệu.
+- Động tác mới dùng lại được: ăn, đọc, chơi game, nghe điện thoại, quét dọn, nấu ăn, chạy, ngủ.
+- Ở nhà (cả ba kiểu nơi ở): thức dậy từ trên giường rồi vươn vai hoặc ngáp theo giấc ngủ đêm trước; ăn và học ở bàn; chơi game; xem phim trên giường; nằm nghỉ; quét dọn; lúc rảnh tự đi lại. Bố mẹ hoặc Tùng có việc riêng theo buổi và thỉnh thoảng đổi việc; khi có chuyện thì đi tới nói với bạn.
+- Ngoài nhà: cà phê, trà đá, bia hơi (hai người lần lượt nói và uống), thư viện, chạy bộ quanh hồ, dạo trung tâm thương mại; có người qua lại phía sau.
+- Phỏng vấn: ngồi chờ ở sảnh, rồi ngồi đối diện người phỏng vấn qua bàn.
+- Công ty: thêm bữa trưa, ngày đầu đi làm (chị HR đi vào từ cửa) và OT buổi tối (văn phòng tối, vắng người).
+- Trời mưa (ngày có sự kiện mưa): các cảnh ngoài trời và đoạn đi xe máy cũng có mưa.
+- Chạm vào bất kỳ ai ở bất kỳ đâu: họ phản ứng và nói một câu.
+- Kiểm thử: chín ngày đầu không còn cảnh hình tĩnh nào.
+
+Chưa làm: quán ăn riêng (bữa ăn giờ tự chạy theo nếp nên hiếm khi hiện thành cảnh); đồ cầm tay theo động tác (bát đũa, chổi, sách); nhân vật thay quần áo; phân cảnh riêng cho các mốc lớn.
+
+## v8 (thử nghiệm): Văn phòng sống
 Lát cắt thử nghiệm hướng “thế giới đang sống”: một ngày đi làm ở công ty. Luật chơi và con số không đổi, chỉ thay phần hình của các cảnh ở công ty.
 - Sân khấu văn phòng: hai dãy bàn, cửa ra vào, bảng công việc, góc lấy nước. Mỗi nhân vật có vị trí và đi lại được.
 - Động tác mới dùng lại được: đi bộ (chân tách riêng), ngồi gõ phím, nói chuyện, cầm cốc uống, đi xe máy.

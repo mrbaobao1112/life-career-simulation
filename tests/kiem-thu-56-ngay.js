@@ -110,7 +110,23 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   d.querySelector('#stage .choice').click(); if (d.querySelector('#next')) d.querySelector('#next').click();
   const id2 = w.eval('S.cur && S.cur.id + ":" + S.cur.arg');
   check('Có chuyển động: phân cảnh hiện ra và bấm một lần là qua', id2 === 'cut:leave' && !!d.querySelector('#stage .choice'), String(id2));
-  d.querySelector('#stage .choice').click(); check('Qua phân cảnh, game đi tiếp bình thường', w.eval('!S.cur || S.cur.id !== "cut"') && !w.errs.length, w.errs[0] || '');
+  const refBefore = w.eval('S.cur'); d.querySelector('#stage .choice').click(); check('Qua phân cảnh, game đi tiếp bình thường', w.eval('S.cur') !== refBefore && !w.errs.length, w.errs[0] || '');
+  w.eval('window.matchMedia = () => ({ matches:true })'); w.close(); }
+
+// 8. Cảnh sống ở mọi nơi (v9): mọi cảnh có hình đều dựng được, kể cả khi có chuyển động
+{ const w = mk(); start(w, 'ghep'); const d = w.document; let live = 0, still = 0; const seen = new Set();
+  w.eval('window.matchMedia = () => ({ matches:false })');
+  for (let i = 0; i < 700 && w.eval('S.day') <= 9; i++) {
+    const nw = d.querySelector('#nextWeek'); if (nw) { nw.click(); continue; }
+    if (d.querySelector('.panel')) { if (d.querySelector('.panel.stage .actor')) { live++; seen.add(w.eval('S.cur ? S.cur.id : "kq"')); } else still++; }
+    const ts = d.querySelector('#tSkip'); if (ts) { ts.click(); continue; }
+    const nx = d.querySelector('#next'); if (nx) { nx.click(); continue; }
+    const ch = [...d.querySelectorAll('#stage .choice')].filter(b => !b.disabled && !b.closest('[hidden]') && !b.textContent.includes('Tua đến')); if (!ch.length) break;
+    ch[i % ch.length].click();
+  }
+  check('Chín ngày đầu: mọi cảnh có hình đều là cảnh sống, không lỗi', live >= 10 && still === 0 && !w.errs.length, `${live} cảnh sống, ${still} cảnh tĩnh, ${seen.size} loại cảnh ${w.errs[0] || ''}`);
+  const kinds = w.eval(`JSON.stringify(['room_nha','cafe','sidewalk','biahoi','lake','library','mall','lobby'].map(k => { const sp = liveSpec({ id:'activity' }, { bg:k, npc: k === 'cafe' ? 'linh' : null }, null); return sp ? sp.pose : null; }))`);
+  check('Mỗi địa điểm có tư thế riêng', kinds === '["idle","seat","idle","idle","run","idle","shop","wait"]', kinds);
   w.eval('window.matchMedia = () => ({ matches:true })'); w.close(); }
 
 console.log(fail ? `\n${fail} mục KHÔNG đạt` : '\nTất cả đều đạt');
