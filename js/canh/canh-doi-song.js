@@ -57,7 +57,7 @@ SC.activity = (slot) => {
   return { icon:'🗓️', title: { morning:'Sáng nay làm gì?', afternoon:'Chiều nay làm gì?', evening:'Tối nay làm gì?' }[slot],
     html: P(intro, S.energy < 25 ? '<span class="warn">Bạn đang rất mệt. Nghỉ ngơi có lẽ là lựa chọn khôn ngoan.</span>' : ''),
     choices: list.map(a => ({ icon:a.icon, label:a.label, short:ACT_SHORT[a.id], hints: repeatCount(a.id) ? [...a.hints, '😐 Làm gần đây rồi, hiệu quả giảm'] : a.hints, cost:a.cost, bg:ACT_BG[a.id], npc:ACT_NPC[a.id], actId:a.id,
-      fx:() => { let out = a.fx(); const more = sickOuting(a.id); if (more) { if (typeof out === 'string') out += more; else if (out && out.text) out.text += more; } return out; } })) };
+      fx:a.fx })) };
 };
 
 /* ----- Đi ngủ & nhật ký ----- */

@@ -27,7 +27,7 @@ function startDay(){
   S.flags.outLate = false;
   applyWake();
   leaveMorning();
-  if (goingOut()) { const f = Math.min(FIN.FUEL, S.money); if (f > 0) { S.money -= f; spendLog(f); note(`Xăng xe: −${fmt(f)}.`); } }
+  if (goingOut()) { const f = Math.min(FIN.FUEL, S.money); if (f > 0) { S.money -= f; spendLog(f); note(`Xăng xe: −${fmt(f)}.`); S.flags.fuel = { d:S.day, a:f }; } }
   clampAll();
   tickPhone();
   buildSlot();
