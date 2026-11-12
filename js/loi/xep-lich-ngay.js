@@ -10,7 +10,7 @@ function sceneType(ref){
   if (id === 'iv_arrive' || id === 'iv_result' || id === 'ob_arrive') return { t:'scheduled' };
   if (id === 'call_invite') return { t:'consequence', cause:'Vì sáng nay bạn đã nộp hồ sơ…' };
   if (id === 'bk_call') return { t:'random' };
-  if (id === 'bug_back') { const b = S.bugs.find(x => x.due <= S.day); return { t:'consequence', cause: b ? `Vì hôm trước bạn chọn “làm nhanh” task ${b.title}…` : '' }; }
+  if (id === 'bug_back') { const b = S.bugs.find(x => x.due <= S.day); return { t:'consequence', cause: !b ? '' : b.handover ? `Vì bạn bàn giao “${b.title}” cho ${PEOPLE[b.handover].name} trước khi nghỉ…` : `Vì hôm trước bạn chọn “làm nhanh” task ${b.title}…` }; }
   if (id === 'bill_short') return { t:'consequence', cause:'Vì đến hạn thanh toán mà số dư không đủ…' };
   if (id === 'payday' || id === 'repay' || id === 'review' || id === 'tung_repay' || id === 'reapply' || id === 'monthReport') return { t:'scheduled' };
   if (id === 'plan' && !S.cur.arg) return { t:'scheduled' };
@@ -72,7 +72,7 @@ function buildSlot(){
     q.push({ id:'bedtime' }, { id:'dayReport' });
   }
   if (!S.fast && (s === 'morning' || s === 'afternoon' || s === 'evening')) maybeMsg(s);   // khi tua nhanh, điện thoại im lặng
-  S.queue = q;
+  S.queue = S.flags.dayTrip === d && s !== 'morning' ? q.filter(r => r.id !== 'activity' && r.id !== 'ev') : q;   // đi cả ngày: chiều và tối không còn giờ rảnh
 }
 
 function pushCommute(q){

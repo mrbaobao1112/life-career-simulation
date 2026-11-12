@@ -18,7 +18,7 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 - **Mỗi người một tính cách:** anh Dũng ít nói, hiếm khi rời bàn; chị Mai hay sang bàn người khác và hay cười; Phong hay chạy sang hỏi anh Dũng; chị Hạnh đi họp nhiều; Tùng hay đùa; mẹ hay hỏi han. Tính cách điều khiển hành vi thật trên màn hình, và hiện trong Hồ sơ.
 - **Văn phòng mỗi ngày một khác:** lịch của từng người được xếp lại mỗi ngày; có ngày họp đột xuất, lỗi khẩn cấp, chạy hạn chót, có ngày một người nghỉ phép. Hết sự kiện thì ai về việc nấy.
 - **Chủ động bắt chuyện:** đồng nghiệp và người ở cùng nhà tự đến nói với bạn vài câu, nội dung tùy độ thân, công việc và chuyện vừa xảy ra; không có lựa chọn, chỉ làm thân hơn rất nhẹ.
-- **Xin nghỉ phép:** mở điện thoại, nhắn chị Hạnh xin nghỉ ngày mai (mỗi tháng một ngày).
+- **Nghỉ phép:** nhắn chị Hạnh trên điện thoại, chọn loại nghỉ (nghỉ phép, nghỉ ốm, nghỉ không lương), chọn một hay nhiều ngày, chọn lý do. Chị Hạnh có thể duyệt, từ chối, đề xuất đổi ngày hoặc yêu cầu bàn giao việc. Đang thử việc thì chưa dùng được ngày phép. Ngày nghỉ là một ngày rảnh, có thêm các hoạt động cả ngày: về quê, giải quyết việc cá nhân, đi chơi với bạn.
 - **Qua nhanh và tua:** “Qua nhanh hôm nay” cho ngày tự trôi theo nếp; “Tua đến…” chạy nhiều ngày liền và dừng ở mốc tiếp theo hoặc khi có việc cần quyết định.
 - **Các mốc trong 8 tuần:** nhận xét của trưởng nhóm 27/11, Tùng trả nợ cuối tháng, hóa đơn ngày 1, lương ngày 10, tiền nhà ngày 16; tổng kết mỗi Chủ nhật và mỗi đầu tháng.
 - **Tìm việc tiếp:** người chưa có việc được nộp hồ sơ lại mỗi thứ Hai, vào các công ty chưa từng nộp.
@@ -62,6 +62,7 @@ Muốn sửa gì thì mở file nào:
 |---|---|
 | Con số cân bằng (năng lượng, điểm cộng…) | `js/du-lieu/can-bang.js` |
 | Tiền, lương, hóa đơn | `js/he-thong/tai-chinh.js` |
+| Nghỉ phép: số ngày phép, điều kiện duyệt, bàn giao, hoạt động cả ngày | `js/he-thong/nghi-phep.js` |
 | Task, câu hỏi phỏng vấn, hoạt động tự do | `js/du-lieu/noi-dung.js` |
 | Sự kiện, số ngày chờ trước khi lặp lại | `js/su-kien/su-kien.js` |
 | Nhận xét của trưởng nhóm, Tùng trả nợ, tổng kết tháng | `js/su-kien/moc-thoi-gian.js` |

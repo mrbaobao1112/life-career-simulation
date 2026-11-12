@@ -26,7 +26,7 @@ const EVENTS = {
       { icon:'🚕', label:'Gửi xe, gọi xe công nghệ', cost:65000, hints:['⏱ +5 phút'], fx:() => { S.mood -= 1; addDelay('Đổi sang xe công nghệ', 5);
         return `Tài xế bật nhạc bolero suốt quãng đường. Khô ráo, và có một chút cảm xúc. ${arriveTxt()}`; } },
       { icon:'🧥', label:'Mặc áo mưa và hy vọng', hints:['🎲 +5 hoặc +35 phút'], fx:() => {
-        if (chance(.5)) { addDelay('Mưa', 5); return `Áo mưa làm tròn nhiệm vụ. ${arriveTxt()}`; }
+        if ((S.flags.bikeFixed && S.day - S.flags.bikeFixed < DAY_TRIP.errand.days) || chance(.5)) { addDelay('Mưa', 5); return `Áo mưa làm tròn nhiệm vụ. ${arriveTxt()}`; }
         addDelay('Xe chết máy giữa đường ngập', 35); S.mood -= 3;
         return `Xe chết máy giữa đường ngập. Bạn dắt bộ 300 mét trong ánh mắt cảm thông của người đi đường. ${arriveTxt()}`; } },
     ] }) },

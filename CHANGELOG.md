@@ -1,6 +1,21 @@
 # Lịch sử phiên bản
 
-## v11: Mỗi người một tính cách (hiện tại)
+## v12: Hệ thống nghỉ phép (hiện tại)
+Thay bản xin nghỉ tối giản của v11 bằng một hệ thống riêng (`js/he-thong/nghi-phep.js`). Hệ thống này chỉ quyết định “hôm nay có phải đi làm không”; làm gì trong ngày nghỉ vẫn là màn chọn việc lúc rảnh, nên sau này thêm du lịch không phải sửa phần nghỉ phép.
+- Ba loại nghỉ: nghỉ phép (có lương, trừ ngày phép), nghỉ ốm (có lương 1 ngày mỗi tháng, chỉ xin được khi sức khỏe hoặc năng lượng thật sự thấp, xin được ngay sáng hôm đó), nghỉ không lương (không tính công).
+- Ngày phép: mỗi tháng tích lũy 1 ngày, mọi công ty như nhau. Đang thử việc thì chưa dùng được, muốn nghỉ chỉ có nghỉ không lương hoặc nghỉ ốm.
+- Đơn nghỉ một ngày hoặc nhiều ngày liền (tối đa 5 ngày làm việc). Cuối tuần và ngày lễ nằm giữa không bị tính; cả kỳ nghỉ không quay lại lịch đi làm.
+- Chị Hạnh xét đơn theo quan hệ, xin sớm hay muộn, số ngày, vừa nghỉ gần đây chưa, có lỗi treo không: duyệt, từ chối, đề xuất đổi ngày (đồng ý hoặc rút đơn), hoặc duyệt kèm yêu cầu bàn giao.
+- Bàn giao cho Phong (ít phiền, dễ bị làm sót) hoặc anh Dũng (phiền hơn, chắc tay). Việc bị làm sót quay lại thành lỗi vào ngày đi làm lại.
+- Nghỉ từ 3 ngày: bắt buộc bàn giao, ngày đầu đi làm lại tốn sức bắt nhịp. Đồng nghiệp nhắc tới việc bạn vừa nghỉ.
+- Nghỉ không lương trừ thẳng vào ngày công của kỳ lương tới; bảng lương ghi rõ số ngày bị trừ.
+- Hoạt động cả ngày vào ngày không phải đi làm: về quê thăm bố mẹ, giải quyết việc cá nhân (bảo dưỡng xe: 30 ngày sau xe không chết máy giữa đường ngập), đi chơi cả ngày với bạn (tùy hôm bạn có rảnh). Chọn rồi thì chiều và tối không còn giờ rảnh.
+- Ngày nghỉ ốm: có thêm đi khám, không có hoạt động cả ngày; ra ngoài chơi có thể bị chị Mai bắt gặp.
+- Hồ sơ hiện số ngày phép. Đơn nghỉ của bản v11 được chuyển sang hệ thống mới.
+
+Chưa làm: nghỉ nửa ngày, du lịch, hủy đơn đã duyệt, nhận bàn giao khi đồng nghiệp nghỉ.
+
+## v11: Mỗi người một tính cách
 Tài chính, sức khỏe và công thức chỉ số không đổi.
 - Tính cách thành dữ liệu điều khiển hành vi (`js/du-lieu/tinh-cach.js`): hòa đồng, tập trung, hay đùa, nói ngắn. Người hòa đồng rời bàn và bắt chuyện nhiều hơn; người tập trung gõ lâu, ít nghỉ; người hay đùa hay cười sau câu chuyện. Hồ sơ hiện một dòng tính cách lấy từ cùng bảng này.
 - Lịch động (`js/hinh-anh/lich-van-phong.js`): lịch của từng đồng nghiệp được xếp lại mỗi ngày theo tính cách và độ thân, không còn một chu kỳ lặp lại.

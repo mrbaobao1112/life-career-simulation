@@ -203,9 +203,9 @@ function renderPhoneList(){
         <span class="ph-txt"><b>${THREADS[k].name}</b><span>${last.who === 'me' ? 'Bạn: ' : ''}${esc(last.t)}</span></span>
         ${p.pending[k] ? '<span class="ph-wait">Chờ trả lời</span>' : ''}${u ? `<span class="ph-badge">${u}</span>` : ''}</button>`; }).join('')
       : '<p class="ph-empty">Chưa có tin nhắn nào. Yên bình quá.</p>'}
-    ${canAskLeave() ? '<button class="ghost" type="button" id="askLeave" style="width:100%;margin-top:12px">🏖️ Nhắn chị Hạnh xin nghỉ phép ngày mai</button>' : ''}`;
+    ${leaveCan() ? '<button class="ghost" type="button" id="askLeave" style="width:100%;margin-top:12px">🏖️ Nhắn chị Hạnh xin nghỉ</button>' : ''}`;
   $('#phClose').addEventListener('click', () => closeDlg());
-  const al = $('#askLeave'); if (al) al.addEventListener('click', askLeave);
+  const al = $('#askLeave'); if (al) al.addEventListener('click', () => openLeaveForm());
   $('#dlgBody').querySelectorAll('.ph-item').forEach(b => b.addEventListener('click', () => openThread(b.dataset.th)));
 }
 function openThread(th, chips){
@@ -221,10 +221,12 @@ function openThread(th, chips){
   $('#dlgBody').innerHTML = `<div class="ph-head"><button class="ghost sm" type="button" id="phBack">Quay lại</button><b class="ph-name">${T_.name}</b><button class="ghost sm" type="button" id="phClose">Đóng</button></div>
     <div class="ph-msgs thread">${body}</div>
     ${chips && chips.length ? `<div class="chips">${chipsHTML(chips)}</div>` : ''}
-    ${pd ? `<p class="reply-lbl">Trả lời (nếu để quá lâu, ${T_.name.toLowerCase() === 'bố mẹ' ? 'bố mẹ' : 'họ'} sẽ phật lòng):</p>${replies}` : ''}`;
+    ${pd ? `<p class="reply-lbl">Trả lời (nếu để quá lâu, ${T_.name.toLowerCase() === 'bố mẹ' ? 'bố mẹ' : 'họ'} sẽ phật lòng):</p>${replies}` : ''}
+    ${th === 'boss' && S.leavePending ? `<p class="reply-lbl">Trả lời chị Hạnh:</p>${leaveReplies().map((r, i) => `<button class="reply lv" type="button" data-lv="${i}">${esc(r.t)}</button>`).join('')}` : ''}`;
   $('#phBack').addEventListener('click', renderPhoneList);
   $('#phClose').addEventListener('click', () => closeDlg());
-  $('#dlgBody').querySelectorAll('.reply').forEach(b => b.addEventListener('click', () => replyMsg(th, +b.dataset.r)));
+  $('#dlgBody').querySelectorAll('.reply:not(.lv)').forEach(b => b.addEventListener('click', () => replyMsg(th, +b.dataset.r)));
+  $('#dlgBody').querySelectorAll('.reply.lv').forEach(b => b.addEventListener('click', () => leaveReply(+b.dataset.lv)));
   const box = $('#dlgBody .thread'); if (box) box.scrollTop = box.scrollHeight;
 }
 
