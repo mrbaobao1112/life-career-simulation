@@ -116,7 +116,7 @@ SC.bug_back = () => {
   const done = () => { S.bugs = S.bugs.filter(x => x !== b); };
   return { icon:'🐞', title:'Lỗi quay lại',
     html: P(`Chị Mai đi thẳng đến bàn bạn, tay cầm điện thoại: “Em ơi, cái “${b.title}” hôm trước em làm ấy, khách vừa báo lỗi.”`,
-            '<span class="tip">Đây là hậu quả của lựa chọn “làm nhanh” hôm trước.</span>'),
+            b.handover ? '<span class="tip">Việc bàn giao trước khi nghỉ bị làm sót. Người nhận lại vẫn là bạn.</span>' : '<span class="tip">Đây là hậu quả của lựa chọn “làm nhanh” hôm trước.</span>'),
     choices: [
       { icon:'🛠️', label:'Nhận lỗi và sửa ngay', hints:['⚡ −12','🤝 +Chị Hạnh'], fx:() => { done(); S.energy -= 12; S.perf -= 1; rel('mai',2); rel('boss',2); S.stat.bugsFixed++;
         return 'Bạn xin lỗi, ngồi sửa trong một tiếng. Chị Hạnh nói: “Lỗi thì ai cũng có, nhận và sửa nhanh là được.” Bài học: nhanh hôm trước thì chậm hôm sau.'; } },

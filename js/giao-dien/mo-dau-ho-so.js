@@ -124,6 +124,7 @@ function openProfile(){
       <span>Nơi ở</span><span>${bgName}</span>
       <span>Gia cảnh</span><span>${(FAMILY[S.fam] || FAMILY.tb).name}</span>
       <span>Công việc</span><span>${job}</span>
+      ${S.job ? `<span>Ngày phép</span><span>${inProbation() ? `Tích lũy ${leaveBalance().earned}, dùng được sau thử việc` : `Còn ${leaveBalance().left}/${leaveBalance().earned}`}</span>` : ''}
       <span>Giấc ngủ gần nhất</span><span>${S.day > 1 ? fmtH(S.sleep) : 'Chưa có'}</span>
       <span>Ăn uống dạo này</span><span>${nutrWord()}</span>
     </div>

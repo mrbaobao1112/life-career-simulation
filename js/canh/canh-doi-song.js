@@ -56,7 +56,8 @@ SC.activity = (slot) => {
                   evening: isWorkday() ? 'Tan làm rồi. Buổi tối là của bạn.' : 'Buổi tối rảnh rỗi.' }[slot];
   return { icon:'🗓️', title: { morning:'Sáng nay làm gì?', afternoon:'Chiều nay làm gì?', evening:'Tối nay làm gì?' }[slot],
     html: P(intro, S.energy < 25 ? '<span class="warn">Bạn đang rất mệt. Nghỉ ngơi có lẽ là lựa chọn khôn ngoan.</span>' : ''),
-    choices: list.map(a => ({ icon:a.icon, label:a.label, short:ACT_SHORT[a.id], hints: repeatCount(a.id) ? [...a.hints, '😐 Làm gần đây rồi, hiệu quả giảm'] : a.hints, cost:a.cost, fx:a.fx, bg:ACT_BG[a.id], npc:ACT_NPC[a.id], actId:a.id })) };
+    choices: list.map(a => ({ icon:a.icon, label:a.label, short:ACT_SHORT[a.id], hints: repeatCount(a.id) ? [...a.hints, '😐 Làm gần đây rồi, hiệu quả giảm'] : a.hints, cost:a.cost, bg:ACT_BG[a.id], npc:ACT_NPC[a.id], actId:a.id,
+      fx:() => { let out = a.fx(); const more = sickOuting(a.id); if (more) { if (typeof out === 'string') out += more; else if (out && out.text) out.text += more; } return out; } })) };
 };
 
 /* ----- Đi ngủ & nhật ký ----- */
@@ -89,7 +90,7 @@ function previewTomorrow(){
   if (d === S.ivDay) return `Ngày mai: phỏng vấn ở ${COMPANIES[S.applied].name}, 9 giờ sáng.`;
   if (S.job && d === S.job.start) return `Ngày mai: ngày đầu tiên đi làm ở ${COMPANIES[S.job.co].name}. Nhớ đặt báo thức.`;
   if (isWorkday(d)) return 'Ngày mai: đi làm, có mặt lúc 9 giờ.';
-  if (S.leave && S.leave[d]) return 'Ngày mai: nghỉ phép.';
+  if (leaveOn(d)) return `Ngày mai: ${LEAVE_TYPE[leaveOn(d).type].name.toLowerCase()}.`;
   if (isHoliday(d)) return 'Ngày mai: nghỉ Tết Dương lịch.';
   if (isWeekend(d)) return 'Ngày mai: cuối tuần!';
   return 'Ngày mai: chưa có lịch gì.';

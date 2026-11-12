@@ -26,6 +26,7 @@ function startDay(){
   S.d0 = snap();
   S.flags.outLate = false;
   applyWake();
+  leaveMorning();
   if (goingOut()) { const f = Math.min(FIN.FUEL, S.money); if (f > 0) { S.money -= f; spendLog(f); note(`Xăng xe: −${fmt(f)}.`); } }
   clampAll();
   tickPhone();

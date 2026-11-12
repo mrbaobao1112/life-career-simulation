@@ -190,8 +190,8 @@ function stageMount(root, mode, o = {}){
       const hit = Object.values(A).some(b => {
         if (b === a || b.lay !== 'aisle' || b.el.classList.contains('gone') || Math.abs((b.ty ?? b.y) - y) >= 6) return false;
         const b0 = b.fx ?? b.x, moving = b.fx != null && Math.abs(b.x - b0) > 2;
-        // người đi cùng chiều, đã ở phía trước một quãng thì không vướng (cùng tốc độ nên không đuổi kịp)
-        if (moving && !fast && dir && Math.sign(b.x - b0) === dir && (b0 - a.x) * dir >= 30) return false;
+        // người đi cùng chiều, đã ở phía trước một quãng và sẽ đi xa hơn mình thì không vướng (cùng tốc độ nên không đuổi kịp)
+        if (moving && !fast && dir && Math.sign(b.x - b0) === dir && (b0 - a.x) * dir >= 30 && (b.x - x) * dir >= 20) return false;
         return Math.max(b.x, b0) > lo && Math.min(b.x, b0) < hi; });
       if (!hit) return y;
     }

@@ -53,21 +53,21 @@ function payFor(d){
   if (!S.job) return { amount:0, days:0 };
   const x = dateOf(d), a = dayOfDate(new Date(x.getFullYear(), x.getMonth() - 1, 1)), b = dayOfDate(new Date(x.getFullYear(), x.getMonth(), 0));
   const from = Math.max(a, S.job.start); if (from > b) return { amount:0, days:0 };
-  const days = workdays(from, b), full = workdays(a, b);
+  const off = unpaidIn(from, b), days = workdays(from, b) - off, full = workdays(a, b);      // ngày nghỉ không lương không tính công
   const sx = dateOf(S.job.start), monthsIn = (x.getFullYear() - sx.getFullYear()) * 12 + x.getMonth() - sx.getMonth();
   const rate = monthsIn <= FIN.PROBATION_MONTHS ? FIN.PROBATION_RATE : 1;
   const per = `${x.getMonth()}-${x.getFullYear()}`, adv = (S.advances || {})[per] || 0;
   const gross = Math.round(S.job.salary * rate * days / full / 1000) * 1000;
-  return { amount: Math.max(0, gross - adv), gross, days, full, rate, adv, per };
+  return { amount: Math.max(0, gross - adv), gross, days, full, rate, adv, per, off };
 }
-const payLine = p => `${p.days}/${p.full} ngày công × ${fmtTr(S.job.salary)}${p.rate < 1 ? ` × ${Math.round(p.rate * 100)}% thử việc` : ''}${p.adv ? `, trừ tạm ứng ${fmt(p.adv)}` : ''} = <b>${fmt(p.amount)}</b>`;
+const payLine = p => `${p.days}/${p.full} ngày công × ${fmtTr(S.job.salary)}${p.rate < 1 ? ` × ${Math.round(p.rate * 100)}% thử việc` : ''}${p.adv ? `, trừ tạm ứng ${fmt(p.adv)}` : ''} = <b>${fmt(p.amount)}</b>${p.off ? ` (đã trừ ${p.off} ngày nghỉ không lương)` : ''}`;
 function addLoan(from, amount, due, label){ (S.loans = S.loans || []).push({ from, amount, due, mk:monthKey(), label }); }
 function nextPaydayAfter(d){ for (let i = d + 1; i <= d + 40; i++) if (isPayday(i)) return i; return d + 30; }
 function openLoans(){ return (S.loans || []).filter(L => !L.repaid); }
 function earnedSoFar(){
   if (!S.job || S.day < S.job.start) return 0;
   const x = dateOf(S.day), a = dayOfDate(new Date(x.getFullYear(), x.getMonth(), 1)), b = dayOfDate(new Date(x.getFullYear(), x.getMonth() + 1, 0));
-  return Math.round(S.job.salary * FIN.PROBATION_RATE * workdays(Math.max(a, S.job.start), S.day) / workdays(a, b));
+  return Math.round(S.job.salary * FIN.PROBATION_RATE * (workdays(Math.max(a, S.job.start), S.day) - unpaidIn(Math.max(a, S.job.start), S.day)) / workdays(a, b));
 }
 function advanceKey(){ const x = dateOf(S.day); return `${x.getMonth() + 1}-${x.getFullYear()}`; }
 function canAdvance(){ return S.job && S.day >= S.job.start + FIN.ADVANCE_AFTER && !(S.advances || {})[advanceKey()]; }
