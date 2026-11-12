@@ -1,6 +1,19 @@
 # Lịch sử phiên bản
 
-## v12: Hệ thống nghỉ phép (hiện tại)
+## v12.1: Nghỉ phép gọn lại, đúng ngày công (hiện tại)
+Sau khi rà soát v12. Không đổi giao diện, không thêm tính năng; không đổi công thức lương.
+- Xin nghỉ là báo cho cấp trên: chị Hạnh không còn từ chối hay đề xuất đổi ngày vì lý do, quan hệ hay “team thiếu người”. Lý do là chuyện riêng, không ảnh hưởng kết quả. Chỉ còn các chặn sổ sách: trùng đơn, không đủ ngày phép, tối đa 5 ngày làm việc.
+- Còn hai loại: nghỉ phép và nghỉ không lương. Bỏ loại nghỉ ốm (và điều kiện “phải thật sự ốm”, chuyện bị bắt gặp khi đi chơi).
+- Thử việc chỉ còn một định nghĩa, trùng với bảng lương: tháng nào hưởng 85% thì tháng đó là thử việc. Trong thử việc, mọi ngày nghỉ đều không tính công.
+- Ngày phép: chỉ cộng khi đã chính thức, 1 ngày vào ngày 1 mỗi tháng (12 ngày mỗi năm). Xét theo ngày nghỉ chứ không theo ngày báo, nên cuối thử việc đã báo được nghỉ phép cho ngày đầu chính thức. Hết phép thì nghỉ không lương.
+- Bàn giao vẫn bắt buộc khi nghỉ từ 3 ngày hoặc đang có việc dở. Yêu cầu bàn giao để quá ngày nghỉ thì hết hiệu lực.
+- Cái giá của việc nghỉ: ngày công, và chị Hạnh kém vui hơn khi nghỉ dài, báo sát giờ hoặc nghỉ dồn dập.
+- Báo nghỉ được ngay sáng hôm đó; tiền xăng đã trừ lúc ngủ dậy được trả lại.
+- Sửa lỗi: đơn nhiều ngày bị tính chung một trạng thái có lương hay không; đồng ý với một đề xuất đã quá hạn làm đơn bị ghi vào quá khứ và trừ lương ngày đã đi làm.
+- Đơn của bản v11 và v12 (kể cả nghỉ ốm cũ) vẫn có hiệu lực và không làm đổi lương.
+- Kiểm thử: 21 mục cho nghỉ phép, gồm nghỉ một ngày, hai ngày liên tiếp, nhiều lần trong tháng, vắt qua hai tháng, nghỉ phép ngay sau thử việc, vắt qua cuối tuần, lưu và tải lại, yêu cầu bàn giao đang chờ và quá hạn.
+
+## v12: Hệ thống nghỉ phép
 Thay bản xin nghỉ tối giản của v11 bằng một hệ thống riêng (`js/he-thong/nghi-phep.js`). Hệ thống này chỉ quyết định “hôm nay có phải đi làm không”; làm gì trong ngày nghỉ vẫn là màn chọn việc lúc rảnh, nên sau này thêm du lịch không phải sửa phần nghỉ phép.
 - Ba loại nghỉ: nghỉ phép (có lương, trừ ngày phép), nghỉ ốm (có lương 1 ngày mỗi tháng, chỉ xin được khi sức khỏe hoặc năng lượng thật sự thấp, xin được ngay sáng hôm đó), nghỉ không lương (không tính công).
 - Ngày phép: mỗi tháng tích lũy 1 ngày, mọi công ty như nhau. Đang thử việc thì chưa dùng được, muốn nghỉ chỉ có nghỉ không lương hoặc nghỉ ốm.

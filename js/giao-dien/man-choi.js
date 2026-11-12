@@ -203,7 +203,7 @@ function renderPhoneList(){
         <span class="ph-txt"><b>${THREADS[k].name}</b><span>${last.who === 'me' ? 'Bạn: ' : ''}${esc(last.t)}</span></span>
         ${p.pending[k] ? '<span class="ph-wait">Chờ trả lời</span>' : ''}${u ? `<span class="ph-badge">${u}</span>` : ''}</button>`; }).join('')
       : '<p class="ph-empty">Chưa có tin nhắn nào. Yên bình quá.</p>'}
-    ${leaveCan() ? '<button class="ghost" type="button" id="askLeave" style="width:100%;margin-top:12px">🏖️ Nhắn chị Hạnh xin nghỉ</button>' : ''}`;
+    ${leaveCan() ? '<button class="ghost" type="button" id="askLeave" style="width:100%;margin-top:12px">🏖️ Nhắn chị Hạnh báo nghỉ</button>' : ''}`;
   $('#phClose').addEventListener('click', () => closeDlg());
   const al = $('#askLeave'); if (al) al.addEventListener('click', () => openLeaveForm());
   $('#dlgBody').querySelectorAll('.ph-item').forEach(b => b.addEventListener('click', () => openThread(b.dataset.th)));
