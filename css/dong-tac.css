@@ -44,6 +44,9 @@
 @keyframes typeL{0%,100%{transform:rotate(-34deg)}50%{transform:rotate(-34deg) translateY(-3.5px)}}
 @keyframes typeR{0%,100%{transform:rotate(34deg)}50%{transform:rotate(34deg) translateY(-3.5px)}}
 @keyframes typeLook{0%,62%,100%{transform:rotate(0) translateY(1px)}72%,88%{transform:rotate(-5deg)}}
+/* Đang chạy việc gấp: gõ nhanh hơn hẳn */
+.act-type.fast .cb-armL,.act-type.fast .cb-armR{animation-duration:.17s}
+.act-type.fast .cb-head{animation:none;transform:translateY(2px)}
 /* Suy nghĩ: dừng tay, một tay đưa lên cằm, đầu nghiêng */
 .act-think .cb-armR{transform:rotate(-140deg) translate(4px,6px)}
 .act-think .cb-armL{transform:rotate(-20deg)}

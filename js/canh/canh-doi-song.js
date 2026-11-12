@@ -89,6 +89,7 @@ function previewTomorrow(){
   if (d === S.ivDay) return `Ngày mai: phỏng vấn ở ${COMPANIES[S.applied].name}, 9 giờ sáng.`;
   if (S.job && d === S.job.start) return `Ngày mai: ngày đầu tiên đi làm ở ${COMPANIES[S.job.co].name}. Nhớ đặt báo thức.`;
   if (isWorkday(d)) return 'Ngày mai: đi làm, có mặt lúc 9 giờ.';
+  if (S.leave && S.leave[d]) return 'Ngày mai: nghỉ phép.';
   if (isHoliday(d)) return 'Ngày mai: nghỉ Tết Dương lịch.';
   if (isWeekend(d)) return 'Ngày mai: cuối tuần!';
   return 'Ngày mai: chưa có lịch gì.';

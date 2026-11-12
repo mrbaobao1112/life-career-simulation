@@ -203,7 +203,8 @@ function openHabits(){
     <p class="muted">Những việc thường ngày sẽ tự diễn ra theo nếp này. Thay đổi có hiệu lực từ lần kế tiếp, kể cả trong hôm nay.</p>
     ${['lunchWork','meal','bed','work','free'].map(row).join('')}
     <label class="hrow chk"><input type="checkbox" id="optDetail" ${S.opt && S.opt.detail ? 'checked' : ''}><span>Hiện chi tiết cộng trừ chỉ số trên từng lựa chọn</span></label>
-    <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Cảnh sống: nhân vật đi lại, làm việc, trò chuyện ở nhà, công ty và các nơi khác</span></label>`;
+    <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Cảnh sống: nhân vật đi lại, làm việc, trò chuyện ở nhà, công ty và các nơi khác</span></label>
+    <label class="hrow chk"><input type="checkbox" id="optFps" ${S.opt && S.opt.fps ? 'checked' : ''}><span>Hiện số khung hình mỗi giây (để đo độ mượt trên máy này)</span></label>`;
   const dlg = $('#dlg'); dlg.classList.remove('phone-dlg');
   $('#closeDlg').addEventListener('click', () => { closeDlg(); if (S && S.cur && S.phase === 'play') renderScene(); });
   $('#dlgBody').querySelectorAll('select[data-h]').forEach(s => s.addEventListener('change', () => {
@@ -211,5 +212,20 @@ function openHabits(){
     h[k] = k === 'bed' && v !== 'ask' ? +v : v; save(); }));
   $('#optDetail').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.detail = e.target.checked; save(); });
   $('#optStage').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.stage = e.target.checked; save(); });
+  $('#optFps').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.fps = e.target.checked; save(); fpsMeter(); });
   if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+}
+
+/* ----- Bộ đếm khung hình: bật trong "Nếp sinh hoạt" để đo độ mượt trên máy đang chơi ----- */
+let fpsOn = false;
+function fpsMeter(){
+  const want = !!(S && S.opt && S.opt.fps); let el = document.getElementById('fps');
+  if (!want) { if (el) el.remove(); fpsOn = false; return; }
+  if (!el) { el = document.createElement('div'); el.id = 'fps'; el.setAttribute('aria-hidden', 'true'); document.body.appendChild(el); }
+  if (fpsOn) return; fpsOn = true;
+  let n = 0, t0 = performance.now(), low = 99;
+  const tick = t => { if (!fpsOn) return; n++;
+    if (t - t0 >= 1000) { const f = Math.round(n * 1000 / (t - t0)); low = Math.min(low, f); el.textContent = `${f} khung hình/giây (thấp nhất ${low})`; n = 0; t0 = t; }
+    requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
 }

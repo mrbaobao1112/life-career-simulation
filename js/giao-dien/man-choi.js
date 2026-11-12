@@ -28,6 +28,7 @@ function calHTML(extra=''){
 }
 
 function updateHUD(enter){
+  fpsMeter();
   $('#top').hidden = false; $('#bars').hidden = false; $('#foot').hidden = false; $('#phoneFab').hidden = false;
   $('#cal').innerHTML = calHTML(enter ? 'enter' : '');
   $('#avatar').innerHTML = chibiSVG(playerLook(), playerExpr(), { dark:darkCircles(), label:`${S.name}, tâm trạng hiện tại` });
@@ -201,8 +202,10 @@ function renderPhoneList(){
       return `<button class="ph-item" type="button" data-th="${k}"><span class="ph-av">${headSVG(NPC[avKey(k)].look, defaultNpcExpr(k))}</span>
         <span class="ph-txt"><b>${THREADS[k].name}</b><span>${last.who === 'me' ? 'Bạn: ' : ''}${esc(last.t)}</span></span>
         ${p.pending[k] ? '<span class="ph-wait">Chờ trả lời</span>' : ''}${u ? `<span class="ph-badge">${u}</span>` : ''}</button>`; }).join('')
-      : '<p class="ph-empty">Chưa có tin nhắn nào. Yên bình quá.</p>'}`;
+      : '<p class="ph-empty">Chưa có tin nhắn nào. Yên bình quá.</p>'}
+    ${canAskLeave() ? '<button class="ghost" type="button" id="askLeave" style="width:100%;margin-top:12px">🏖️ Nhắn chị Hạnh xin nghỉ phép ngày mai</button>' : ''}`;
   $('#phClose').addEventListener('click', () => closeDlg());
+  const al = $('#askLeave'); if (al) al.addEventListener('click', askLeave);
   $('#dlgBody').querySelectorAll('.ph-item').forEach(b => b.addEventListener('click', () => openThread(b.dataset.th)));
 }
 function openThread(th, chips){

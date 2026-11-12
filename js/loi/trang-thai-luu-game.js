@@ -22,7 +22,7 @@ function eat(v){ logMeal(v >= 20 ? 'home' : v >= 10 ? 'cook' : v > 0 ? 'ot' : 's
 function note(t){ S.notes.push(t); }
 function memo(t){ S.memo.push({ day:S.day, text:t }); }
 function co(){ return COMPANIES[S.job ? S.job.co : S.applied]; }
-function isWorkday(d = S.day){ return !!S.job && d >= S.job.start && !isDayOff(d); }
+function isWorkday(d = S.day){ return !!S.job && d >= S.job.start && !isDayOff(d) && !(S.leave && S.leave[d]); }
 function goingOut(d = S.day){ return isWorkday(d) || d === S.ivDay || d === S.backupDay; }
 function snap(){ return { money:S.money, energy:S.energy, health:S.health, mood:S.mood, tech:S.tech, soft:S.soft, rel:{ ...S.rel } }; }
 function clampAll(){

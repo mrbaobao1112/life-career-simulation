@@ -15,6 +15,10 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 
 - **Nếp sinh hoạt:** việc thường ngày (ăn, ngủ, họp đầu ngày, tắc đường) tự diễn ra theo nếp của nhân vật và hiện thành nhật ký trong ngày; người chơi chỉ quyết định việc đáng quyết định. Đổi nếp bất cứ lúc nào bằng nút “Nếp sinh hoạt”.
 - **Cảnh sống:** mọi cảnh có hình đều chuyển động. Ở nhà: thức dậy từ trên giường, ăn, học, chơi game, quét dọn, người ở cùng (bố mẹ hoặc Tùng) có việc riêng theo buổi. Ở công ty: đi xe máy tới, chào đồng nghiệp, ngồi gõ phím, đồng nghiệp đi lại và trò chuyện, OT buổi tối vắng người. Ngoài đường: cà phê, trà đá, bia hơi, chạy bộ quanh hồ, thư viện, trung tâm thương mại, có người qua lại; trời mưa thì cảnh ngoài trời cũng mưa. Chạm vào ai thì người đó phản ứng. Bật tắt trong “Nếp sinh hoạt”.
+- **Mỗi người một tính cách:** anh Dũng ít nói, hiếm khi rời bàn; chị Mai hay sang bàn người khác và hay cười; Phong hay chạy sang hỏi anh Dũng; chị Hạnh đi họp nhiều; Tùng hay đùa; mẹ hay hỏi han. Tính cách điều khiển hành vi thật trên màn hình, và hiện trong Hồ sơ.
+- **Văn phòng mỗi ngày một khác:** lịch của từng người được xếp lại mỗi ngày; có ngày họp đột xuất, lỗi khẩn cấp, chạy hạn chót, có ngày một người nghỉ phép. Hết sự kiện thì ai về việc nấy.
+- **Chủ động bắt chuyện:** đồng nghiệp và người ở cùng nhà tự đến nói với bạn vài câu, nội dung tùy độ thân, công việc và chuyện vừa xảy ra; không có lựa chọn, chỉ làm thân hơn rất nhẹ.
+- **Xin nghỉ phép:** mở điện thoại, nhắn chị Hạnh xin nghỉ ngày mai (mỗi tháng một ngày).
 - **Qua nhanh và tua:** “Qua nhanh hôm nay” cho ngày tự trôi theo nếp; “Tua đến…” chạy nhiều ngày liền và dừng ở mốc tiếp theo hoặc khi có việc cần quyết định.
 - **Các mốc trong 8 tuần:** nhận xét của trưởng nhóm 27/11, Tùng trả nợ cuối tháng, hóa đơn ngày 1, lương ngày 10, tiền nhà ngày 16; tổng kết mỗi Chủ nhật và mỗi đầu tháng.
 - **Tìm việc tiếp:** người chưa có việc được nộp hồ sơ lại mỗi thứ Hai, vào các công ty chưa từng nộp.
@@ -66,7 +70,9 @@ Muốn sửa gì thì mở file nào:
 | Tin nhắn điện thoại | `js/he-thong/dien-thoai.js` |
 | Hình nhân vật, kiểu tóc, quần áo | `js/hinh-anh/chibi.js`, `js/hinh-anh/danh-muc-do.js` |
 | Tốc độ animation, âm thanh | `js/hinh-anh/animation-am-thanh.js` |
-| Văn phòng sống: vị trí bàn, lịch riêng, các đoạn trao đổi của đồng nghiệp, tốc độ đi | `js/hinh-anh/san-khau.js` |
+| Văn phòng sống: vị trí bàn, tốc độ đi, các việc riêng và sự kiện diễn ra thế nào | `js/hinh-anh/san-khau.js` |
+| Tính cách từng người, câu họ nói với bạn và với nhau | `js/du-lieu/tinh-cach.js` |
+| Xác suất có sự kiện văn phòng, có người nghỉ phép; cách xếp lịch mỗi ngày | `js/hinh-anh/lich-van-phong.js` |
 | Cảnh sống ở nhà và nơi khác: chỗ đứng, tư thế theo việc, lịch của người ở cùng | `js/hinh-anh/dia-diem.js` |
 | Các động tác (đi, ngồi, gõ phím, nghĩ, nói, nghe, cười, uống, đi xe…) | `css/dong-tac.css` |
 | Màu sắc, cỡ chữ | `css/giao-dien.css` |
@@ -81,7 +87,8 @@ Cần cài [Node.js](https://nodejs.org/) (bản 18 trở lên).
 cd tests
 npm install
 npm test              # kiểm thử hệ thống, tài chính, các mốc 56 ngày + 20 lượt chơi ngẫu nhiên trọn 56 ngày
-npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ
+npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
+npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)
 npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày
 npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra cân bằng (mất vài phút)
 npm run tai-chinh     # kiểm thử sổ hóa đơn và mô phỏng tài chính cả tháng

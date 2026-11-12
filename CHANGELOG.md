@@ -1,6 +1,24 @@
 # Lịch sử phiên bản
 
-## v10: Động tác tự nhiên (hiện tại)
+## v11: Mỗi người một tính cách (hiện tại)
+Tài chính, sức khỏe và công thức chỉ số không đổi.
+- Tính cách thành dữ liệu điều khiển hành vi (`js/du-lieu/tinh-cach.js`): hòa đồng, tập trung, hay đùa, nói ngắn. Người hòa đồng rời bàn và bắt chuyện nhiều hơn; người tập trung gõ lâu, ít nghỉ; người hay đùa hay cười sau câu chuyện. Hồ sơ hiện một dòng tính cách lấy từ cùng bảng này.
+- Lịch động (`js/hinh-anh/lich-van-phong.js`): lịch của từng đồng nghiệp được xếp lại mỗi ngày theo tính cách và độ thân, không còn một chu kỳ lặp lại.
+- Sự kiện văn phòng chèn lên lịch: họp đột xuất (chị Hạnh gọi vài người ra phòng họp), lỗi khẩn cấp (một người chạy sang báo, người kia sửa gấp), chạy hạn chót (cả phòng cắm mặt làm, chị Hạnh đi một vòng). Hết sự kiện, mọi người làm tiếp lịch đang dở. Chỉ ảnh hưởng đồng nghiệp, không kéo nhân vật chính vào.
+- Có ngày một đồng nghiệp nghỉ phép: bàn trống, có biển nhỏ.
+- Văn phòng nhớ diễn biến trong ngày: đổi thẻ giữa lúc đang họp thì người đi họp vẫn vắng mặt và quay về đúng lúc.
+- Chủ động bắt chuyện: đồng nghiệp tự sang bàn bạn; ở nhà, bố mẹ hoặc Tùng tự đến nói vài câu. Câu nói chọn theo chuyện vừa xảy ra (đi muộn, OT hôm qua, lương về, lỗi còn treo), công việc đang làm, độ thân, rồi mới đến tán gẫu theo tính cách. Hai bên nói và nghe theo lượt, có lúc cùng cười. Không có lựa chọn.
+- Mỗi lần được bắt chuyện làm thân hơn 1 điểm, nhiều nhất 3 lần mỗi ngày.
+- Ở nhà: người ở cùng có buổi đi vắng.
+- Xin nghỉ phép qua điện thoại: nhắn chị Hạnh từ hôm trước; mỗi tháng một ngày, chị Hạnh hơi kém vui; bị từ chối nếu đang có việc dở hoặc trùng buổi nhận xét. Ngày nghỉ phép vẫn tính công.
+- Mỗi người chỉ do một việc điều khiển tại một thời điểm; người đi trên lối không đi chéo, chờ khi cả hai hàng đang có người.
+- Sửa lỗi phát hiện khi kiểm thử: người đi họp có thể không quay lại nếu cuộc họp kết thúc trước khi họ ra tới cửa; người đang đi chỉ được tính ở điểm đến nên người khác có thể đi xuyên qua.
+- Bộ đếm khung hình mỗi giây, bật trong “Nếp sinh hoạt”, để đo độ mượt trên điện thoại thật.
+- Kiểm thử mới `kiem-thu-van-phong.js` chạy trong trình duyệt thật: một ngày có sự kiện bất ngờ.
+
+Chưa làm: các chuyến đi ngắn (lấy nước, sang bàn nhau) chưa được nhớ khi đổi thẻ, chỉ sự kiện và người nghỉ phép được nhớ; ở nhà mới có bắt chuyện và đi vắng, chưa có sự kiện chèn lịch như văn phòng.
+
+## v10: Động tác tự nhiên
 Theo góp ý “nhân vật giống hình minh họa bị kéo đi trên nền”. Luật chơi, tài chính, sức khỏe và lưu game không đổi.
 - Sửa lỗi gốc: ở v8 và v9, động tác tay được gắn vào lớp tay đang bị ẩn nên tay gần như không cử động. Giờ mỗi động tác bật đúng lớp tay của nó.
 - Nhân vật có thêm khớp: đùi và bắp chân tách riêng, miệng mấp máy khi nói, tay cầm được cốc, tài liệu, điện thoại.
