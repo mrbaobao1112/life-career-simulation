@@ -3,15 +3,24 @@
    ========================================================= */
 function hideHUD(){ $('#top').hidden = true; $('#bars').hidden = true; $('#foot').hidden = true; $('#phoneFab').hidden = true; }
 
+// Đọc bản lưu cho màn mở đầu, không sửa và không xóa gì. kind: 'none' (chưa có), 'ok', 'bad' (có nhưng không đọc được)
+function titleSave(){
+  let raw = null; try { raw = localStorage.getItem(SAVE_KEY); } catch (e) {}
+  if (!raw) return { kind:'none' };
+  const sv = load();
+  const ok = sv && typeof sv === 'object' && (sv.v === 6 || sv.v === 7) && typeof sv.phase === 'string' && Number.isFinite(sv.day) && sv.day >= 1 && sv.day <= LAST_DAY + 1
+    && Number.isFinite(sv.money) && ['nha','tro','ghep'].includes(sv.bg) && sv.look && typeof sv.look === 'object' && sv.stat && sv.rel && sv.flags;
+  if (!ok) return { kind:'bad' };
+  try { return { kind:'ok', sv, card:saveCardHTML(sv) }; } catch (e) { return { kind:'bad' }; }
+}
 function renderTitle(){
   hideHUD(); titleStop();
-  const saved = load();
-  const canResume = saved && (saved.v === 6 || saved.v === 7) && saved.phase;
+  const st = titleSave(), saved = st.sv, canResume = st.kind === 'ok';
   const demo = { g:'nam', hair:'hair_short', hairColor:'#2B2321', skin:'#FFD6BA', outfit:{ kind:'shirt', color:'#FFFFFF' }, tie:true, acc:[] };
-  // ngoại hình đã tạo, mặc đồ đi chơi
-  const look = canResume && saved.look ? lookToL(saved.look, 'casual', saved.gender) : demo, d = canResume ? saved.day || 1 : 1, di = dayInfo(d), slot = titleSlot();
+  let look = demo; if (canResume) try { look = lookToL(saved.look, 'casual', saved.gender); } catch (e) {}    // ngoại hình đã tạo, mặc đồ đi chơi
+  const d = canResume ? saved.day : 1, di = dayInfo(d), slot = titleSlot();
   const lay = TITLE.LAYOUT, h1 = '<h1>' + 'Life & Career Simulation'.split(' ').map(w => `<span class="w">${esc(w)}</span>`).join(' ') + '</h1>';
-  $('#stage').innerHTML = `<section class="title-wrap lay-${lay}">
+  $('#stage').innerHTML = `<section class="title-wrap lay-${lay} ${canResume ? 'has-save' : ''}">
     <div class="t-scene panel stage title-scene">
       ${lay === 'b' ? `<div class="t-over">${h1}</div>` : ''}
       <div class="title-cal"><div class="cal-page enter ${di.wd === 0 ? 'sun' : ''}"><div class="cal-bind"><span></span><span></span></div>
@@ -19,19 +28,24 @@ function renderTitle(){
       <button class="t-sound" type="button" id="tSound">🔈</button><span class="t-hint" id="tHint">🎵 Chạm để nghe</span>
       ${titleSceneSVG(slot)}
     </div>
-    ${lay === 'a' ? h1 : ''}
-    <p class="lead">Tám tuần đầu tiên sau khi tốt nghiệp, ở Hà Thành, từ 16/11/2026 đến 10/1/2027. Một tấm bằng, một khoản tiết kiệm nhỏ, và tháng lương đầu tiên.</p>
-    ${canResume ? saveCardHTML(saved) + '<button class="btn alt" type="button" id="fresh">Chơi lại từ đầu</button>' : '<button class="btn" type="button" id="fresh">Bắt đầu</button>'}
+    <div class="t-body">
+      ${lay === 'a' ? h1 : ''}
+      <p class="lead">Tám tuần đầu tiên sau khi tốt nghiệp, ở Hà Thành. Một tấm bằng, một khoản tiết kiệm nhỏ, và tháng lương đầu tiên.</p>
+      ${canResume ? st.card : st.kind === 'bad' ? '<p class="t-bad" role="status">Không đọc được bản lưu cũ (dữ liệu hỏng hoặc từ phiên bản khác). Bản lưu vẫn được giữ nguyên; bắt đầu mới sẽ ghi đè lên nó.</p>' : ''}
+    </div>
+    <div class="t-actions ${canResume ? 'two' : ''}">
+      ${canResume ? `<button class="btn" type="button" id="resume">${saved.phase === 'end' ? 'Xem lại tổng kết' : 'Chơi tiếp'}</button><button class="btn alt" type="button" id="fresh">Chơi lại</button>` : '<button class="btn" type="button" id="fresh">Bắt đầu</button>'}
+    </div>
   </section>`;
   titleMount($('#stage .t-scene'), look);
   titleSoundBtn();
-  $('#tSound').addEventListener('click', () => { if (!SFX.on) { SFX.toggle(); titleAudioStart(); } else if (TA.on) { SFX.toggle(); titleAudioStop(true); } else titleAudioStart(); titleSoundBtn(); try { soundLabel(); } catch (e) {} });
+  $('#tSound').addEventListener('click', titleSoundToggle);
   if (canResume) $('#resume').addEventListener('click', () => { titleStop(); S = saved; migrate(); resume(); });
-  // có bản lưu thì “Chơi lại từ đầu” phải bấm hai lần, để tránh bấm nhầm mất bản lưu
-  let armed = null;
+  // đang có bản lưu (đọc được hay không) thì “Chơi lại” / “Bắt đầu” phải bấm hai lần, để tránh bấm nhầm mất bản lưu
+  const guard = st.kind !== 'none'; let armed = null;
   $('#fresh').addEventListener('click', e => {
-    const b = e.currentTarget;
-    if (canResume && !armed) { b.classList.add('armed'); b.textContent = 'Bấm lần nữa: bỏ bản lưu, chơi lại'; armed = setTimeout(() => { armed = null; b.classList.remove('armed'); b.textContent = 'Chơi lại từ đầu'; }, 3500); return; }
+    const b = e.currentTarget, label = b.textContent;
+    if (guard && !armed) { b.classList.add('armed'); b.dataset.label = label; b.textContent = 'Bấm lần nữa để xác nhận'; armed = setTimeout(() => { armed = null; b.classList.remove('armed'); b.textContent = b.dataset.label; }, 3500); return; }
     clearTimeout(armed); titleStop(); renderSetup();
   });
 }

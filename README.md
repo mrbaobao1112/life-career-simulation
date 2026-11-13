@@ -93,6 +93,7 @@ npm install
 npm test              # kiểm thử hệ thống, tài chính, các mốc 56 ngày + 20 lượt chơi ngẫu nhiên trọn 56 ngày
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)
+npm run mo-dau        # màn hình mở đầu: âm thanh, ra vào, chuyển tab, bản lưu hỏng, giảm chuyển động, hiệu năng (cần Playwright, khoảng 3 phút; thêm DAI=1 để để yên 5 phút)
 npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày
 npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra cân bằng (mất vài phút)
 npm run tai-chinh     # kiểm thử sổ hóa đơn và mô phỏng tài chính cả tháng

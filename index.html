@@ -6,7 +6,9 @@
 <title>Life &amp; Career Simulation: Những tuần đầu tiên</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+<!-- Font tải song song, không chặn hiển thị trang (chưa tải xong thì dùng font hệ thống) -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Patrick+Hand&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet"></noscript>
 <link rel="stylesheet" href="css/giao-dien.css">
 <link rel="stylesheet" href="css/nhan-vat-dien-thoai.css">
 <link rel="stylesheet" href="css/animation.css">
@@ -23,7 +25,11 @@
     <div class="who" id="who"></div>
   </header>
   <section class="bars" id="bars" hidden aria-label="Chỉ số"></section>
-  <main id="stage" aria-live="polite"></main>
+  <main id="stage" aria-live="polite">
+    <!-- Khung chờ: hiện ngay trong lúc các file của game đang tải, được thay bằng màn mở đầu khi tải xong (cùng kích thước nên không bị nhảy bố cục) -->
+    <section class="title-wrap lay-a boot" aria-busy="true"><div class="t-scene boot-scene"></div>
+      <div class="t-body"><h1>Life &amp; Career Simulation</h1><p class="boot-txt">Đang mở phố Hà Thành…</p></div></section>
+  </main>
   <footer class="foot" id="foot" hidden>
     <button class="ghost" id="btnProfile" type="button">🪪 Hồ sơ</button>
     <button class="ghost" id="btnHabit" type="button">🧭 Nếp sinh hoạt</button>

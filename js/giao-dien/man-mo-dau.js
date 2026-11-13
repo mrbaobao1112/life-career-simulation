@@ -13,9 +13,11 @@ const TITLE = {
   BIKE: [118, 138],         // tốc độ xe máy của hai làn
   SPAWN: [700, 2000],       // khoảng cách giữa hai lần có người mới xuất hiện (mili giây)
   BIKE_GAP: [1100, 3200],   // khoảng cách giữa hai xe máy
-  MAX_WALKERS: 5, MAX_BIKES: 3,
+  MAX_WALKERS: 5, MAX_BIKES: 3,   // nhiều nhất chừng này người đi bộ và xe máy mỗi làn cùng lúc trên màn hình
+  MAX_SAY: 2,               // nhiều nhất chừng này bong bóng thoại cùng lúc
+  SPECIAL_GAP: [3500, 8000],// nghỉ giữa hai hoạt cảnh (bạn bè chào, hàng rong, hai người gặp nhau, xe tấp vào lề)
+  MOOD_EVERY: [14000, 30000], MOODS: [[1, 1], [.65, 1.05], [1.6, .92], [1.15, 1]],   // nhịp phố: [hệ số khoảng cách xuất hiện, hệ số tốc độ đi]
   MUSIC_VOL: 1,             // độ to của nhạc nền (0 đến 1); tiếng phố và âm thanh sự kiện không đổi
-  FRIEND_EVERY: [9000, 16000], VENDOR_EVERY: [14000, 24000], PARK_EVERY: [16000, 26000],
 };
 // Giờ thật trên máy người chơi → buổi trong ngày
 function titleSlot(){ const h = new Date().getHours(); return h >= 5 && h < 10 ? 'morning' : h < 13 ? 'noon' : h < 17 ? 'afternoon' : h < 19 ? 'evening' : 'night'; }
@@ -26,7 +28,7 @@ function titleSceneSVG(slot){
   const sky = SKY[slot], night = slot === 'night', eve = slot === 'evening', lit = night || eve;
   const houses = [[0, 44, 46, '#F2C14E'], [44, 50, 34, '#E07A5F'], [94, 46, 54, '#81B29A'], [140, 52, 30, '#F4E1C1'], [192, 44, 48, '#3D5A80'], [236, 50, 38, '#F2A65A'], [286, 42, 56, '#C3B1E1'], [328, 40, 40, '#9CC5A1']];
   let s = `<defs><radialGradient id="tLamp"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".75"/><stop offset="1" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient></defs>
-    <rect width="360" height="250" fill="${sky}"/>`;
+    <rect y="-12" width="360" height="262" fill="${sky}"/>`;
   if (night) for (let i = 0; i < 18; i++) s += `<circle class="twinkle" style="animation-delay:${(i * 0.37) % 3}s" cx="${(i * 53) % 360}" cy="${6 + (i * 29) % 46}" r="${i % 3 ? 1 : 1.5}" fill="#fff"/>`;
   s += night ? '<circle cx="300" cy="24" r="10" fill="#FFF3B0"/><circle cx="305" cy="21" r="9" fill="' + sky + '"/>' : `<circle cx="${slot === 'morning' ? 60 : slot === 'noon' ? 180 : 300}" cy="${slot === 'noon' ? 18 : 30}" r="12" fill="${eve ? '#FFB067' : '#FFF3B0'}"/>`;
   s += `<g class="env"><g class="cloud"><ellipse cx="40" cy="22" rx="20" ry="7" fill="#fff" opacity="${night ? .25 : .9}"/><ellipse cx="54" cy="18" rx="12" ry="7" fill="#fff" opacity="${night ? .25 : .9}"/></g>
@@ -58,7 +60,7 @@ function titleSceneSVG(slot){
     <rect x="58" y="160" width="34" height="4" rx="1" fill="#2F6FD1"/><rect x="61" y="164" width="3" height="9" fill="#2F6FD1"/><rect x="86" y="164" width="3" height="9" fill="#2F6FD1"/>
     <rect x="63" y="152" width="5" height="8" fill="#E3A447" opacity=".9"/><rect x="80" y="153" width="5" height="7" fill="#E3A447" opacity=".9"/><path d="M70 160 h8 v-6 q-4 -4 -8 0z" fill="#8C8C8C"/>
     <g class="steam"><path d="M73 150 q-3 -4 0 -8 q3 -4 0 -8" stroke="#fff" stroke-width="1.4" fill="none" opacity=".8"/></g>`;
-  return `<svg viewBox="0 0 360 250" role="img" aria-label="Góc phố Hà Thành">${s}<g class="L-back"></g><g class="L-aisle"></g><g class="L-front"></g><g class="L-road"></g>${eve ? '<rect width="360" height="250" fill="#FF8A4C" opacity=".1" pointer-events="none"/>' : night ? '<rect width="360" height="250" fill="#121836" opacity=".22" pointer-events="none"/>' : ''}<g class="L-say"></g></svg>`;
+  return `<svg viewBox="0 -10 360 260" role="img" aria-label="Góc phố Hà Thành">${s}<g class="L-back"></g><g class="L-aisle"></g><g class="L-front"></g><g class="L-road"></g>${eve ? '<rect y="-10" width="360" height="260" fill="#FF8A4C" opacity=".1" pointer-events="none"/>' : night ? '<rect y="-10" width="360" height="260" fill="#121836" opacity=".22" pointer-events="none"/>' : ''}<g class="L-say"></g></svg>`;
 }
 
 /* ----- Âm thanh 8-bit: nhạc nền, tiếng phố, âm thanh theo sự kiện ----- */
@@ -90,8 +92,10 @@ function titleMusicBar(){
   [0, 4].forEach(i => tTone(120, i * E, .12, 'sine', .12 * V, 50));
 }
 function titleAudioStart(){
-  if (TA.on || !SFX.on || !document.querySelector('.title-scene')) return;
-  TA.on = true; TA.vol = .35; TA.bar = 0;               // bắt đầu nhỏ rồi to dần
+  if (!SFX.on || !document.querySelector('.title-scene')) return;
+  if (TA.on && !TA.fading) return;                         // đang phát rồi: không tạo thêm vòng nhạc
+  TA.timers.forEach(clearInterval); TA.timers = []; TA.fading = false;      // đang nhỏ dần thì dừng hẳn rồi phát lại
+  TA.on = true; TA.vol = .35; TA.bar = 0;                   // bắt đầu nhỏ rồi to dần
   const up = setInterval(() => { TA.vol = Math.min(1, TA.vol + .1); if (TA.vol >= 1) clearInterval(up); }, 100); TA.timers.push(up);
   titleMusicBar(); TA.timers.push(setInterval(() => { if (!document.querySelector('.title-scene')) return titleAudioStop(true); titleMusicBar(); }, TUNE.EIGHTH * 8 * 1000));
   TA.timers.push(setInterval(() => { tNoise(0, 1.8, .025, 260); if (Math.random() < .35) TSND.vroom(); }, 1700));     // tiếng phố rì rầm, xe máy xa
@@ -101,28 +105,66 @@ function titleAudioStart(){
 // Tắt âm thanh: nhỏ dần rồi dừng (now = dừng ngay)
 function titleAudioStop(now){
   if (!TA.on) return;
-  const stop = () => { TA.timers.forEach(clearInterval); TA.timers = []; TA.on = false; TA.vol = 0; titleSoundBtn(); };
+  const stop = () => { TA.timers.forEach(clearInterval); TA.timers = []; TA.on = false; TA.fading = false; TA.vol = 0; titleSoundBtn(); };
   if (now) return stop();
-  TA.timers.forEach(clearInterval); TA.timers = [];
-  const down = setInterval(() => { TA.vol = Math.max(0, TA.vol - .15); if (TA.vol <= 0) { clearInterval(down); stop(); } }, 80); TA.timers.push(down);
+  if (TA.fading) return;
+  TA.timers.forEach(clearInterval); TA.timers = []; TA.fading = true;
+  const down = setInterval(() => { TA.vol = Math.max(0, TA.vol - .15); if (TA.vol <= 0) stop(); }, 80); TA.timers.push(down);
 }
 function titleSoundBtn(){
   const b = document.getElementById('tSound'); if (!b) return;
-  b.textContent = !SFX.on ? '🔇' : TA.on ? '🔊' : '🔈';
-  b.setAttribute('aria-label', !SFX.on ? 'Bật âm thanh' : TA.on ? 'Tắt âm thanh' : 'Bật nhạc');
-  const hint = document.getElementById('tHint'); if (hint) hint.hidden = TA.on || !SFX.on;
+  const playing = TA.on && !TA.fading;
+  b.textContent = !SFX.on ? '🔇' : playing ? '🔊' : '🔈';
+  b.setAttribute('aria-label', !SFX.on ? 'Bật âm thanh' : playing ? 'Tắt âm thanh' : 'Bật nhạc');
+  const hint = document.getElementById('tHint'); if (hint) hint.hidden = playing || !SFX.on;
+}
+// Nút loa: bấm liên tục cũng chỉ có một vòng nhạc
+function titleSoundToggle(){
+  if (!SFX.on) { SFX.toggle(); titleAudioStart(); }
+  else if (TA.on && !TA.fading) { SFX.toggle(); titleAudioStop(true); }
+  else titleAudioStart();
+  titleSoundBtn(); try { soundLabel(); } catch (e) {}
 }
 
-/* ----- Đạo diễn góc phố ----- */
-let titleUnlock = null;
+/* ----- Vòng đời: chuyển tab thì tạm dừng, quay lại thì dựng lại; đổi cài đặt giảm chuyển động thì dựng lại ----- */
+let titleUnlock = null, titleWasPlaying = false;
+const titleShown = () => !!document.querySelector('.title-scene');
 function titleStop(){
   stageStop(); titleAudioStop();
   if (titleUnlock) { document.removeEventListener('pointerdown', titleUnlock, true); document.removeEventListener('keydown', titleUnlock, true); titleUnlock = null; }
 }
+// Hai trình nghe này chỉ đăng ký một lần cho cả trang
+document.addEventListener('visibilitychange', () => {
+  if (!titleShown()) return;
+  if (document.hidden) { titleWasPlaying = TA.on && !TA.fading; titleStop(); TA.timers.forEach(clearInterval); TA.timers = []; TA.on = false; TA.fading = false; }
+  else { renderTitle(); if (titleWasPlaying) titleAudioStart(); titleWasPlaying = false; }
+});
+if (window.matchMedia) { const mq = window.matchMedia('(prefers-reduced-motion: reduce)'); const re = () => { if (titleShown()) renderTitle(); };
+  if (mq && mq.addEventListener) mq.addEventListener('change', re); else if (mq && mq.addListener) mq.addListener(re); }
+
+/* ----- Đạo diễn góc phố ----- */
+// Câu nói: chọn câu chưa nói gần đây
+const TITLE_LINES = {
+  rao: ['Bánh mì nóng đây!', 'Xôi ngô, xôi lạc đây!', 'Ai cốm làng Vòng không?', 'Bánh giò nóng đây!'],
+  buy: [['Cho cô hai cái nhé!', 'Có ngay ạ!'], ['Bao nhiêu một gói?', 'Mười lăm nghìn ạ.'], ['Còn nóng không em?', 'Vừa ra lò ạ!']],
+  meet: [['Lâu lắm mới gặp!', 'Dạo này sao rồi?', 'Vẫn thế thôi.'], ['Đi đâu đấy?', 'Đi chợ thôi.'], ['Ăn sáng chưa?', 'Rồi, phở đầu ngõ.'], ['Nay đi làm muộn à?', 'Tắc đường quá!'], ['Cuối tuần đi đâu?', 'Ngủ.', 'Hay đấy.']],
+  hero: ['Chào!', 'Hì, chào nhé!', 'Lát nữa nhé!', 'Ok!'],
+};
+const titleRecent = [];
+function freshPick(list){
+  const fresh = list.filter(x => !titleRecent.includes(JSON.stringify(x))), v = pick(fresh.length ? fresh : list);
+  titleRecent.push(JSON.stringify(v)); if (titleRecent.length > 8) titleRecent.shift(); return v;
+}
 function titleMount(root, look){
-  const C = stageCore(root), { A, still, alive, wait, later, layer, act, add, snap, face, say, react } = C, svg = C.svg;
+  const C = stageCore(root), { A, still, alive, wait, later, layer, act, add, snap, face, react } = C, svg = C.svg;
   const rnd = (a, b) => a + Math.random() * (b - a), now = () => performance.now();
+  const TITLE_MOOD = { gap:1, speed:1 };
+  // Bong bóng thoại: nhiều nhất TITLE.MAX_SAY cái cùng lúc (kể cả câu khi người chơi chạm vào nhân vật), cái cũ nhất nhường chỗ
+  const sayL = layer('say'), trim = () => { while (sayL.children.length > TITLE.MAX_SAY) sayL.firstChild.remove(); };
+  new MutationObserver(trim).observe(sayL, { childList:true });
+  const say = (a, text, ms) => C.say(a, text, ms);
   // người chơi chạm lần đầu thì bật âm thanh (trình duyệt không cho tự phát)
+  if (titleUnlock) { document.removeEventListener('pointerdown', titleUnlock, true); document.removeEventListener('keydown', titleUnlock, true); }
   titleUnlock = e => { if (e.target.closest && e.target.closest('#resume, #fresh, #tSound')) return; titleAudioStart(); };
   document.addEventListener('pointerdown', titleUnlock, true); document.addEventListener('keydown', titleUnlock, true);
 
@@ -131,72 +173,124 @@ function titleMount(root, look){
   // quán trà đá: hai người khách ngồi ghế nhựa, lần lượt nói và uống, thỉnh thoảng cùng cười
   const guests = [add('p', 50, 164, 'back', 'act-talk', 'happy', { id:'g1', look:PASSER_LOOKS[0], s:.42, dy:6 }), add('p', 100, 164, 'back', 'act-drink', 'happy', { id:'g2', look:PASSER_LOOKS[3], s:.42, dy:6 })];
   face(guests[1], true);
-  // một xe máy đỗ sẵn bên đường
   const bikeEl = (look2, dir, rider) => {
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'bike snap');
     g.innerHTML = `<g transform="scale(${dir < 0 ? -1 : 1} 1)">${bikeSVG()}<g class="rider" transform="translate(-3 -11) scale(.4) translate(-60 -140)" ${rider ? '' : 'style="display:none"'}><g class="cb cb-idle act-ride">${chibi(look2, 'neutral')}</g></g></g>`;
     layer('road').appendChild(g); return g;
   };
   const moveEl = (el, x, y, ms, curve) => { el.classList.toggle('snap', !ms); el.style.transitionDuration = (ms || 0) + 'ms'; el.style.transitionTimingFunction = curve || 'linear'; el.style.transform = `translate(${x}px, ${y}px)`; };
+  // một xe máy đỗ sẵn bên đường
   const parked = { el:bikeEl(PASSER_LOOKS[2], 1, false), x:150, look:PASSER_LOOKS[2] }; moveEl(parked.el, 150, 214);
-  if (still) { add('p', 140, 178, 'aisle', '', 'neutral', { id:'w1', look:PASSER_LOOKS[1], s:.45 }); add('p', 300, 194, 'front', '', 'neutral', { id:'w2', look:PASSER_LOOKS[4], s:.5 }); face(A.w2, true); return; }
+  if (still) {                                               // giảm chuyển động: khung cảnh tĩnh, không có gì tự chạy
+    add('p', 140, 178, 'aisle', '', 'neutral', { id:'w1', look:PASSER_LOOKS[1], s:.45 }); add('p', 300, 194, 'front', '', 'neutral', { id:'w2', look:PASSER_LOOKS[4], s:.5 }); face(A.w2, true);
+    guests.forEach(g => act(g, '')); return;
+  }
 
   /* --- người đi bộ: hai làn ngược chiều; trong một làn, người đi sau không bao giờ nhanh hơn người đi trước --- */
   const lanes = [{ y:178, dir:1, lay:'aisle', s:.45, list:[], block:0 }, { y:194, dir:-1, lay:'front', s:.5, list:[], block:0 }];
   const xAt = w => w.stop != null && now() >= w.tStop ? w.stop : w.x0 + w.dir * w.speed * (now() - w.t0) / 1000;
   const startX = L => L.dir > 0 ? -22 : 382, endX = L => L.dir > 0 ? 384 : -24;
   let pid = 0;
+  const walkers = () => lanes.reduce((n, L) => n + L.list.length, 0);
   const laneFree = (L, need = 46) => L.block === 0 && L.list.every(w => (xAt(w) - startX(L)) * L.dir >= need);
   const slowest = L => L.list.reduce((m, w) => Math.min(m, w.stop != null ? 0 : w.speed), 999);
-  // giữ riêng một làn cho một hoạt cảnh (hàng rong, bạn bè, chủ xe): không cho người mới vào, chờ những người đang đi ra hết
+  const kindsNow = k => lanes.reduce((n, L) => n + L.list.filter(w => w.kind === k).length, 0);
+  // giữ riêng một làn cho một hoạt cảnh: không cho người mới vào, chờ những người đang đi ra hết
   const claim = async (L, max = 60) => { if (L.block) return false; L.block++; for (let i = 0; i < max && L.list.length; i++) if (!await wait(300)) return false; if (L.list.length) { L.block--; return false; } return true; };
-  // cho một người đi từ đầu đến cuối làn (hoặc tới điểm dừng); trả về khi đi xong
+  // cho một người đi từ chỗ đang đứng tới cuối làn (hoặc tới điểm dừng); trả về khi đi xong
   const cross = async (L, w, a, until) => {
     const to = until ?? endX(L); a.speed = w.speed; a.el.style.transitionTimingFunction = 'linear';
     void a.el.getBoundingClientRect();                                // người vừa xuất hiện: để trình duyệt ghi nhận vị trí đầu rồi mới cho đi
-    w.x0 = a.x; w.t0 = now(); w.dir = L.dir;
-    const ok = await C.walk(a, to, L.y, { act:w.act, keep:!!w.act });
-    return ok;
+    w.x0 = a.x; w.t0 = now(); w.dir = L.dir; w.stop = null;
+    return C.walk(a, to, L.y, { act:w.act, keep:!!w.act });
   };
+  const leave = (L, w) => { L.list = L.list.filter(x => x !== w); w.a.el.remove(); delete A[w.a.id]; };
+  const addPasser = (L, x, extra = {}) => { const a = add('p', x, L.y, L.lay, '', extra.expr || 'neutral', { id:'w' + (++pid), look:extra.look || pick(PASSER_LOOKS), s:L.s }); face(a, L.dir < 0); return a; };
+  const setStep = (a, L, speed) => a.el.querySelector('.cb').style.setProperty('--step', Math.round(2 * 27 * L.s / speed * 1000) + 'ms');
+  // kind: '' | 'run' | 'phone' | 'dog' | 'pause' (dừng lại xem điện thoại hoặc đứng nghỉ giữa đường rồi đi tiếp)
   const walker = async (L, kind) => {
-    if (L.list.length >= 4 || Object.keys(A).length > 15) return;
-    const id = 'w' + (++pid), look2 = pick(PASSER_LOOKS), cap = slowest(L);
-    let speed = rnd(...TITLE.WALK), actName = '', extra = '';
+    if (L.list.length >= 4 || walkers() >= TITLE.MAX_WALKERS) return;
+    if (['run','dog','phone','pause'].includes(kind) && kindsNow(kind) >= 1) kind = '';          // không để hai người cùng làm một việc đặc biệt
+    let speed = rnd(...TITLE.WALK) * TITLE_MOOD.speed, actName = '';
     if (kind === 'run') { if (L.list.length) return; speed = 96; actName = 'act-walk act-run'; }
     if (kind === 'phone') actName = 'act-walk act-phone';
-    speed = Math.min(speed, cap); if (speed < 24) return;
-    const a = add('p', startX(L), L.y, L.lay, '', 'neutral', { id, look:look2, s:L.s }); a.el.querySelector('.cb').style.setProperty('--step', Math.round(2 * 27 * L.s / speed * 1000) + 'ms');
+    speed = Math.min(speed, slowest(L)); if (speed < 24) return;
+    const a = addPasser(L, startX(L)); setStep(a, L, speed);
     if (kind === 'dog') { const dg = document.createElementNS('http://www.w3.org/2000/svg', 'g'); dg.setAttribute('class', 'dog'); dg.innerHTML = '<path d="M92 112 L140 126" stroke="#8C5A3C" stroke-width="1.6"/><g class="dog-body"><ellipse cx="150" cy="128" rx="13" ry="7" fill="#E3B27A"/><circle cx="163" cy="122" r="6" fill="#E3B27A"/><path d="M165 117 l3 -5 l2 6z" fill="#B9813E"/><rect x="141" y="133" width="3" height="7" fill="#B9813E"/><rect x="155" y="133" width="3" height="7" fill="#B9813E"/><path d="M137 125 q-6 -6 -4 -10" stroke="#E3B27A" stroke-width="3" fill="none"/></g>'; a.el.querySelector('.flip').appendChild(dg); }
-    face(a, L.dir < 0);
-    const w = { a, speed, act:actName || null }; L.list.push(w);
-    await cross(L, w, a);
-    L.list = L.list.filter(x => x !== w); a.el.remove(); delete A[id];
+    const w = { a, speed, act:actName || null, kind }; L.list.push(w);
+    if (kind === 'pause') {
+      // không ai vào làn phía sau trong lúc người này dừng, nên không ai đi xuyên qua
+      L.block++;
+      const at = L.dir > 0 ? rnd(70, 290) : rnd(70, 290);
+      if (await cross(L, w, a, at)) {
+        w.stop = at; w.tStop = now();
+        if (Math.random() < .55) { act(a, 'act-phone'); if (await wait(rnd(2200, 3600))) { act(a, ''); } }
+        else { react(a, 'stretch', ANIM.WAKE_MS); await wait(ANIM.WAKE_MS + rnd(300, 1200)); }
+        if (alive()) await cross(L, w, a);
+      }
+      L.block--; leave(L, w); return;
+    }
+    await cross(L, w, a); leave(L, w);
   };
-  // hàng rong gánh hàng: đi chậm, dừng giữa đường rao một câu (cả làn chờ phía sau)
-  const vendor = async () => {
+
+  /* --- hoạt cảnh: mỗi lúc chỉ một (bạn bè chào, hàng rong, hai người gặp nhau, xe tấp vào lề) --- */
+  let special = null;
+  const solo = (name, fn) => async () => { if (special) return; special = name; try { await fn(); } finally { if (alive()) special = null; } };
+  // hàng rong gánh hàng: đi chậm, dừng giữa đường rao; có lúc một khách dừng lại mua
+  const vendor = solo('vendor', async () => {
     const L = lanes[0]; if (!await claim(L)) return;
-    const id = 'v' + (++pid), a = add('p', startX(L), L.y, L.lay, '', 'happy', { id, look:{ g:'nu', hair:'hair_bun', hairColor:'#2B2321', skin:'#E8B48C', outfit:{ kind:'tee', color:'#7FB3D5' } }, s:L.s });
+    const a = addPasser(L, startX(L), { expr:'happy', look:{ g:'nu', hair:'hair_bun', hairColor:'#2B2321', skin:'#E8B48C', outfit:{ kind:'tee', color:'#7FB3D5' } } });
     const cb = a.el.querySelector('.cb'), g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'prop');
     g.innerHTML = '<path d="M-22 90 L142 90" stroke="#8C5A3C" stroke-width="4" stroke-linecap="round"/><path d="M-14 90 L-22 116 M-14 90 L-6 116 M134 90 L126 116 M134 90 L142 116" stroke="#8C5A3C" stroke-width="1.6"/><ellipse cx="-14" cy="120" rx="16" ry="7" fill="#C9A15B"/><ellipse cx="134" cy="120" rx="16" ry="7" fill="#C9A15B"/><path d="M-26 117 q12 -8 24 0 M122 117 q12 -8 24 0" fill="#E9C46A"/>';
     cb.appendChild(g);
     const hat = document.createElementNS('http://www.w3.org/2000/svg', 'path'); hat.setAttribute('d', 'M14 24 L60 -12 L106 24 Z'); hat.setAttribute('fill', '#E9D7A5'); hat.setAttribute('stroke', '#B89B5E'); a.el.querySelector('.cb-head').appendChild(hat);
-    const w = { a, speed:28, act:null }; L.list.push(w);
-    if (await cross(L, w, a, 168)) { w.stop = 168; w.tStop = now(); act(a, ''); titleSound('rao'); if (await say(a, pick(['Bánh mì nóng đây!', 'Xôi ngô, xôi lạc đây!', 'Ai cốm làng Vòng không?']), 1900)) { w.stop = null; await cross(L, w, a); } }
-    L.list = L.list.filter(x => x !== w); a.el.remove(); delete A[id]; L.block--;
-  };
+    const w = { a, speed:28, act:null }; L.list.push(w); setStep(a, L, 28);
+    const stopX = rnd(140, 190);
+    if (await cross(L, w, a, stopX)) {
+      w.stop = stopX; w.tStop = now(); act(a, ''); titleSound('rao');
+      let ok = await say(a, freshPick(TITLE_LINES.rao), 1900);
+      if (ok && Math.random() < .55) {                        // một khách đi ngược lại từ phía bên kia, dừng mua rồi quay đi
+        const [q, r_] = freshPick(TITLE_LINES.buy), c = addPasser(L, 382); face(c, true); const cw = { a:c, speed:42, act:null }; L.list.push(cw); setStep(c, L, 42);
+        c.speed = 42; c.el.style.transitionTimingFunction = 'linear'; void c.el.getBoundingClientRect();
+        if (await C.walk(c, stopX + 30, L.y)) { face(c, true); face(a, false); act(c, 'act-talk'); ok = await say(c, q, 1500); act(c, 'act-listen');
+          if (ok) { act(a, 'act-talk'); ok = await say(a, r_, 1300); act(a, ''); }
+          if (ok) { react(c, 'nod'); face(c, false); ok = await C.walk(c, 384, L.y); } }
+        leave(L, cw);
+      }
+      if (ok && alive()) await cross(L, w, a);
+    }
+    leave(L, w); L.block--;
+  });
   // bạn bè đi ngang: dừng lại chào nhân vật chính, nói một câu rồi đi tiếp
   const FRIENDS = [['tung', 'Ê! Trà đá không?'], ['linh', 'Hôm nay học gì chưa?'], ['mai', 'Đi làm à em?'], ['phong', 'Ông ơi, chờ tôi với!'], ['mom', 'Nhớ ăn sáng nhé con!']];
-  const friend = async () => {
+  let lastFriend = null;
+  const friend = solo('friend', async () => {
     const L = lanes[1]; if (!await claim(L)) return;
-    const [who, line] = pick(FRIENDS), a = add(who, startX(L), L.y, L.lay, '', 'happy', { s:L.s }); face(a, true);
+    const opts = FRIENDS.filter(f => f[0] !== lastFriend), [who, line] = pick(opts); lastFriend = who;
+    const a = add(who, startX(L), L.y, L.lay, '', 'happy', { s:L.s }); face(a, true); setStep(a, L, 44);
     const w = { a, speed:44, act:null }; L.list.push(w); titleSound('bell');
     if (await cross(L, w, a, hero.x + 34)) {
       w.stop = hero.x + 34; w.tStop = now(); face(a, true); face(hero, false);
       react(a, 'wave'); act(a, 'act-talk'); titleSound('hi');
-      if (await say(a, line, 1700)) { act(a, 'act-listen'); react(hero, 'wave'); act(hero, 'act-talk'); if (await say(hero, pick(['Chào!', 'Hì, chào nhé!', 'Lát nữa nhé!']), 1300)) { act(hero, ''); act(a, ''); w.stop = null; await cross(L, w, a); } }
+      if (await say(a, line, 1700)) { act(a, 'act-listen'); react(hero, 'wave'); act(hero, 'act-talk'); if (await say(hero, freshPick(TITLE_LINES.hero), 1300)) { act(hero, ''); act(a, ''); await cross(L, w, a); } }
     }
-    L.list = L.list.filter(x => x !== w); a.el.remove(); delete A[who]; L.block--; act(hero, '');
-  };
+    leave(L, w); L.block--; act(hero, '');
+  });
+  // hai người đi ngược chiều gặp nhau, dừng lại hỏi han vài câu rồi ai đi đường nấy
+  const meet = solo('meet', async () => {
+    const [L1, L2] = lanes; if (!await claim(L1)) return; if (!await claim(L2)) { L1.block--; return; }
+    const x = rnd(110, 200), p1 = addPasser(L1, startX(L1)), p2 = addPasser(L2, startX(L2));
+    const w1 = { a:p1, speed:40, act:null }, w2 = { a:p2, speed:40, act:null }; L1.list.push(w1); L2.list.push(w2); setStep(p1, L1, 40); setStep(p2, L2, 40);
+    const [r1, r2] = await Promise.all([cross(L1, w1, p1, x - 12), cross(L2, w2, p2, x + 12)]);
+    if (r1 && r2) {
+      w1.stop = x - 12; w2.stop = x + 12; w1.tStop = w2.tStop = now(); face(p1, false); face(p2, true); react(p1, 'wave'); react(p2, 'wave');
+      const lines = freshPick(TITLE_LINES.meet); let ok = true;
+      for (let i = 0; i < lines.length && ok; i++) { const sp = i % 2 ? p2 : p1, li = i % 2 ? p1 : p2; act(sp, 'act-talk'); act(li, 'act-listen'); ok = await say(sp, lines[i], 1400); }
+      if (ok && Math.random() < .4) { act(p1, 'act-laugh'); act(p2, 'act-laugh'); titleSound('laugh'); ok = await wait(1000); }
+      if (ok) { act(p1, ''); act(p2, ''); await Promise.all([cross(L1, w1, p1), cross(L2, w2, p2)]); }
+    }
+    leave(L1, w1); leave(L2, w2); L1.block--; L2.block--;
+  });
 
   /* --- xe máy: hai làn ngược chiều, mỗi làn một tốc độ nên không bao giờ đâm vào nhau --- */
   const road = [{ y:226, dir:1, speed:TITLE.BIKE[0], list:[], block:0 }, { y:246, dir:-1, speed:TITLE.BIKE[1], list:[], block:0 }];
@@ -209,19 +303,18 @@ function titleMount(root, look){
     if (Math.random() < .3) later(() => titleSound('horn'), ms * .4);
     await wait(ms); el.remove(); R.list = R.list.filter(x => x !== b);
   };
-  // xe đỗ bên đường: chủ xe từ quán đi ra, lên xe, nổ máy rời đi; một lúc sau có xe khác tấp vào, người bước xuống đi vào phố
-  const park = async () => {
+  // xe đỗ bên đường: chủ xe đi ra, lên xe, nổ máy rời đi; lần sau có xe khác tấp vào, người bước xuống đi vào phố
+  const park = solo('park', async () => {
     const R = road[0], L = lanes[1];
     if (parked.el) {
       if (R.block || !await claim(L)) return; R.block++;
-      const a = add('p', startX(L), L.y, L.lay, '', 'neutral', { id:'own', look:parked.look, s:L.s }); face(a, true);
-      const w = { a, speed:40, act:null }; L.list.push(w);
+      const a = addPasser(L, startX(L), { look:parked.look }); const w = { a, speed:40, act:null }; L.list.push(w); setStep(a, L, 40);
       if (await cross(L, w, a, parked.x + 6)) {
-        L.list = L.list.filter(x => x !== w); a.el.remove(); delete A.own;
+        leave(L, w);
         const el = parked.el; el.querySelector('.rider').style.display = ''; titleSound('vroom');
         if (await wait(500)) { el.classList.add('moving'); moveEl(el, parked.x + 40, R.y, 700, 'ease-in'); if (await wait(700)) { moveEl(el, 410, R.y, (410 - parked.x) / R.speed * 1000); if (await wait((410 - parked.x) / R.speed * 1000)) el.remove(); } }
         parked.el = null;
-      } else L.list = L.list.filter(x => x !== w);
+      } else leave(L, w);
       L.block--; R.block--; return;
     }
     if (R.block) return; R.block++; for (let i = 0; i < 20 && R.list.length; i++) if (!await wait(300)) return;
@@ -230,29 +323,36 @@ function titleMount(root, look){
     moveEl(el, -50, R.y); void el.getBoundingClientRect(); moveEl(el, 150, 214, 2300, 'cubic-bezier(.2,.7,.35,1)');     // giảm tốc, tấp vào lề
     if (!await wait(2300)) return; el.classList.remove('moving'); R.block--;
     parked.el = el; parked.x = 150; parked.look = look2;
-    if (!await wait(400)) return;
+    if (!await wait(rnd(400, 1400))) return;
     for (let i = 0; i < 20 && !(laneFree(L, 0) && L.list.every(w => xAt(w) < 120)); i++) if (!await wait(300)) return;   // chờ vỉa hè trống chỗ rồi mới bước xuống
     el.querySelector('.rider').style.display = 'none';
-    const a = add('p', 156, L.y, L.lay, 'act-getoff', 'neutral', { id:'p' + (++pid), look:look2, s:L.s }); face(a, true);
-    const w = { a, speed:Math.min(42, slowest(L)), act:null }; L.list.push(w);
+    const sp = Math.min(42, slowest(L)), a = addPasser(L, 156, { look:look2 }); act(a, 'act-getoff'); const w = { a, speed:sp, act:null }; L.list.push(w); setStep(a, L, sp);
     if (await wait(430)) { act(a, ''); await cross(L, w, a); }
-    L.list = L.list.filter(x => x !== w); a.el.remove(); delete A[a.id];
-  };
+    leave(L, w);
+  });
 
   /* --- quán trà đá và nhân vật chính --- */
-  (async () => { let t = 0; while (await wait(rnd(1600, 2600))) { t++; act(guests[0], t % 2 ? 'act-drink' : 'act-talk'); act(guests[1], t % 2 ? 'act-talk' : 'act-drink');
-    if (t % 5 === 0) { act(guests[0], 'act-laugh'); act(guests[1], 'act-laugh'); titleSound('laugh'); if (!await wait(1100)) return; } } })();
-  (async () => { while (await wait(rnd(5000, 9000))) { if (hero.act) continue; const r = Math.random();
+  (async () => { let t = 0; while (await wait(rnd(1600, 2800))) { t++; act(guests[0], t % 2 ? 'act-drink' : 'act-talk'); act(guests[1], t % 2 ? 'act-talk' : 'act-drink');
+    if (t % 5 === 0 && special !== 'meet') { act(guests[0], 'act-laugh'); act(guests[1], 'act-laugh'); titleSound('laugh'); if (!await wait(1100)) return; } } })();
+  (async () => { while (await wait(rnd(5000, 9000))) { if (hero.act || special === 'friend') continue; const r = Math.random();
     if (r < .35) { face(hero, Math.random() < .5); } else if (r < .6) { act(hero, 'act-phone'); if (!await wait(2600)) return; act(hero, ''); } else react(hero, pick(['stretch', 'nod'])); } })();
 
-  /* --- lịch xuất hiện --- */
-  const loop = async (gap, fn) => { while (await wait(rnd(...gap))) fn(); };
-  walker(lanes[0], ''); later(() => walker(lanes[1], 'dog'), 600); later(() => bike(road[0]), 300); later(() => bike(road[1]), 1300);
-  loop(TITLE.SPAWN, () => { const L = pick(lanes); const r = Math.random(); if (laneFree(L)) walker(L, r < .12 ? 'run' : r < .3 ? 'phone' : r < .4 ? 'dog' : ''); });
+  /* --- nhịp phố: lúc đông lúc vắng, không đều tăm tắp --- */
+  (async () => { while (await wait(rnd(...TITLE.MOOD_EVERY))) { const m = pick(TITLE.MOODS); TITLE_MOOD.gap = m[0]; TITLE_MOOD.speed = m[1]; } })();
+  const loop = async (gap, fn) => { while (await wait(rnd(...gap) * TITLE_MOOD.gap)) fn(); };
+  walker(lanes[0], ''); later(() => walker(lanes[1], 'dog'), 900); later(() => bike(road[0]), 300); later(() => bike(road[1]), 1600);
+  loop(TITLE.SPAWN, () => { const L = pick(lanes); const r = Math.random(); if (laneFree(L)) walker(L, r < .1 ? 'run' : r < .24 ? 'phone' : r < .34 ? 'dog' : r < .44 ? 'pause' : ''); });
   loop(TITLE.BIKE_GAP, () => bike(pick(road)));
-  (async () => { if (!await wait(4500)) return; friend(); loop(TITLE.FRIEND_EVERY, friend); })();
-  (async () => { if (!await wait(9000)) return; vendor(); loop(TITLE.VENDOR_EVERY, vendor); })();
-  (async () => { if (!await wait(13000)) return; park(); loop(TITLE.PARK_EVERY, park); })();
+  // các hoạt cảnh lần lượt theo một thứ tự được xáo lại, không cái nào lặp ngay sau chính nó
+  (async () => {
+    if (!await wait(rnd(3500, 5500))) return;
+    let bag = [];
+    while (alive()) {
+      if (!bag.length) bag = shuffle([friend, vendor, meet, park, friend, meet]);
+      const fn = bag.shift(); await fn();
+      if (!await wait(rnd(...TITLE.SPECIAL_GAP))) return;
+    }
+  })();
 }
 
 /* ----- Thẻ "Chơi tiếp": tóm tắt bản lưu ----- */
@@ -285,6 +385,5 @@ function saveCardHTML(sv){
     <div class="sc-row"><span>💼 ${m.job}</span></div>
     <div class="sc-row"><span>💰 ${fmt(m.money)}</span>${m.fin ? `<span class="sc-fin">${m.fin}</span>` : ''}</div>
     <div class="sc-bars">${m.bars.map(bar).join('')}</div>
-    ${m.next.length ? `<div class="sc-next">⏭️ Sắp tới: ${m.next.join(' · ')}</div>` : ''}
-    <button class="btn" type="button" id="resume">${m.end ? 'Xem lại tổng kết' : 'Chơi tiếp'}</button></div>`;
+    ${m.next.length ? `<div class="sc-next">⏭️ Sắp tới: ${m.next.join(' · ')}</div>` : ''}</div>`;
 }
