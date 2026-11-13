@@ -1,6 +1,47 @@
 # Lịch sử phiên bản
 
-## v13.3: Nghỉ phép rõ ràng hơn, luật cho người mới (hiện tại)
+## v14: Tự đi lại trong nhà – Phase 1 của thế giới tương tác (hiện tại)
+Không đổi luật chơi, công thức chỉ số, tài chính, lương, nghỉ phép, mô phỏng 56 ngày. Bản lưu cũ mở bình thường (chỉ thêm vị trí nhân vật trong nhà).
+- Giờ rảnh, bữa ăn ở nhà và giờ đi ngủ giờ được chơi trong một căn nhà có thể đi lại tự do, thay cho bảng chọn việc:
+  - Bàn phím: WASD hoặc mũi tên để đi, giữ để đi liên tục, giữ hai phím để đi chéo (không nhanh hơn đi thẳng); E để dùng đồ, số 1–9 để chọn việc, Esc để đóng.
+  - Điện thoại: joystick và nút ✋ nằm ngay dưới khung nên không che cảnh.
+  - Bấm hoặc chạm vào đồ vật: nhân vật tự tìm đường đến (vòng qua đồ đạc, vách ngăn), tới nơi thì hiện các việc làm được ở đó. Bấm xuống sàn thì đi đến chỗ đó.
+  - Không đi xuyên tường, đồ đạc hay ra ngoài nhà. Đi vào phía trong thì nhân vật nhỏ lại, ra phía ngoài thì to lên. Camera bám theo, góc phải ghi tên phòng đang đứng.
+  - Mất focus hay chuyển tab khi đang giữ phím thì nhân vật dừng ngay, không bị kẹt phím.
+- Mỗi hoàn cảnh một căn nhà khác hẳn:
+  - Phòng trọ: một phòng khép kín (đệm, bàn học, bàn gấp, tủ lạnh mini, bếp điện, dây phơi quần áo) và nhà tắm nhỏ.
+  - Căn hộ ghép: nhà tắm, phòng ngủ của bạn, phòng khách có TV và máy chơi game (Tùng hay ngồi chơi hoặc ngủ trên sofa), bếp có bàn ăn.
+  - Nhà bố mẹ: phòng của bạn, phòng khách có bàn thờ và bộ ấm chén (bố đọc báo, uống trà), bếp có mẹ nấu cơm và mâm cơm.
+- Đồ vật là lối vào cho đúng các lựa chọn cũ, cùng một hàm áp dụng, nên chỉ số và tiền tính đúng một lần:
+  - Giường: nằm nghỉ; ban đêm là đi ngủ.
+  - Máy tính: học, ôn phỏng vấn, xem tin tuyển dụng, sửa CV, tính tiền nong; ở trọ thì chơi game và xem phim cũng ở đây.
+  - TV: xem phim; ở ghép thì chơi game với máy của Tùng.
+  - Bếp và tủ lạnh: tự nấu, mì tôm. Bàn ăn: cơm mẹ nấu, gọi đồ ăn.
+  - Chổi: dọn nhà. Cửa sổ: gọi về cho bố mẹ. Bộ ấm chén: uống trà với bố mẹ.
+  - Cửa ra vào: cà phê, trà đá, chạy bộ, mua sắm, rủ đi chơi, các việc cả ngày, cơm bụi đầu ngõ. Ra cửa thì chuyển sang cảnh bên ngoài như trước.
+- Đồng hồ trong game chạy liên tục cả khi đi lại (1 giây ngoài đời = 2 phút), dừng khi mở điện thoại, khi đang chọn việc hay chuyển tab. Mỗi buổi có khung giờ riêng: sáng từ lúc dậy đến 12:00, chiều 13:30–18:30, tối 19:30–22:00, ăn trưa và ăn tối mỗi bữa một khung, đêm 22:00–02:00.
+  - Dùng một đồ vật chính thì nhân vật diễn động tác (nằm đắp chăn, gõ máy, nấu có khói, ăn, quét nhà, ra cửa), đồng hồ quay nhanh đến cuối buổi, kết quả hiện ngay dưới khung, rồi nhấn E hoặc “Tiếp tục”.
+  - Việc nhỏ chỉ tốn vài phút, vẫn ở trong buổi: tắm (20 phút, tinh thần +2, mỗi ngày tính một lần), rửa mặt, uống nước, ngắm phố, ngồi nghỉ ở sofa, chào người nhà.
+  - Lên giường lúc nào thì giờ đi ngủ tính đúng lúc đó (làm tròn 15 phút). Đến 02:00 chưa ngủ thì ngủ gục.
+  - Hết giờ mà chưa làm gì: giờ rảnh thì tính là lướt điện thoại (như chọn “Xem phim, lướt mạng”), bữa ăn thì ăn theo nếp.
+  - Dòng giờ ở đầu trang và nhật ký trong ngày ghi đúng giờ trên đồng hồ.
+- Người nhà có mặt theo buổi và chào khi bạn đi ngang. Chạm vào họ để chào; với bố mẹ thì có thêm “Uống trà với bố mẹ” nếu lúc đó làm được.
+- Danh sách lựa chọn cũ vẫn mở được ngay dưới khung (“📋 Danh sách lựa chọn”). Nút “Qua nhanh hôm nay” vẫn như cũ. Tắt hẳn chế độ này trong “Nếp sinh hoạt”, hoặc tắt “Cảnh sống” thì cũng tắt luôn.
+- Giảm chuyển động: vẫn điều khiển bình thường, camera và các động tác không chạy hiệu ứng.
+- Mã: thêm thư mục `js/the-gioi/` (bản đồ, điều khiển, di chuyển, tương tác, vòng lặp) và `css/the-gioi.css`. Hàm `choose` tách phần áp dụng lựa chọn thành `settleChoice` để thế giới dùng chung; lựa chọn giờ ngủ tách thành `bedChoice`. Các con số chỉnh được nằm ở bảng `ROAM`.
+- Kiểm thử: thêm `npm run the-gioi` (43 mục, trình duyệt thật) gồm:
+  - ba căn nhà: đồ vật nào cũng đi tới được, lựa chọn nào cũng có chỗ làm;
+  - phím, đi chéo, va chạm, mất focus, đồng hồ chạy và dừng;
+  - dùng bàn học cho chỉ số giống hệt bấm nút; tắm; hết giờ; đi ngủ đúng giờ;
+  - joystick trên điện thoại; tắt chế độ; bản lưu cũ; giảm chuyển động.
+
+Để lại cho bản sau:
+- Nhân vật chưa có dáng quay lưng hay đi lên trên: đi vào trong hay ra ngoài thì vẫn quay mặt ra.
+- Người nhà còn đứng yên tại chỗ theo buổi; trò chuyện sâu, rủ đi chơi khi gặp trực tiếp để Phase 2.
+- Văn phòng và ngoài phố vẫn là cảnh xem (Phase 3–4).
+- Chưa thử trên điện thoại thật, chỉ giả lập iPhone 13 trong trình duyệt.
+
+## v13.3: Nghỉ phép rõ ràng hơn, luật cho người mới
 Không đổi gameplay khác, tài chính, mô phỏng 56 ngày; không đổi cấu trúc bản lưu.
 - Người mới đi làm: trong 5 ngày làm việc đầu tiên chỉ báo nghỉ được từng ngày một (việc gấp), không được nghỉ đúng ngày đầu đi làm. Xin nghỉ nhiều ngày lúc này thì chị Hạnh giải thích và không nhận đơn; nghỉ một ngày thì được nhưng chị nhắc khéo và kém vui hơn một chút. Qua tuần đầu thì như cũ.
 - Màn chơi luôn nhắc lịch nghỉ: “Đã xin nghỉ … · còn N ngày nữa. Hôm nay vẫn đi làm.”; khi đang nghỉ thì ghi ngày thứ mấy và ngày đi làm lại; đang chờ bàn giao cũng được nhắc.

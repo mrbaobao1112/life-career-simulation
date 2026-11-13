@@ -85,6 +85,7 @@ function autoPick(ref, sc){
 
 /* ----- Nhật ký trong ngày: mỗi việc đã làm là một dòng ngắn ----- */
 function feedTime(ref){
+  if (typeof ROAM_NOW === 'number' && !(ref && ref.id === 'bedtime')) return clock(ROAM_NOW);   // việc làm trong thế giới tự do: ghi đúng giờ trên đồng hồ
   if (ref && ref.id === 'wake') return clock(S.am ? S.am.wake / 60 : alarmFor(S.day));
   if (ref && ref.id === 'bedtime') return clock(S.bedHour || 23);
   return SLOT_INFO[S.slot][1];
@@ -204,6 +205,7 @@ function openHabits(){
     ${['lunchWork','meal','bed','work','free'].map(row).join('')}
     <label class="hrow chk"><input type="checkbox" id="optDetail" ${S.opt && S.opt.detail ? 'checked' : ''}><span>Hiện chi tiết cộng trừ chỉ số trên từng lựa chọn</span></label>
     <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Cảnh sống: nhân vật đi lại, làm việc, trò chuyện ở nhà, công ty và các nơi khác</span></label>
+    <label class="hrow chk"><input type="checkbox" id="optRoam" ${!(S.opt && S.opt.roam === false) ? 'checked' : ''}><span>Tự đi lại trong nhà: điều khiển nhân vật bằng phím hoặc joystick, chạm vào đồ vật để dùng (tắt thì chọn việc bằng danh sách)</span></label>
     <label class="hrow chk"><input type="checkbox" id="optFps" ${S.opt && S.opt.fps ? 'checked' : ''}><span>Hiện số khung hình mỗi giây (để đo độ mượt trên máy này)</span></label>`;
   const dlg = $('#dlg'); dlg.classList.remove('phone-dlg');
   $('#closeDlg').addEventListener('click', () => { closeDlg(); if (S && S.cur && S.phase === 'play') renderScene(); });
@@ -212,6 +214,7 @@ function openHabits(){
     h[k] = k === 'bed' && v !== 'ask' ? +v : v; save(); }));
   $('#optDetail').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.detail = e.target.checked; save(); });
   $('#optStage').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.stage = e.target.checked; save(); });
+  $('#optRoam').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.roam = e.target.checked; save(); });
   $('#optFps').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.fps = e.target.checked; save(); fpsMeter(); });
   if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
 }

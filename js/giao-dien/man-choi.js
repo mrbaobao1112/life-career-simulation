@@ -95,7 +95,7 @@ const avKey = th => (THREADS[th] && THREADS[th].av) || th;
 let talkIdx = 0;
 function renderScene(){
   const ref = S.cur;
-  stageStop();                                             // chuyển cảnh: dừng mọi hoạt cảnh và lịch nhân vật của cảnh trước
+  stageStop(); roamLeave();                                // chuyển cảnh: dừng mọi hoạt cảnh và lịch nhân vật của cảnh trước
   current = buildScene(ref);
   const ty = sceneType(ref);
   updateHUD();
@@ -115,6 +115,11 @@ function renderScene(){
       <div class="ph-frame"><div class="ph-bar"><span class="ph-av">${headSVG(NPC[avKey(th)].look, defaultNpcExpr(th))}</span><b>${T_.name}</b></div>
         <div class="ph-msgs">${current.msgs.map(t => `<div class="msg in">${t}</div>`).join('')}</div></div>
       <p class="reply-lbl">Bạn trả lời:</p><div class="choices">${btns}</div></article>`;
+  } else if (roamFor(ref)) {                                // ở nhà: tự đi lại, dùng đồ vật; danh sách cũ vẫn mở được bên dưới
+    const intro = current.html ? `<div class="st w-st">${current.html}</div>` : '';
+    $('#stage').innerHTML = `${boardHTML()}<article class="scene roam">${roamHTML(ref)}
+      <header class="sh"><span class="si" aria-hidden="true">${current.icon || ''}</span><h2>${current.title}</h2></header>${intro}${first}
+      <details class="w-list"><summary>📋 Danh sách lựa chọn</summary><div class="choices ${isAct ? 'tiles' : ''}">${btns}</div></details>${ff}</article>`;
   } else {
     const talk = current.talk || [];
     const live = stageFor(ref, current) ? stagePanel(ref, current, { meExpr:current.meExpr }) : livePanel(ref, current);      // cảnh ở công ty: dùng sân khấu sống
@@ -129,6 +134,7 @@ function renderScene(){
     armPanelSkip();
   }
   $('#stage').querySelectorAll('.choice').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
+  if ($('#world')) roamMount($('#stage'), ref);
   const fb = $('#ffDay'); if (fb) fb.addEventListener('click', () => { startFast(false); S.queue.unshift(S.cur); S.cur = null; advance(); });
   window.scrollTo({ top:0 });
   if (ref.id === 'wake') { SFX.play('alarm'); SFX.play(WAKE_ANIM[wakeAnimKey()].snd, 650); }
@@ -147,9 +153,10 @@ function showTalk(focus){
   if (focus) $('#tNext').focus({ preventScroll:true });
 }
 
-function choose(i){
-  const ch = current && current.choices[i];
-  if (!ch || ch.disabled || (ch.cost && S.money < ch.cost)) return;
+// Áp dụng một lựa chọn của cảnh hiện tại: chỉ số, tiền, nếp sinh hoạt, nhật ký.
+// Dùng chung cho bấm nút trong danh sách và cho dùng đồ vật trong thế giới tự do (the-gioi.js).
+function settleChoice(ch){
+  if (!ch || ch.disabled || (ch.cost && S.money < ch.cost)) return null;
   const ref = S.cur;
   const { before, out } = applyChoice(ch);
   if (ref) {
@@ -159,9 +166,19 @@ function choose(i){
     if (!out.go && !quiet)
       feedAdd(ref, ch.icon || current.icon, ref.id === 'bedtime' ? feedText(ref, current, ch) : daily ? ch.label + '.' : current.title + '.', S.money - before.money);
   }
-  if (out.go === 'nextday') return tearAndNext();
-  if (out.go === 'ff') { startFast(true); return tearAndNext(); }
-  if (out.go === 'week') { S.phase = S.day >= LAST_DAY ? 'end' : 'week'; S.cur = null; save(); return renderWeek(); }
+  return { ref, ch, before, out };
+}
+// Lựa chọn đưa sang ngày mới, tua nhanh hoặc tổng kết tuần: làm luôn, trả về true
+function followGo(out){
+  if (out.go === 'nextday') { tearAndNext(); return true; }
+  if (out.go === 'ff') { startFast(true); tearAndNext(); return true; }
+  if (out.go === 'week') { S.phase = S.day >= LAST_DAY ? 'end' : 'week'; S.cur = null; save(); renderWeek(); return true; }
+  return false;
+}
+function choose(i){
+  const r = settleChoice(current && current.choices[i]); if (!r) return;
+  const { ref, ch, before, out } = r;
+  if (followGo(out)) return;
   const chips = diffChips(before, snap());
   const sceneNpc = current.kind === 'phone' ? null : current.npc;
   const npc = out.npc !== undefined ? out.npc : ch.npc !== undefined ? ch.npc : sceneNpc;
@@ -174,7 +191,7 @@ function choose(i){
     : livePanel(ref, { bg, npc, title:current.title }, { bg, npc, actId:ch.actId, meExpr:out.meExpr, npcExpr:nExpr, meAnim:fx.anim });
   S.cur = null; save();
   if (out.silent || (!out.text && !chips.length)) return advance();
-  stageStop(); updateHUD();
+  stageStop(); roamLeave(); updateHUD();
   $('#stage').innerHTML = `<article class="scene result">
     ${live ? live.html : `<div class="panel">${panelSVG(bg, npc, nExpr, out.meExpr, current.title, { meAnim: fx.anim, npcAnim: npcReact(nExpr) })}</div>`}
     <header class="sh"><span class="si" aria-hidden="true">${current.icon || '📝'}</span><h2>${current.title}</h2></header>
