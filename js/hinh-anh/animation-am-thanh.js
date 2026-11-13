@@ -4,7 +4,12 @@
 const ANIM = { WAKE_MS:1700, MOMENT_MS:1300, MONEY_MS:600, SKIP_ON_TAP:true };
 document.documentElement.style.setProperty('--a-wake', ANIM.WAKE_MS + 'ms');
 document.documentElement.style.setProperty('--a-moment', ANIM.MOMENT_MS + 'ms');
-const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+// Giảm chuyển động: 'auto' theo cài đặt của hệ điều hành, 'reduce' luôn giảm (chọn trong Cài đặt ở màn mở đầu)
+const MOTION = { get pref(){ try { return localStorage.getItem('lcs-motion') === 'reduce' ? 'reduce' : 'auto'; } catch (e) { return 'auto'; } },
+  set(v){ try { localStorage.setItem('lcs-motion', v); } catch (e) {} document.documentElement.classList.toggle('rm', v === 'reduce'); },
+  get system(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } };
+const reduceMotion = () => MOTION.pref === 'reduce' || MOTION.system;
+document.documentElement.classList.toggle('rm', MOTION.pref === 'reduce');
 
 // Âm thanh tổng hợp bằng Web Audio, không cần file ngoài
 const SFX = (() => {

@@ -24,7 +24,7 @@ async function open(browser, opts = {}, saveRaw){
   await page.goto(URL); await page.waitForSelector('.title-scene svg');
   return page;
 }
-const state = page => page.evaluate(() => ({ title:!!document.querySelector('.title-scene'), audio:TA.on, fading:!!TA.fading, aTimers:TA.timers.length, sTimers:stageTimers.size, pd:window.__pd.size,
+const state = page => page.evaluate(() => ({ title:!!document.querySelector('.title-scene'), dlg:document.getElementById('dlg').open, music:MUSIC.on, sfx:SFX.on, audio:TA.on, fading:!!TA.fading, aTimers:TA.timers.length, sTimers:stageTimers.size, pd:window.__pd.size,
   actors:document.querySelectorAll('.title-scene .actor').length, says:document.querySelectorAll('.title-scene .say').length }));
 async function makeSave(page){ await page.click('#fresh'); await page.click('.bgopt[data-f] >> nth=1'); await page.click('.bgopt[data-b] >> nth=1'); await page.click('#go');
   await page.evaluate(() => { S.name = 'Minh'; S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.money = 3820000; ensureBills(); save(); }); }
@@ -37,11 +37,17 @@ async function makeSave(page){ await page.click('#fresh'); await page.click('.bg
     let s = await state(page); check('Chưa chạm thì chưa có âm thanh', !s.audio && s.aTimers === 0);
     await page.mouse.click(200, 150); await page.waitForTimeout(300); s = await state(page);
     check('Chạm vào khung phố: nhạc bật, đúng một bộ hẹn giờ', s.audio && s.aTimers >= 2 && s.aTimers <= 4, `${s.aTimers} hẹn giờ âm thanh`);
-    for (let i = 0; i < 21; i++) { await page.click('#tSound'); await page.waitForTimeout(i % 3 ? 15 : 120); }
+    await page.click('#tGear');
+    for (let i = 0; i < 21; i++) { await page.click('#swMusic'); await page.waitForTimeout(i % 3 ? 15 : 120); }
     await page.waitForTimeout(400); s = await state(page);
-    const btn = await page.evaluate(() => document.getElementById('tSound').textContent);
-    check('Bấm nút loa 21 lần liên tục: vẫn chỉ một vòng nhạc, nút hiện đúng trạng thái', s.aTimers <= 4 && (s.audio ? btn === '🔊' : btn !== '🔊'), `${s.aTimers} hẹn giờ, đang ${s.audio ? 'bật' : 'tắt'}, nút ${btn}`);
-    if (!s.audio) { await page.click('#tSound'); await page.waitForTimeout(200); }
+    const sw = await page.getAttribute('#swMusic', 'aria-checked');
+    check('Bật/tắt Nhạc nền 21 lần liên tục: vẫn chỉ một bộ âm thanh, công tắc hiện đúng', s.aTimers <= 4 && String(s.music) === sw && !s.music && s.audio === s.sfx, `${s.aTimers} hẹn giờ, nhạc ${s.music ? 'bật' : 'tắt'}, hiệu ứng ${s.sfx ? 'bật' : 'tắt'}`);
+    await page.click('#swSfx'); await page.waitForTimeout(200); s = await state(page);
+    check('Tắt cả Nhạc nền và Hiệu ứng: dừng hẳn âm thanh', !s.music && !s.sfx && !s.audio && s.aTimers === 0, JSON.stringify(s));
+    await page.click('#swMusic'); await page.waitForTimeout(200); s = await state(page);
+    check('Chỉ bật Nhạc nền (Hiệu ứng vẫn tắt): âm thanh chạy lại, hai tùy chọn độc lập', s.music && !s.sfx && s.audio && s.aTimers <= 4 && await page.evaluate(() => !SFX.on && MUSIC.on));
+    await page.click('#swSfx'); await page.waitForTimeout(100); await page.click('#setX'); await page.waitForTimeout(200);
+    s = await state(page); check('Bật lại cả hai rồi đóng Cài đặt: âm thanh vẫn chạy, chỉ một bộ', s.music && s.sfx && s.audio && !s.dlg && s.aTimers <= 4, JSON.stringify(s));
     await makeSave(page); await page.waitForTimeout(1200); s = await state(page);
     check('Bấm Bắt đầu rồi vào game: nhạc nhỏ dần và tắt hẳn, không còn hẹn giờ âm thanh', !s.title && !s.audio && s.aTimers === 0 && s.pd === 0, JSON.stringify(s));
     check('Không có lỗi', page.errs.length === 0, page.errs[0] || ''); await page.context().close(); }
@@ -83,19 +89,22 @@ async function makeSave(page){ await page.click('#fresh'); await page.click('.bg
     await page.waitForTimeout(3000);
     check('Chơi tiếp đọc đúng bản lưu (tên, ngày, công việc, số dư)', /Minh/.test(t) && /24\/11/.test(t) && /Hồ Tây Soft/.test(t) && /3\.820\.000đ/.test(t), t.slice(0, 120));
     check('Chỉ mở màn mở đầu thì bản lưu không thay đổi', raw0 === await page.evaluate(k => localStorage.getItem(k), KEY));
-    await page.click('#fresh'); await page.waitForTimeout(150);
-    check('Chơi lại: bấm lần đầu chỉ hỏi xác nhận, bản lưu còn nguyên', !(await page.$('#go')) && raw0 === await page.evaluate(k => localStorage.getItem(k), KEY));
-    await page.waitForTimeout(3700);
-    check('Không bấm lần hai thì nút tự trở lại như cũ', (await page.textContent('#fresh')) === 'Chơi lại');
+    check('Màn chính chỉ có một nút hành động: Chơi tiếp', (await page.$$eval('.t-actions button', b => b.map(x => x.textContent))).join() === 'Chơi tiếp' && !(await page.$('#fresh')));
+    await page.click('#tGear'); await page.click('#setNew'); await page.waitForTimeout(150);
+    check('Chơi lại trong Cài đặt: chỉ hiện xác nhận, bản lưu còn nguyên', /thay thế/.test(await page.textContent('#dlgBody')) && !(await page.$('#go')) && raw0 === await page.evaluate(k => localStorage.getItem(k), KEY));
+    await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+    check('Bấm Escape: đóng hộp thoại, không xóa gì, vẫn ở màn mở đầu', !(await state(page)).dlg && !!(await page.$('.title-scene')) && raw0 === await page.evaluate(k => localStorage.getItem(k), KEY));
     await page.click('#resume'); await page.waitForTimeout(400);
     check('Bấm Chơi tiếp: vào đúng ngày đang chơi', await page.evaluate(() => S && S.day === 9 && S.name === 'Minh'));
     await page.context().close(); }
   for (const [name, raw] of [['chuỗi hỏng', '{khong-phai-json'], ['thiếu dữ liệu', JSON.stringify({ v:7, phase:'play' })], ['sai kiểu', JSON.stringify({ v:7, phase:'play', day:'ba', money:null, bg:'nha', look:{}, stat:{}, rel:{}, flags:{} })], ['phiên bản lạ', JSON.stringify({ v:99, phase:'play', day:3 })]]) {
     const page = await open(browser, {}, raw); await page.waitForTimeout(400);
-    const bad = await page.$('.t-bad'), card = await page.$('.save-card');
-    await page.click('#fresh'); await page.waitForTimeout(100);
+    const bad = await page.$('.t-bad'), card = await page.$('.save-card'), main = await page.$$eval('.t-actions button', b => b.map(x => x.textContent));
+    await page.click('#fresh'); await page.waitForTimeout(150);
+    const confirm = /thay thế/.test(await page.textContent('#dlgBody')) && (await state(page)).dlg;
     const stillTitle = !!(await page.$('.title-scene')), kept = raw === await page.evaluate(k => localStorage.getItem(k), KEY);
-    check(`Bản lưu ${name}: không lỗi, báo không đọc được, giữ nguyên dữ liệu, bắt đầu mới phải xác nhận`, !!bad && !card && stillTitle && kept && !page.errs.length, page.errs[0] || '');
+    await page.click('#setGo'); await page.waitForTimeout(150);
+    check(`Bản lưu ${name}: không lỗi, báo không đọc được, giữ nguyên dữ liệu, bắt đầu mới phải xác nhận`, !!bad && !card && main.join() === 'Bắt đầu cuộc sống mới' && confirm && stillTitle && kept && !!(await page.$('#go')) && !page.errs.length, page.errs[0] || '');
     await page.context().close(); }
 
   // 5. Bong bóng thoại, người đi bộ, các hành vi ngắn (theo dõi 100 giây)
@@ -128,10 +137,56 @@ async function makeSave(page){ await page.click('#fresh'); await page.click('.bg
     const a = await state(page); await page.waitForTimeout(3000); const b = await state(page);
     const anim = await page.evaluate(() => [...document.querySelectorAll('.title-scene *')].filter(e => getComputedStyle(e).animationName !== 'none').length);
     check('Giảm chuyển động: không hẹn giờ, không người mới xuất hiện, không hoạt ảnh trang trí', a.sTimers === 0 && b.actors === a.actors && anim === 0, `${anim} phần tử còn hoạt ảnh`);
-    await page.click('#tSound'); await page.waitForTimeout(100); const c = await state(page);
+    await page.click('#tGear'); await page.click('#swMusic'); await page.click('#swMusic'); await page.waitForTimeout(100); const c = await state(page); await page.click('#setX');
     await page.click('#fresh'); await page.waitForTimeout(200);
-    check('Giảm chuyển động: nút loa và nút Bắt đầu vẫn dùng được', c.audio && !!(await page.$('#go')) && !page.errs.length, page.errs[0] || '');
+    check('Giảm chuyển động: Cài đặt, bật nhạc và nút Bắt đầu vẫn dùng được', c.audio && c.dlg && !!(await page.$('#go')) && !page.errs.length, page.errs[0] || '');
     await page.context().close(); }
+
+  // 9. Hộp thoại Cài đặt: mở/đóng liên tục không làm dựng lại khung phố, không nhân đôi hẹn giờ hay trình nghe
+  { const page = await open(browser); await page.mouse.click(200, 150); await page.waitForTimeout(6000);
+    await page.evaluate(() => { window.__svg0 = document.querySelector('.title-scene svg'); window.__mounts = 0; const m = window.titleMount; });
+    const pos = () => page.evaluate(() => [...document.querySelectorAll('.title-scene .actor')].map(el => el.dataset.who + ':' + Math.round(new DOMMatrix(getComputedStyle(el).transform).e)).join(','));
+    const t0 = (await state(page)).sTimers, p0 = await pos(); const ways = ['x', 'esc', 'ngoai'];
+    let maxT = 0;
+    for (let i = 0; i < 15; i++) {
+      await page.click('#tGear'); await page.waitForTimeout(60 + (i % 4) * 40);
+      const w = ways[i % 3];
+      if (w === 'x') await page.click('#setX'); else if (w === 'esc') await page.keyboard.press('Escape'); else await page.mouse.click(4, 4);
+      await page.waitForTimeout(60); maxT = Math.max(maxT, (await state(page)).sTimers);
+    }
+    await page.waitForTimeout(800);
+    const s = await state(page), p1 = await pos(), same = await page.evaluate(() => document.querySelector('.title-scene svg') === window.__svg0);
+    const focus = await page.evaluate(() => document.activeElement && document.activeElement.id);
+    check('Mở/đóng Cài đặt 15 lần (nút ✕, Escape, chạm ra ngoài): khung phố không bị dựng lại, nhân vật vẫn đi tiếp', same && p1 !== p0 && !s.dlg, `${p0.slice(0, 50)} → ${p1.slice(0, 50)}`);
+    check('Không nhân đôi hẹn giờ, trình nghe hay âm thanh', maxT < 2.2 * Math.max(t0, 6) && s.pd === 1 && s.aTimers <= 4 && s.audio, `hẹn giờ ${t0} → nhiều nhất ${maxT}, trình nghe ${s.pd}, âm thanh ${s.aTimers}`);
+    check('Đóng Cài đặt thì con trỏ bàn phím quay về nút Cài đặt', focus === 'tGear', String(focus));
+    // mở trong lúc đang có hoạt cảnh và đóng giữa chừng
+    let got = false; for (let i = 0; i < 80 && !got; i++) { await page.waitForTimeout(250); got = await page.evaluate(() => document.querySelectorAll('.title-scene .say').length > 0); }
+    await page.click('#tGear'); await page.waitForTimeout(900); await page.click('#setX'); await page.waitForTimeout(4000);
+    check('Mở rồi đóng Cài đặt giữa lúc nhân vật đang nói: hoạt cảnh tiếp tục, không lỗi', got && same && !page.errs.length && (await state(page)).actors >= 3, page.errs[0] || '');
+    // Luôn giảm chuyển động: áp dụng ngay, tắt đi thì chạy lại; âm thanh không bị ảnh hưởng
+    await page.click('#tGear'); await page.click('#swMotion'); await page.waitForTimeout(400);
+    const r1 = await state(page), rm = await page.evaluate(() => document.documentElement.classList.contains('rm')), anim = await page.evaluate(() => [...document.querySelectorAll('.title-scene *')].filter(e => getComputedStyle(e).animationName !== 'none').length);
+    await page.click('#swMotion'); await page.waitForTimeout(1200); const r2 = await state(page);
+    check('Cài đặt “Luôn giảm chuyển động”: dừng mọi hoạt cảnh ngay; tắt đi thì phố chạy lại; nhạc vẫn phát', rm && r1.sTimers === 0 && anim === 0 && r2.sTimers > 0 && r1.audio && r2.audio && r2.pd === 1 && !page.errs.length, `bật: ${r1.sTimers} hẹn giờ, ${anim} hoạt ảnh; tắt: ${r2.sTimers} hẹn giờ`);
+    await page.click('#setX'); await page.context().close(); }
+
+  // 10. Các cỡ màn hình: không tràn ngang, nút đủ to và nằm trong màn hình, hộp thoại không tràn
+  { const rows = [];
+    for (const [w, h] of [[320, 568], [375, 667], [390, 844], [430, 932], [1280, 800]]) for (const save of [false, true]) {
+      const page = await open(browser, { viewport:{ width:w, height:h } }); if (save) { await makeSave(page); await page.evaluate(() => { titleStop(); renderTitle(); }); } await page.waitForTimeout(300);
+      const m = await page.evaluate(() => { const r = s => document.querySelector(s).getBoundingClientRect(); const g = r('#tGear'), b = r('.t-actions .btn'), sc = r('.t-scene');
+        return { over:document.documentElement.scrollWidth - innerWidth, g:[Math.round(g.width), Math.round(g.height), Math.round(g.right), Math.round(g.top)], b:[Math.round(b.top), Math.round(b.bottom), Math.round(b.height)], sc:Math.round(sc.width * sc.height), vw:innerWidth, vh:innerHeight }; });
+      await page.click('#tGear'); await page.waitForTimeout(250);
+      const dlg = await page.evaluate(() => { const r = document.getElementById('dlg').getBoundingClientRect(); const b = document.getElementById('dlgBody'); return [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom), b.scrollHeight > b.clientHeight]; });
+      await page.keyboard.press('Escape');
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.waitForTimeout(100);
+      const g2 = await page.evaluate(() => Math.round(document.getElementById('tGear').getBoundingClientRect().top));
+      const ok = m.over <= 0 && m.g[0] >= 44 && m.g[1] >= 44 && m.g[2] <= m.vw && m.b[1] <= m.vh && m.b[2] >= 48 && dlg[0] >= 0 && dlg[1] >= 0 && dlg[2] <= m.vw && dlg[3] <= m.vh && g2 === m.g[3];
+      rows.push(`${w}×${h}${save ? ' có lưu' : ''}: ${ok ? 'ổn' : 'LỖI'} (nút chính ${m.b[0]}–${m.b[1]}, hộp thoại ${dlg.slice(0, 4).join(',')}${dlg[4] ? ', cuộn bên trong' : ''})`);
+      if (!ok) console.log('   ', JSON.stringify({ m, dlg, g2 }));
+      await page.context().close(); }
+    check('5 cỡ màn hình × có/không bản lưu: không tràn ngang; nút Cài đặt ≥ 44 điểm ảnh, đứng yên khi cuộn; nút chính trong màn hình; hộp thoại không tràn', rows.every(r => / ổn /.test(r)), '\n      ' + rows.join('\n      ')); }
 
   // 7. Hiệu năng: giả lập điện thoại với bộ xử lý chậm 4 lần
   { const page = await open(browser, { viewport:{ width:390, height:844 }, deviceScaleFactor:3, isMobile:true, hasTouch:true });

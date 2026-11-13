@@ -236,18 +236,27 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   check('Đơn của bản v11 và v12 (kể cả nghỉ ốm cũ) vẫn có hiệu lực và không làm đổi lương', r.on && r.work.join() === 'false,false' && r.pay === 9 && /nghỉ ốm/.test(r.line), r.line);
   w.close(); }
 
-// 12. Màn hình mở đầu (v13)
+// 12. Màn hình mở đầu (v13.2): một nút chính, các chức năng phụ trong Cài đặt
 { const w = mk(); const d = w.document;
-  check('Không có bản lưu: có góc phố, nút Bắt đầu, không có thẻ chơi tiếp', !!d.querySelector('.title-scene svg') && /Bắt đầu/.test(d.querySelector('#fresh').textContent) && !d.querySelector('.save-card') && !w.errs.length, w.errs[0] || '');
+  const btns = () => [...d.querySelectorAll('.title-wrap .t-actions button')].map(b => b.textContent);
+  check('Không có bản lưu: khung phố, đúng một nút “Bắt đầu cuộc sống mới”, có nút Cài đặt', !!d.querySelector('.title-scene svg') && btns().join() === 'Bắt đầu cuộc sống mới' && !!d.querySelector('#tGear') && !d.querySelector('.save-card') && !w.errs.length, btns().join() + (w.errs[0] || ''));
   start(w, 'tro'); w.eval(`S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.money = 3820000; ensureBills(); save();`);
-  const w2 = mk(w.localStorage.getItem('lcs-tuan-dau-tien-v6')), d2 = w2.document, card = d2.querySelector('.save-card');
-  const t = card ? card.textContent.replace(/\s+/g, ' ') : '';
+  const raw = w.localStorage.getItem('lcs-tuan-dau-tien-v6');
+  const w2 = mk(raw), d2 = w2.document, card = d2.querySelector('.save-card');
+  const t = card ? card.textContent.replace(/\s+/g, ' ') : '', b2 = [...d2.querySelectorAll('.title-wrap .t-actions button')].map(b => b.textContent);
   check('Có bản lưu: thẻ tóm tắt ngày, tuần, công việc, số dư, mốc sắp tới, thời điểm lưu', /Thứ Ba, 24\/11/.test(t) && /Tuần 2\/8/.test(t) && /Hồ Tây Soft/.test(t) && /3\.820\.000đ/.test(t) && /Sắp tới/.test(t) && /Lưu/.test(t), t.slice(0, 160));
+  check('Có bản lưu: màn chính chỉ có một nút “Chơi tiếp”, không có nút chơi lại', b2.join() === 'Chơi tiếp' && !d2.querySelector('#fresh'), b2.join());
   check('Tờ lịch hiện đúng ngày đang chơi dở', d2.querySelector('.title-scene .cal-num').textContent === '24');
-  d2.querySelector('#fresh').click();
-  check('“Chơi lại từ đầu” bấm lần đầu chỉ hỏi lại, chưa vào màn tạo nhân vật', !d2.querySelector('#go') && /Bấm lần nữa/.test(d2.querySelector('#fresh').textContent));
-  d2.querySelector('#fresh').click();
-  check('Bấm lần hai mới vào màn tạo nhân vật', !!d2.querySelector('#go') && !d2.querySelector('.title-scene') && w2.eval('stageTimers.size') === 0 && !w2.errs.length, w2.errs[0] || '');
+  const svg0 = d2.querySelector('.title-scene svg');
+  d2.querySelector('#tGear').click();
+  const dlg = d2.querySelector('#dlg'), txt = () => d2.querySelector('#dlgBody').textContent;
+  check('Bấm Cài đặt: hộp thoại có đủ nhóm Âm thanh, Hiển thị, Dữ liệu, Thông tin; khung phố không bị dựng lại', dlg.hasAttribute('open') && /Âm thanh/.test(txt()) && /Hiển thị/.test(txt()) && /Dữ liệu trò chơi/.test(txt()) && /Phiên bản/.test(txt()) && d2.querySelector('.title-scene svg') === svg0);
+  d2.querySelector('#setNew').click();
+  check('Chơi lại trong Cài đặt: hiện xác nhận, nêu rõ tiến trình sẽ bị thay, chưa xóa gì', /thay thế/.test(txt()) && /24\/11/.test(txt()) && w2.localStorage.getItem('lcs-tuan-dau-tien-v6') === raw && !d2.querySelector('#go'));
+  d2.querySelector('#setCancel').click();
+  check('Bấm Hủy: quay về Cài đặt, bản lưu còn nguyên', /Cài đặt/.test(txt()) && w2.localStorage.getItem('lcs-tuan-dau-tien-v6') === raw);
+  d2.querySelector('#setNew').click(); d2.querySelector('#setGo').click();
+  check('Xác nhận: vào màn tạo nhân vật, hộp thoại đóng, bản lưu cũ vẫn còn cho đến khi tạo xong', !!d2.querySelector('#go') && !d2.querySelector('.title-scene') && !dlg.hasAttribute('open') && w2.localStorage.getItem('lcs-tuan-dau-tien-v6') === raw && w2.eval('stageTimers.size') === 0 && !w2.errs.length, w2.errs[0] || '');
   w.close(); w2.close(); }
 
 console.log(fail ? `\n${fail} mục KHÔNG đạt` : '\nTất cả đều đạt');

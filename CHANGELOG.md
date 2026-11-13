@@ -1,6 +1,18 @@
 # Lịch sử phiên bản
 
-## v13.1: Hoàn thiện màn hình mở đầu (hiện tại)
+## v13.2: Màn hình mở đầu gọn lại – một nút chính, một lối vào Cài đặt (hiện tại)
+Chỉ thay giao diện màn hình mở đầu. Không đổi gameplay, tài chính, sức khỏe, nghỉ phép, mô phỏng 56 ngày; không đổi cấu trúc bản lưu.
+- Màn chính chỉ còn một nút hành động: “Chơi tiếp” khi có bản lưu, “Bắt đầu cuộc sống mới” khi chưa có. Bản lưu không đọc được thì báo rõ, nút chính hỏi xác nhận trước khi bắt đầu mới, không xóa dữ liệu cũ.
+- Đầu trang: tên game và một dòng giới thiệu bên trái; nút Cài đặt (bánh răng, 46×46 điểm ảnh) cố định ở góc trên bên phải, không trôi khi cuộn. Bỏ nút loa và nút chơi lại khỏi màn chính.
+- Hộp thoại Cài đặt (dùng lại hộp thoại có sẵn của game; giữa màn hình trên máy tính, trượt lên từ đáy trên điện thoại; đóng bằng nút ✕, Escape hoặc chạm ra ngoài; nội dung dài thì cuộn bên trong):
+  - Âm thanh: Nhạc nền và Hiệu ứng âm thanh, hai công tắc độc lập. Nhạc nền là tùy chọn mới (chỉ có ở màn mở đầu); Hiệu ứng âm thanh dùng chung với nút âm thanh trong game.
+  - Hiển thị: “Luôn giảm chuyển động” (mặc định theo hệ điều hành; bật thì áp dụng cho cả game). Chất lượng hình ảnh ghi “Tự động”, không phải công tắc, vì game chưa có cơ chế chất lượng riêng.
+  - Dữ liệu trò chơi: “Chơi mới / Chơi lại từ đầu” mở bước xác nhận nêu rõ tiến trình nào sẽ bị thay; bản lưu cũ còn nguyên cho đến khi tạo xong nhân vật mới.
+  - Thông tin: phiên bản, thời gian của bản chơi thử.
+- Mở hoặc đóng Cài đặt không dựng lại khung phố, nhân vật, hoạt cảnh hay âm thanh. Đóng thì con trỏ bàn phím quay về nút Cài đặt.
+- Kiểm thử màn mở đầu cập nhật theo giao diện mới, thêm phần hộp thoại Cài đặt và 5 cỡ màn hình.
+
+## v13.1: Hoàn thiện màn hình mở đầu
 Không đổi luật chơi, tài chính, sức khỏe, nghỉ phép; không đổi cấu trúc bản lưu.
 
 Lỗi thật đã sửa (đã tái hiện được trên v13):
