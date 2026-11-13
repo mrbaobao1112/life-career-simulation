@@ -8,7 +8,6 @@
    Không đổi luật chơi. Rời màn hình là mọi hoạt cảnh, hẹn giờ và âm thanh đều dừng.
    ========================================================= */
 const TITLE = {
-  LAYOUT: 'a',              // 'a': khung cảnh ở trên, chữ bên dưới; 'b': khung cảnh tràn viền, tên game nằm trên trời
   WALK: [36, 56],           // tốc độ người đi bộ (đơn vị hình mỗi giây)
   BIKE: [118, 138],         // tốc độ xe máy của hai làn
   SPAWN: [700, 2000],       // khoảng cách giữa hai lần có người mới xuất hiện (mili giây)
@@ -63,8 +62,13 @@ function titleSceneSVG(slot){
   return `<svg viewBox="0 -10 360 260" role="img" aria-label="Góc phố Hà Thành">${s}<g class="L-back"></g><g class="L-aisle"></g><g class="L-front"></g><g class="L-road"></g>${eve ? '<rect y="-10" width="360" height="260" fill="#FF8A4C" opacity=".1" pointer-events="none"/>' : night ? '<rect y="-10" width="360" height="260" fill="#121836" opacity=".22" pointer-events="none"/>' : ''}<g class="L-say"></g></svg>`;
 }
 
-/* ----- Âm thanh 8-bit: nhạc nền, tiếng phố, âm thanh theo sự kiện ----- */
-const TA = { on:false, vol:0, timers:[], bar:0 };
+/* ----- Âm thanh 8-bit: nhạc nền, tiếng phố, âm thanh theo sự kiện -----
+   Hai tùy chọn độc lập: Nhạc nền (MUSIC, chỉ có ở màn mở đầu) và Hiệu ứng âm thanh (SFX, dùng chung với trong game:
+   tiếng phố, còi xe, tiếng rao, tiếng cười ở màn mở đầu và mọi âm thanh trong lúc chơi). */
+const GAME_VERSION = '13.2';
+const MUSIC = (() => { let on = true; try { on = localStorage.getItem('lcs-music') !== 'off'; } catch (e) {}
+  return { get on(){ return on; }, set(v){ on = !!v; try { localStorage.setItem('lcs-music', on ? 'on' : 'off'); } catch (e) {} } }; })();
+const TA = { on:false, vol:0, timers:[], bar:0, unlocked:false };
 const N_ = { G4:392, A4:440, C5:523, D5:587, E5:659, G5:784, A5:880, C6:1047, F2:87, G2:98, A2:110, C3:131, D3:147, E3:165, G3:196 };
 const TUNE = {
   lead: [['E5','G5','A5','G5','E5','D5','C5','D5'], ['E5','E5','G5',0,'A5','G5','E5',0], ['D5','E5','G5','A5','C6','A5','G5','E5'], ['D5',0,'C5','D5','E5',0,0,0]],
@@ -72,6 +76,9 @@ const TUNE = {
   EIGHTH: .2,
 };
 function tTone(f, t0, dur, type, vol, f2){ if (TA.vol > 0 && SFX.on && SFX.raw) SFX.raw.tone(f, t0, dur, type, vol * TA.vol, f2); }
+// nốt nhạc nền: theo tùy chọn Nhạc nền, không theo Hiệu ứng âm thanh
+function mTone(f, t0, dur, type, vol, f2){ if (TA.vol > 0 && MUSIC.on && SFX.raw) SFX.raw.tone(f, t0, dur, type, vol * TA.vol, f2); }
+function mNoise(t0, dur, vol, freq){ if (TA.vol > 0 && MUSIC.on && SFX.raw) SFX.raw.noise(t0, dur, vol * TA.vol, freq); }
 function tNoise(t0, dur, vol, freq){ if (TA.vol > 0 && SFX.on && SFX.raw) SFX.raw.noise(t0, dur, vol * TA.vol, freq); }
 const TSND = {
   horn:  () => { tTone(440, 0, .11, 'square', .06); tTone(554, .12, .16, 'square', .06); },
@@ -86,13 +93,16 @@ function titleSound(name){ if (TA.on) try { TSND[name](); } catch (e) {} }
 function titleMusicBar(){
   const E = TUNE.EIGHTH, b = TA.bar++ % 4;
   const V = TITLE.MUSIC_VOL;
-  TUNE.lead[b].forEach((n, i) => { if (n) tTone(N_[n], i * E, E * .9, 'square', .04 * V); });
-  TUNE.bass[b].forEach((n, i) => tTone(N_[n], i * 2 * E, E * 1.8, 'triangle', .1 * V));
-  for (let i = 0; i < 8; i++) tNoise(i * E, .03, (i % 2 ? .01 : .016) * V, 7000);
-  [0, 4].forEach(i => tTone(120, i * E, .12, 'sine', .12 * V, 50));
+  TUNE.lead[b].forEach((n, i) => { if (n) mTone(N_[n], i * E, E * .9, 'square', .04 * V); });
+  TUNE.bass[b].forEach((n, i) => mTone(N_[n], i * 2 * E, E * 1.8, 'triangle', .1 * V));
+  for (let i = 0; i < 8; i++) mNoise(i * E, .03, (i % 2 ? .01 : .016) * V, 7000);
+  [0, 4].forEach(i => mTone(120, i * E, .12, 'sine', .12 * V, 50));
 }
+// Bộ âm thanh của màn mở đầu chạy khi có ít nhất một trong hai tùy chọn đang bật
+const titleAudioWanted = () => MUSIC.on || SFX.on;
 function titleAudioStart(){
-  if (!SFX.on || !document.querySelector('.title-scene')) return;
+  if (!titleAudioWanted() || !document.querySelector('.title-scene')) return;
+  TA.unlocked = true;
   if (TA.on && !TA.fading) return;                         // đang phát rồi: không tạo thêm vòng nhạc
   TA.timers.forEach(clearInterval); TA.timers = []; TA.fading = false;      // đang nhỏ dần thì dừng hẳn rồi phát lại
   TA.on = true; TA.vol = .35; TA.bar = 0;                   // bắt đầu nhỏ rồi to dần
@@ -111,18 +121,13 @@ function titleAudioStop(now){
   TA.timers.forEach(clearInterval); TA.timers = []; TA.fading = true;
   const down = setInterval(() => { TA.vol = Math.max(0, TA.vol - .15); if (TA.vol <= 0) stop(); }, 80); TA.timers.push(down);
 }
+// Dòng nhắc “Chạm để nghe”: chỉ hiện khi đang có âm thanh được bật mà chưa phát
 function titleSoundBtn(){
-  const b = document.getElementById('tSound'); if (!b) return;
-  const playing = TA.on && !TA.fading;
-  b.textContent = !SFX.on ? '🔇' : playing ? '🔊' : '🔈';
-  b.setAttribute('aria-label', !SFX.on ? 'Bật âm thanh' : playing ? 'Tắt âm thanh' : 'Bật nhạc');
-  const hint = document.getElementById('tHint'); if (hint) hint.hidden = playing || !SFX.on;
+  const hint = document.getElementById('tHint'); if (hint) hint.hidden = (TA.on && !TA.fading) || !titleAudioWanted();
 }
-// Nút loa: bấm liên tục cũng chỉ có một vòng nhạc
-function titleSoundToggle(){
-  if (!SFX.on) { SFX.toggle(); titleAudioStart(); }
-  else if (TA.on && !TA.fading) { SFX.toggle(); titleAudioStop(true); }
-  else titleAudioStart();
+// Áp dụng sau khi đổi tùy chọn âm thanh: cả hai tắt thì dừng hẳn; còn một cái bật thì chạy (bấm trong Cài đặt cũng là một lần chạm)
+function titleAudioApply(){
+  if (!titleAudioWanted()) titleAudioStop(true); else titleAudioStart();
   titleSoundBtn(); try { soundLabel(); } catch (e) {}
 }
 
@@ -137,9 +142,9 @@ function titleStop(){
 document.addEventListener('visibilitychange', () => {
   if (!titleShown()) return;
   if (document.hidden) { titleWasPlaying = TA.on && !TA.fading; titleStop(); TA.timers.forEach(clearInterval); TA.timers = []; TA.on = false; TA.fading = false; }
-  else { renderTitle(); if (titleWasPlaying) titleAudioStart(); titleWasPlaying = false; }
+  else { titleRemount(); if (titleWasPlaying) titleAudioStart(); titleWasPlaying = false; }
 });
-if (window.matchMedia) { const mq = window.matchMedia('(prefers-reduced-motion: reduce)'); const re = () => { if (titleShown()) renderTitle(); };
+if (window.matchMedia) { const mq = window.matchMedia('(prefers-reduced-motion: reduce)'); const re = () => { if (titleShown()) titleRemount(); };
   if (mq && mq.addEventListener) mq.addEventListener('change', re); else if (mq && mq.addListener) mq.addListener(re); }
 
 /* ----- Đạo diễn góc phố ----- */
@@ -165,7 +170,7 @@ function titleMount(root, look){
   const say = (a, text, ms) => C.say(a, text, ms);
   // người chơi chạm lần đầu thì bật âm thanh (trình duyệt không cho tự phát)
   if (titleUnlock) { document.removeEventListener('pointerdown', titleUnlock, true); document.removeEventListener('keydown', titleUnlock, true); }
-  titleUnlock = e => { if (e.target.closest && e.target.closest('#resume, #fresh, #tSound')) return; titleAudioStart(); };
+  titleUnlock = e => { if (e.target.closest && e.target.closest('#resume, #fresh, #tGear, #dlg')) return; titleAudioStart(); };
   document.addEventListener('pointerdown', titleUnlock, true); document.addEventListener('keydown', titleUnlock, true);
 
   // nhân vật chính đứng trước cửa hàng, hơi lệch phải
@@ -386,4 +391,65 @@ function saveCardHTML(sv){
     <div class="sc-row"><span>💰 ${fmt(m.money)}</span>${m.fin ? `<span class="sc-fin">${m.fin}</span>` : ''}</div>
     <div class="sc-bars">${m.bars.map(bar).join('')}</div>
     ${m.next.length ? `<div class="sc-next">⏭️ Sắp tới: ${m.next.join(' · ')}</div>` : ''}</div>`;
+}
+
+/* ----- Dựng lại riêng khung phố (đổi cài đặt giảm chuyển động, quay lại tab), giữ nguyên chữ, nút và âm thanh ----- */
+function titleRemount(){
+  const box = document.querySelector('#stage .t-scene'); if (!box) return;
+  stageStop(); const old = box.querySelector('svg'); if (old) old.remove();
+  box.insertAdjacentHTML('beforeend', titleSceneSVG(titleSlot())); titleMount(box, box.__look);
+}
+
+/* ----- Cài đặt: mở trong hộp thoại có sẵn (#dlg), không điều hướng và không đụng tới khung phố ----- */
+let settingsOpen = false, settingsBack = null;
+const swHTML = (id, label, on, sub) => `<div class="set-row"><span class="set-l"><span>${label}</span>${sub ? `<small>${sub}</small>` : ''}</span>
+  <button class="sw" type="button" role="switch" id="${id}" aria-checked="${on}" aria-label="${label}"><i></i></button></div>`;
+function settingsHTML(st, view){
+  const sv = st && st.sv, d = sv && Number.isFinite(sv.day) ? sv.day : null;
+  if (view === 'confirm') {
+    const what = st.kind === 'ok' ? `tiến trình của <b>${esc(sv.name || 'nhân vật')}</b> (${dayInfo(d).dow}, ${fmtD(d)}, tuần ${Math.min(8, weekOf(d))}/8)` : 'bản lưu cũ không đọc được';
+    return `<div class="set-head"><h2>Chơi lại từ đầu?</h2><button class="set-x" type="button" id="setX" aria-label="Đóng">✕</button></div>
+      <p class="set-warn">Bắt đầu cuộc sống mới sẽ <b>thay thế</b> ${what}. Không thể lấy lại sau khi thay.</p>
+      <p class="set-note">Bản lưu cũ vẫn còn cho đến khi bạn tạo xong nhân vật mới và vào ngày đầu tiên. Nếu đổi ý giữa chừng, chỉ cần tải lại trang.</p>
+      <div class="set-btns"><button class="btn alt" type="button" id="setCancel">Hủy</button><button class="btn danger" type="button" id="setGo">Tôi hiểu, chơi lại</button></div>`;
+  }
+  const sys = MOTION.system;
+  return `<div class="set-head"><h2>Cài đặt</h2><button class="set-x" type="button" id="setX" aria-label="Đóng">✕</button></div>
+    <h3>Âm thanh</h3>
+    ${swHTML('swMusic', 'Nhạc nền', MUSIC.on, 'Nhạc 8-bit ở màn hình mở đầu')}
+    ${swHTML('swSfx', 'Hiệu ứng âm thanh', SFX.on, 'Tiếng phố, chuông báo thức, tin nhắn, tiền… trong cả game')}
+    <h3>Hiển thị</h3>
+    ${swHTML('swMotion', 'Luôn giảm chuyển động', MOTION.pref === 'reduce', MOTION.pref === 'reduce' ? 'Đang bật theo lựa chọn của bạn' : `Đang theo hệ thống: ${sys ? 'hệ thống đang bật giảm chuyển động' : 'chuyển động đầy đủ'}`)}
+    <div class="set-row"><span class="set-l"><span>Chất lượng hình ảnh</span><small>Game chưa có tùy chọn chất lượng riêng</small></span><span class="set-v">Tự động</span></div>
+    <h3>Dữ liệu trò chơi</h3>
+    ${st.kind === 'none' ? '<p class="set-note">Chưa có bản lưu. Tiến trình được lưu tự động trên trình duyệt này.</p>'
+      : `<p class="set-note">${st.kind === 'ok' ? `Đang lưu: ${esc(sv.name || 'nhân vật')}, ${dayInfo(d).dow.toLowerCase()} ${fmtD(d)}.` : 'Có một bản lưu không đọc được.'} Tiến trình được lưu tự động trên trình duyệt này.</p>
+         <button class="btn alt set-full" type="button" id="setNew">Chơi mới / Chơi lại từ đầu</button>`}
+    <h3>Thông tin</h3>
+    <div class="set-row"><span class="set-l"><span>Phiên bản</span></span><span class="set-v">v${GAME_VERSION}</span></div>
+    <div class="set-row"><span class="set-l"><span>Bản chơi thử</span></span><span class="set-v">16/11/2026 – 10/1/2027</span></div>`;
+}
+function openSettings(st, view){
+  const dlg = document.getElementById('dlg'), body = document.getElementById('dlgBody');
+  if (!settingsOpen) settingsBack = document.activeElement;
+  body.innerHTML = settingsHTML(st, view);
+  dlg.classList.remove('phone-dlg'); dlg.classList.add('settings-dlg');
+  if (!dlg.open) { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); }
+  if (!settingsOpen) { settingsOpen = true; dlg.addEventListener('close', settingsClosed, { once:true }); }
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  const flip = (id, v) => { const el = document.getElementById(id); if (el) el.setAttribute('aria-checked', String(v)); };
+  on('setX', closeSettings);
+  on('swMusic', () => { MUSIC.set(!MUSIC.on); flip('swMusic', MUSIC.on); titleAudioApply(); });
+  on('swSfx', () => { SFX.toggle(); flip('swSfx', SFX.on); titleAudioApply(); });
+  on('swMotion', () => { MOTION.set(MOTION.pref === 'reduce' ? 'auto' : 'reduce'); openSettings(st); titleRemount(); });
+  on('setNew', () => openSettings(st, 'confirm'));
+  on('setCancel', () => openSettings(st));
+  on('setGo', () => { closeSettings(); titleStop(); renderSetup(); });
+  const first = body.querySelector(view === 'confirm' ? '#setCancel' : '.sw, button'); if (first && first.focus) first.focus({ preventScroll:true });
+}
+function closeSettings(){ const dlg = document.getElementById('dlg'); if (!settingsOpen) return; if (dlg.close) dlg.close(); else { dlg.removeAttribute('open'); settingsClosed(); } }
+// Đóng bằng nút ✕, phím Escape hay chạm ra ngoài đều đi qua đây: trả lại mọi thứ như trước khi mở
+function settingsClosed(){
+  settingsOpen = false; const dlg = document.getElementById('dlg'); dlg.classList.remove('settings-dlg');
+  if (settingsBack && settingsBack.focus && document.contains(settingsBack)) settingsBack.focus({ preventScroll:true }); settingsBack = null;
 }

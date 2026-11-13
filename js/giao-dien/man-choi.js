@@ -233,7 +233,7 @@ function openThread(th, chips){
 function tearAndNext(){
   S.cur = null;
   const page = $('#calPage');
-  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = reduceMotion();
   $('#stage').querySelectorAll('button').forEach(b => b.disabled = true);
   const go = () => { startDay(); updateHUD(true); };
   SFX.play('tear');

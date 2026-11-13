@@ -19,35 +19,33 @@ function renderTitle(){
   const demo = { g:'nam', hair:'hair_short', hairColor:'#2B2321', skin:'#FFD6BA', outfit:{ kind:'shirt', color:'#FFFFFF' }, tie:true, acc:[] };
   let look = demo; if (canResume) try { look = lookToL(saved.look, 'casual', saved.gender); } catch (e) {}    // ngoại hình đã tạo, mặc đồ đi chơi
   const d = canResume ? saved.day : 1, di = dayInfo(d), slot = titleSlot();
-  const lay = TITLE.LAYOUT, h1 = '<h1>' + 'Life & Career Simulation'.split(' ').map(w => `<span class="w">${esc(w)}</span>`).join(' ') + '</h1>';
-  $('#stage').innerHTML = `<section class="title-wrap lay-${lay} ${canResume ? 'has-save' : ''}">
+  // Một nút hành động chính duy nhất; mọi chức năng phụ nằm trong Cài đặt
+  const main = canResume ? `<button class="btn" type="button" id="resume">${saved.phase === 'end' ? 'Xem lại tổng kết' : 'Chơi tiếp'}</button>`
+                         : '<button class="btn" type="button" id="fresh">Bắt đầu cuộc sống mới</button>';
+  $('#stage').innerHTML = `<section class="title-wrap ${canResume ? 'has-save' : ''}">
+    <header class="t-head">
+      <div class="t-brand"><h1>${'Life & Career Simulation'.split(' ').map(w => `<span class="w">${esc(w)}</span>`).join(' ')}</h1><p class="t-tag">Tám tuần đầu đời đi làm ở Hà Thành</p></div>
+    </header>
+    <button class="t-gear" type="button" id="tGear" aria-label="Cài đặt" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
     <div class="t-scene panel stage title-scene">
-      ${lay === 'b' ? `<div class="t-over">${h1}</div>` : ''}
       <div class="title-cal"><div class="cal-page enter ${di.wd === 0 ? 'sun' : ''}"><div class="cal-bind"><span></span><span></span></div>
         <div class="cal-month">Tháng ${di.month}, ${di.year}</div><div class="cal-num">${di.date}</div><div class="cal-dow">${di.dow}</div></div></div>
-      <button class="t-sound" type="button" id="tSound">🔈</button><span class="t-hint" id="tHint">🎵 Chạm để nghe</span>
+      <span class="t-hint" id="tHint">🎵 Chạm để nghe</span>
       ${titleSceneSVG(slot)}
     </div>
     <div class="t-body">
-      ${lay === 'a' ? h1 : ''}
-      <p class="lead">Tám tuần đầu tiên sau khi tốt nghiệp, ở Hà Thành. Một tấm bằng, một khoản tiết kiệm nhỏ, và tháng lương đầu tiên.</p>
-      ${canResume ? st.card : st.kind === 'bad' ? '<p class="t-bad" role="status">Không đọc được bản lưu cũ (dữ liệu hỏng hoặc từ phiên bản khác). Bản lưu vẫn được giữ nguyên; bắt đầu mới sẽ ghi đè lên nó.</p>' : ''}
+      <p class="lead">Một tấm bằng, một khoản tiết kiệm nhỏ, và tháng lương đầu tiên. Mỗi lựa chọn hôm nay đều có hậu quả về sau.</p>
+      ${canResume ? st.card : st.kind === 'bad' ? '<p class="t-bad" role="status">Không đọc được bản lưu cũ (dữ liệu hỏng hoặc từ phiên bản khác). Bản lưu vẫn được giữ nguyên cho đến khi bạn tạo xong nhân vật mới.</p>' : ''}
     </div>
-    <div class="t-actions ${canResume ? 'two' : ''}">
-      ${canResume ? `<button class="btn" type="button" id="resume">${saved.phase === 'end' ? 'Xem lại tổng kết' : 'Chơi tiếp'}</button><button class="btn alt" type="button" id="fresh">Chơi lại</button>` : '<button class="btn" type="button" id="fresh">Bắt đầu</button>'}
-    </div>
+    <div class="t-actions">${main}</div>
   </section>`;
-  titleMount($('#stage .t-scene'), look);
+  const box = $('#stage .t-scene'); box.__look = look;
+  titleMount(box, look);
   titleSoundBtn();
-  $('#tSound').addEventListener('click', titleSoundToggle);
-  if (canResume) $('#resume').addEventListener('click', () => { titleStop(); S = saved; migrate(); resume(); });
-  // đang có bản lưu (đọc được hay không) thì “Chơi lại” / “Bắt đầu” phải bấm hai lần, để tránh bấm nhầm mất bản lưu
-  const guard = st.kind !== 'none'; let armed = null;
-  $('#fresh').addEventListener('click', e => {
-    const b = e.currentTarget, label = b.textContent;
-    if (guard && !armed) { b.classList.add('armed'); b.dataset.label = label; b.textContent = 'Bấm lần nữa để xác nhận'; armed = setTimeout(() => { armed = null; b.classList.remove('armed'); b.textContent = b.dataset.label; }, 3500); return; }
-    clearTimeout(armed); titleStop(); renderSetup();
-  });
+  $('#tGear').addEventListener('click', () => openSettings(st));
+  if (canResume) $('#resume').addEventListener('click', () => { closeSettings(); titleStop(); S = saved; migrate(); resume(); });
+  // chưa có bản lưu: bắt đầu luôn; có bản lưu nhưng không đọc được: hỏi xác nhận trước vì bản lưu đó sẽ bị thay
+  else $('#fresh').addEventListener('click', () => { if (st.kind === 'bad') openSettings(st, 'confirm'); else { titleStop(); renderSetup(); } });
 }
 
 // Bản lưu của bản chơi thử 7 ngày (v6): bổ sung dữ liệu mới để chơi tiếp sang ngày 8
