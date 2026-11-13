@@ -73,16 +73,18 @@ SC.bedtime = () => {
   const shiftLine = S.bedShift ? `<span class="warn">Vì ${S.bedShift >= 1 ? '“thêm một trận nữa”' : 'cốc cà phê đặc buổi sáng'}, giờ ngủ thật sẽ muộn hơn ${fmtH(S.bedShift)}.</span>` : '';
   return { icon:'🛌', title:'Đi ngủ',
     html: P(`Báo thức ngày mai: <b>${clock(wake)}</b>. Ngủ ít hơn ${fmtH(BAL.SLEEP_NEED)} sẽ tích lũy nợ ngủ.${S.sleepDebt >= .5 ? ` Bạn đang nợ ngủ ${fmtH(S.sleepDebt)}.` : ''}`, shiftLine),
-    choices: opts.map(o => {
-      const bed = o.h + S.bedShift, hrs = wake + 24 - bed;
-      const est = wakeRows(S.energy, hrs, bed, S.sleepDebt || 0, S.hangover).e;
-      return { h:o.h, icon:o.icon, label:o.label, hints:[`😴 Ngủ ${fmtH(hrs)}`, `⚡ Sáng mai khoảng ${est}`], fx:() => {
-        S.sleep = hrs; S.bedHour = bed; S.eveEnergy = S.energy; if (S.bg === 'nha' && (S.flags.outLate || S.flags.lateOT)) { rel('family', -2); note('Về nhà sau 23 giờ, mẹ vẫn ngồi chờ ở phòng khách.'); } S.flags.lateOT = false;
-        if (bed >= 24.5) S.stat.lateNights++;
-        nightly();
-        return { silent:true }; } };
-    }) };
+    choices: opts.map(o => bedChoice(o, wake)) };
 };
+// Một lựa chọn giờ đi ngủ. Dùng chung cho bảng lựa chọn và cho chiếc giường trong thế giới tự do (giờ đi ngủ bất kỳ)
+function bedChoice(o, wake = alarmFor(S.day + 1)){
+  const bed = o.h + S.bedShift, hrs = wake + 24 - bed;
+  const est = wakeRows(S.energy, hrs, bed, S.sleepDebt || 0, S.hangover).e;
+  return { h:o.h, icon:o.icon, label:o.label, hints:[`😴 Ngủ ${fmtH(hrs)}`, `⚡ Sáng mai khoảng ${est}`], fx:() => {
+    S.sleep = hrs; S.bedHour = bed; S.eveEnergy = S.energy; if (S.bg === 'nha' && (S.flags.outLate || S.flags.lateOT)) { rel('family', -2); note('Về nhà sau 23 giờ, mẹ vẫn ngồi chờ ở phòng khách.'); } S.flags.lateOT = false;
+    if (bed >= 24.5) S.stat.lateNights++;
+    nightly();
+    return { silent:true }; } };
+}
 
 function previewTomorrow(){
   const d = S.day + 1;

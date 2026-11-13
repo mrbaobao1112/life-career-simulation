@@ -65,7 +65,7 @@ function titleSceneSVG(slot){
 /* ----- Âm thanh 8-bit: nhạc nền, tiếng phố, âm thanh theo sự kiện -----
    Hai tùy chọn độc lập: Nhạc nền (MUSIC, chỉ có ở màn mở đầu) và Hiệu ứng âm thanh (SFX, dùng chung với trong game:
    tiếng phố, còi xe, tiếng rao, tiếng cười ở màn mở đầu và mọi âm thanh trong lúc chơi). */
-const GAME_VERSION = '13.2';
+const GAME_VERSION = '14';
 const MUSIC = (() => { let on = true; try { on = localStorage.getItem('lcs-music') !== 'off'; } catch (e) {}
   return { get on(){ return on; }, set(v){ on = !!v; try { localStorage.setItem('lcs-music', on ? 'on' : 'off'); } catch (e) {} } }; })();
 const TA = { on:false, vol:0, timers:[], bar:0, unlocked:false };

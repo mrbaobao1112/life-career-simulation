@@ -147,7 +147,7 @@ function stageCore(root){
   };
   const say = (a, text, ms = 1500) => {
     if (!alive()) return Promise.resolve(false);
-    const s = scaleOf(a), W = office ? STAGE.W : 360, w = Math.max(22, text.length * 4.9 + 12), x = Math.min(W - w - 3, Math.max(3, a.x - w / 2)), y = Math.max(3, a.y - 140 * s - 17 + (a.dy || 0));
+    const s = scaleOf(a), W = +svg.dataset.w || (office ? STAGE.W : 360), w = Math.max(22, text.length * 4.9 + 12), x = Math.min(W - w - 3, Math.max(3, a.x - w / 2)), y = Math.max(3, a.y - 140 * s - 17 + (a.dy || 0));
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('class', 'say');
     g.innerHTML = `<rect x="${x}" y="${y}" width="${w}" height="15" rx="7" fill="#fff" stroke="#B9C2CC"/><path d="M${a.x - 3} ${y + 14.5} L${a.x} ${y + 19} L${a.x + 3} ${y + 14.5}Z" fill="#fff" stroke="#B9C2CC" stroke-width=".8"/><rect x="${a.x - 3.4}" y="${y + 13}" width="6.8" height="2" fill="#fff"/><text x="${x + w / 2}" y="${y + 10.6}" text-anchor="middle" font-size="8.6" font-weight="600" fill="#1B2230" font-family="Be Vietnam Pro,Arial,sans-serif">${esc(text)}</text>`;
     layer('say').appendChild(g); later(() => g.remove(), ms); return wait(still ? 0 : ms);

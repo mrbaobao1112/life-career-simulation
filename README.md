@@ -15,6 +15,7 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 
 - **Màn hình mở đầu là một góc phố Hà Thành đang sống:** người đi bộ hai chiều (có người dắt chó, người chạy bộ, người cầm điện thoại), xe máy chạy qua, quán trà đá có khách, hàng rong gánh hàng rao bán, bạn bè đi ngang chào nhân vật. Trời và đèn đường đổi theo giờ thật. Nhạc 8-bit và tiếng phố bật sau lần chạm đầu tiên. Màn hình chỉ có một nút chính (“Chơi tiếp” hoặc “Bắt đầu cuộc sống mới”); có bản lưu thì thẻ “Chơi tiếp” tóm tắt ngày, công việc, số dư, chỉ số và mốc sắp tới. Nút bánh răng ở góc trên bên phải mở Cài đặt: nhạc nền, hiệu ứng âm thanh, giảm chuyển động, chơi lại từ đầu, phiên bản.
 
+- **Tự đi lại trong nhà (v14):** giờ rảnh, bữa ăn và giờ đi ngủ ở nhà được chơi bằng cách điều khiển nhân vật: phím WASD hoặc mũi tên để đi (đi chéo được), E để dùng đồ; trên điện thoại dùng joystick và nút ✋ ở dưới khung. Bấm hoặc chạm vào đồ vật thì nhân vật tự tìm đường đến. Mỗi hoàn cảnh một căn nhà riêng: phòng trọ khép kín, căn hộ ghép có phòng khách với TV của Tùng, nhà bố mẹ có bàn thờ và bộ ấm chén. Đồng hồ chạy liên tục cả lúc đi lại (1 giây = 2 phút trong game); dùng giường, máy tính, bếp, cửa ra vào… thì làm đúng lựa chọn cũ và sang buổi sau; tắm, uống nước, ngắm phố chỉ tốn vài phút. Hết giờ mà chưa làm gì thì nhân vật lướt điện thoại hết buổi. Danh sách lựa chọn cũ vẫn mở được ngay dưới khung; tắt hẳn trong “Nếp sinh hoạt”.
 - **Nếp sinh hoạt:** việc thường ngày (ăn, ngủ, họp đầu ngày, tắc đường) tự diễn ra theo nếp của nhân vật và hiện thành nhật ký trong ngày; người chơi chỉ quyết định việc đáng quyết định. Đổi nếp bất cứ lúc nào bằng nút “Nếp sinh hoạt”.
 - **Cảnh sống:** mọi cảnh có hình đều chuyển động. Ở nhà: thức dậy từ trên giường, ăn, học, chơi game, quét dọn, người ở cùng (bố mẹ hoặc Tùng) có việc riêng theo buổi. Ở công ty: đi xe máy tới, chào đồng nghiệp, ngồi gõ phím, đồng nghiệp đi lại và trò chuyện, OT buổi tối vắng người. Ngoài đường: cà phê, trà đá, bia hơi, chạy bộ quanh hồ, thư viện, trung tâm thương mại, có người qua lại; trời mưa thì cảnh ngoài trời cũng mưa. Chạm vào ai thì người đó phản ứng. Bật tắt trong “Nếp sinh hoạt”.
 - **Mỗi người một tính cách:** anh Dũng ít nói, hiếm khi rời bàn; chị Mai hay sang bàn người khác và hay cười; Phong hay chạy sang hỏi anh Dũng; chị Hạnh đi họp nhiều; Tùng hay đùa; mẹ hay hỏi han. Tính cách điều khiển hành vi thật trên màn hình, và hiện trong Hồ sơ.
@@ -52,6 +53,7 @@ js/
   canh/           Các cảnh: tìm việc, đi làm, đời sống
   su-kien/        Sự kiện, gia cảnh, nhờ vả, ngày lương, trả nợ, các mốc theo thời gian
   hinh-anh/       Danh mục đồ, nhân vật chibi, bối cảnh, animation và âm thanh (ANIM)
+  the-gioi/       Thế giới tự do trong nhà: bản đồ ba căn nhà, điều khiển, va chạm và tìm đường, nối đồ vật với lựa chọn
   giao-dien/      Màn chơi, tổng kết tuần, màn mở đầu, hồ sơ
 tests/            Kiểm thử tự động (chạy bằng Node.js)
 docs/             Ghi chú thiết kế
@@ -77,6 +79,8 @@ Muốn sửa gì thì mở file nào:
 | Tính cách từng người, câu họ nói với bạn và với nhau | `js/du-lieu/tinh-cach.js` |
 | Xác suất có sự kiện văn phòng, có người nghỉ phép; cách xếp lịch mỗi ngày | `js/hinh-anh/lich-van-phong.js` |
 | Cảnh sống ở nhà và nơi khác: chỗ đứng, tư thế theo việc, lịch của người ở cùng | `js/hinh-anh/dia-diem.js` |
+| Tự đi lại trong nhà: tốc độ đi, tốc độ đồng hồ, cỡ nhân vật, tắm mất bao lâu; vị trí đồ đạc từng căn nhà | `js/the-gioi/ban-do-nha.js` (bảng `ROAM`, `HOUSES`) |
+| Đồ vật nào làm được việc gì, hết giờ thì tự chọn gì | `js/the-gioi/tuong-tac.js` |
 | Các động tác (đi, ngồi, gõ phím, nghĩ, nói, nghe, cười, uống, đi xe…) | `css/dong-tac.css` |
 | Màu sắc, cỡ chữ | `css/giao-dien.css` |
 | Màn hình mở đầu: mật độ người và xe, nhạc nền, hộp thoại Cài đặt, số phiên bản | `js/giao-dien/man-mo-dau.js`, `css/mo-dau.css` |
@@ -93,6 +97,7 @@ npm install
 npm test              # kiểm thử hệ thống, tài chính, các mốc 56 ngày + 20 lượt chơi ngẫu nhiên trọn 56 ngày
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)
+npm run the-gioi      # tự đi lại trong nhà: phím, va chạm, đồng hồ, dùng đồ, đi ngủ, joystick trên điện thoại (cần Playwright, khoảng 1 phút)
 npm run mo-dau        # màn hình mở đầu: âm thanh, ra vào, chuyển tab, bản lưu hỏng, giảm chuyển động, hiệu năng (cần Playwright, khoảng 3 phút; thêm DAI=1 để để yên 5 phút)
 npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày
 npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra cân bằng (mất vài phút)
