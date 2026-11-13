@@ -75,8 +75,8 @@ function deskSVG(who){
 }
 function actorSVG(who, expr, look, id){
   const me = who === 'me'; look = look || (me ? playerLook() : NPC[who].look);
-  const body = chibi(look, expr || (me ? playerExpr() : NPC[who] ? defaultNpcExpr(who) : 'neutral'), me ? { dark:darkCircles() } : {});
-  return `<g class="actor snap" data-who="${id || who}" ${me ? '' : `data-npc="${who}"`} role="button" aria-label="${me ? esc(S.name) : NPC[who] ? NPC[who].name : 'Người qua đường'}"><g class="sc"><g class="flip"><g class="cb cb-idle">${body}</g></g></g></g>`;
+  const body = chibi(look, expr || (me ? playerExpr() : NPC[who] ? defaultNpcExpr(who) : 'neutral'), me && S ? { dark:darkCircles() } : {});
+  return `<g class="actor snap" data-who="${id || who}" ${me ? '' : `data-npc="${who}"`} role="button" aria-label="${me ? esc(S ? S.name : 'Nhân vật chính') : NPC[who] ? NPC[who].name : 'Người qua đường'}"><g class="sc"><g class="flip"><g class="cb cb-idle">${body}</g></g></g></g>`;
 }
 const PROP_SVG = {
   cup:'<rect x="87" y="107" width="10" height="11" rx="2" fill="#fff" stroke="#B9C2CC" stroke-width="1.2"/>',

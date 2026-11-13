@@ -236,5 +236,19 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   check('Đơn của bản v11 và v12 (kể cả nghỉ ốm cũ) vẫn có hiệu lực và không làm đổi lương', r.on && r.work.join() === 'false,false' && r.pay === 9 && /nghỉ ốm/.test(r.line), r.line);
   w.close(); }
 
+// 12. Màn hình mở đầu (v13)
+{ const w = mk(); const d = w.document;
+  check('Không có bản lưu: có góc phố, nút Bắt đầu, không có thẻ chơi tiếp', !!d.querySelector('.title-scene svg') && /Bắt đầu/.test(d.querySelector('#fresh').textContent) && !d.querySelector('.save-card') && !w.errs.length, w.errs[0] || '');
+  start(w, 'tro'); w.eval(`S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.money = 3820000; ensureBills(); save();`);
+  const w2 = mk(w.localStorage.getItem('lcs-tuan-dau-tien-v6')), d2 = w2.document, card = d2.querySelector('.save-card');
+  const t = card ? card.textContent.replace(/\s+/g, ' ') : '';
+  check('Có bản lưu: thẻ tóm tắt ngày, tuần, công việc, số dư, mốc sắp tới, thời điểm lưu', /Thứ Ba, 24\/11/.test(t) && /Tuần 2\/8/.test(t) && /Hồ Tây Soft/.test(t) && /3\.820\.000đ/.test(t) && /Sắp tới/.test(t) && /Lưu/.test(t), t.slice(0, 160));
+  check('Tờ lịch hiện đúng ngày đang chơi dở', d2.querySelector('.title-scene .cal-num').textContent === '24');
+  d2.querySelector('#fresh').click();
+  check('“Chơi lại từ đầu” bấm lần đầu chỉ hỏi lại, chưa vào màn tạo nhân vật', !d2.querySelector('#go') && /Bấm lần nữa/.test(d2.querySelector('#fresh').textContent));
+  d2.querySelector('#fresh').click();
+  check('Bấm lần hai mới vào màn tạo nhân vật', !!d2.querySelector('#go') && !d2.querySelector('.title-scene') && w2.eval('stageTimers.size') === 0 && !w2.errs.length, w2.errs[0] || '');
+  w.close(); w2.close(); }
+
 console.log(fail ? `\n${fail} mục KHÔNG đạt` : '\nTất cả đều đạt');
 process.exit(fail ? 1 : 0);

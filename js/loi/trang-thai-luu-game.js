@@ -30,7 +30,7 @@ function clampAll(){
   Object.keys(S.rel).forEach(k => S.rel[k] = clamp(Math.round(S.rel[k])));
   S.money = Math.round(S.money);
 }
-function save(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e) {} }
+function save(){ try { S.savedAt = Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e) {} }
 function load(){ try { const r = localStorage.getItem(SAVE_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
 function wipe(){ try { localStorage.removeItem(SAVE_KEY); } catch(e) {} }
 
