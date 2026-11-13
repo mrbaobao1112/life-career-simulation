@@ -13,6 +13,8 @@
 const LEAVE = {
   PER_MONTH: 1,             // khi đã chính thức: ngày 1 mỗi tháng cộng chừng này ngày phép
   MAX_DAYS: 5,              // một lần báo nghỉ nhiều nhất chừng này ngày làm việc
+  NEW_WEEK: 5,              // người mới: trong chừng này ngày làm việc đầu tiên chỉ báo nghỉ được từng ngày một, và không nghỉ đúng ngày đầu
+  REL_NEW: 1,               // người mới đã xin nghỉ: chị Hạnh kém vui thêm chừng này
   LONG: 3,                  // nghỉ từ chừng này ngày làm việc là "nghỉ dài": phải bàn giao, đi làm lại phải bắt nhịp
   REL_COST: 1,              // báo nghỉ làm chị Hạnh hơi kém vui
   REL_LONG: 1,              // nghỉ dài: thêm chừng này
@@ -61,6 +63,10 @@ function reviewDay(d){ return !!S.job && !S.flags.review && d >= BAL.REVIEW_DAY 
 // Ngày kết thúc của một kỳ nghỉ bắt đầu từ ngày from, dài n ngày làm việc (bỏ qua cuối tuần và lễ ở giữa)
 function leaveEnd(from, n){ let d = from, c = 0; for (;;) { if (!isDayOff(d)) c++; if (c >= n) return d; d++; } }
 function nextWork(d){ let x = d + 1; while (isDayOff(x)) x++; return x; }
+// Ngày d là ngày làm việc thứ mấy kể từ ngày bắt đầu đi làm (ngày đầu là 1)
+const workIndex = (d = S.day) => S.job ? leaveDays(S.job.start, d) : 0;
+// Đang trong tuần đầu đi làm: chỉ báo nghỉ được từng ngày một
+const leaveNew = () => !!S.job && workIndex(S.day) <= LEAVE.NEW_WEEK;
 const rangeTxt = (a, b) => a === b ? `ngày ${fmtD(a)}` : `từ ${fmtD(a)} đến hết ${fmtD(b)}`;
 
 /* ----- Các loại nghỉ và khoảng ngày có thể chọn ----- */
@@ -80,6 +86,8 @@ function leaveRanges(type){
   const add = (from, n, label) => { const to = leaveEnd(from, n); if (to > LAST_DAY || isDayOff(from)) return;
     if (type === 'annual' && (inProbation(from) || leaveBalance(from).left < n)) return;                         // phép: ngày nghỉ phải là ngày đã chính thức và còn đủ phép
     if (leaveList().some(L => L.status === 'approved' && from <= L.to && to >= L.from)) return;                  // trùng đơn đã có
+    if (S.job && from === S.job.start) return;                                                                    // không nghỉ đúng ngày đầu đi làm
+    if (n > 1 && leaveNew()) return;                                                                              // người mới: chỉ từng ngày một
     out.push({ from, to, n, label }); };
   if (leaveMorningOk()) add(today, 1, `Hôm nay (${fmtD(today)})`);
   add(t1, 1, `${dayInfo(t1).dow} ${fmtD(t1)}, một ngày`);
@@ -98,6 +106,8 @@ function leaveDecide(req){
   const { type, from, to } = req, n = leaveDays(from, to);
   if (n < 1 || n > LEAVE.MAX_DAYS) return { verdict:'reject', text:'Em xem lại ngày giúp chị nhé.' };
   if (leaveList().some(L => L.status === 'approved' && from <= L.to && to >= L.from)) return { verdict:'reject', text:'Mấy ngày đó em đã báo nghỉ rồi mà.' };
+  if (S.job && from === S.job.start) return { verdict:'reject', text:'Hôm nay là ngày đầu tiên của em mà. Em cố đến công ty nhé, có gì gặp chị nói chuyện.' };
+  if (n > 1 && leaveNew()) return { verdict:'reject', text:'Em mới vào tuần đầu, chưa nên nghỉ dài đâu. Đợi quen việc rồi mình sắp xếp nhé. Còn nếu có việc gấp thì em báo chị nghỉ một ngày.' };
   if (type === 'annual') {
     if (inProbation(from)) return { verdict:'reject', text:'Em đang thử việc nên chưa có ngày phép. Em cứ báo nghỉ không lương nhé.' };
     const left = leaveBalance(from).left;
@@ -105,6 +115,7 @@ function leaveDecide(req){
   }
   if (S.unfinished || n >= LEAVE.LONG) return { verdict:'handover', text: S.unfinished ? `Ừ, chị biết rồi. “${S.unfinished}” đang dở, em bàn giao lại cho một bạn trước khi nghỉ nhé.` : 'Ừ, chị biết rồi. Nghỉ dài thế thì em bàn giao việc lại cho một bạn trong team nhé.' };
   const paid = type === 'annual';
+  if (leaveNew()) return { verdict:'ok', text:'Em mới vào mà đã xin nghỉ rồi à? Thôi được, có việc gấp thì chị cho một ngày. Lần sau em sắp xếp sớm hơn nhé.' };
   return { verdict:'ok', text: paid ? 'Ừ, chị biết rồi. Nghỉ ngơi cho khỏe nhé em.' : inProbation(from) ? 'Ừ, chị biết rồi. Đang thử việc nên hôm đó không tính công nhé em.' : 'Ừ, chị biết rồi. Hôm đó không tính công nhé em.' };
 }
 
@@ -114,7 +125,7 @@ function leaveGrant(req, handover){
   const often = list.some(L => L.status === 'approved' && L.to >= req.from - LEAVE.RECENT_DAYS && L.to < req.from);
   const L = { id:'L' + S.day + '-' + list.length, type:req.type, from:req.from, to:req.to, reason:req.reason, paid:req.type === 'annual', status:'approved', asked:S.day, handover:handover || null };
   list.push(L);
-  rel('boss', -(LEAVE.REL_COST + (n >= LEAVE.LONG ? LEAVE.REL_LONG : 0) + (req.from === S.day ? LEAVE.REL_LATE : 0) + (often ? LEAVE.REL_OFTEN : 0)));
+  rel('boss', -(LEAVE.REL_COST + (n >= LEAVE.LONG ? LEAVE.REL_LONG : 0) + (req.from === S.day ? LEAVE.REL_LATE : 0) + (often ? LEAVE.REL_OFTEN : 0) + (leaveNew() ? LEAVE.REL_NEW : 0)));
   memo(`${LEAVE_TYPE[req.type].name} ${rangeTxt(req.from, req.to)}`); note(`Đã báo ${LEAVE_TYPE[req.type].name.toLowerCase()} ${rangeTxt(req.from, req.to)}${L.paid ? '' : ' (không tính công)'}.`);
   return L;
 }
@@ -151,15 +162,19 @@ function openLeaveForm(step){
   if (!leaveCan()) return;
   if (!step) leaveDraft = {};
   const D = leaveDraft, body = $('#dlgBody'), prob = inProbation(), bal = leaveBalance();
+  const notes = [];
+  if (isWorkday() && !leaveMorningOk()) notes.push(S.job && S.day === S.job.start ? 'Hôm nay là ngày đầu đi làm.' : 'Hôm nay bạn vẫn đi làm bình thường. Muốn nghỉ ngay trong ngày thì báo lúc vừa ngủ dậy, trước khi ra khỏi nhà.');
+  if (leaveNew()) notes.push(`Bạn mới đi làm (ngày làm việc thứ ${Math.max(1, workIndex())}): trong ${LEAVE.NEW_WEEK} ngày làm việc đầu chỉ báo nghỉ được từng ngày một.`);
+  const noteHTML = notes.length ? `<p class="lv-note">${notes.join(' ')}</p>` : '';
   const head = `<div class="ph-head"><button class="ghost sm" type="button" id="phBack">Quay lại</button><b class="ph-name">Báo nghỉ</b><button class="ghost sm" type="button" id="phClose">Đóng</button></div>`;
   let html = '';
   if (!D.type) {
-    html = `<p class="muted">${prob ? 'Bạn đang thử việc (lương 85%): chưa có ngày phép, ngày nghỉ không tính công.' : `Ngày phép: còn ${bal.left} (đã cộng ${bal.earned}, đã dùng ${bal.used}). Mỗi tháng được cộng 1 ngày.`}</p>` +
+    html = noteHTML + `<p class="muted">${prob ? 'Bạn đang thử việc (lương 85%): chưa có ngày phép, ngày nghỉ không tính công.' : `Ngày phép: còn ${bal.left} (đã cộng ${bal.earned}, đã dùng ${bal.used}). Mỗi tháng được cộng 1 ngày.`}</p>` +
       ['annual','unpaid'].map(k => { const T_ = LEAVE_TYPE[k], why = leaveBlock(k);
         return `<button class="choice" type="button" data-type="${k}" ${why ? 'disabled' : ''}><span class="ci" aria-hidden="true">${T_.icon}</span><span class="cb"><span class="cl">${T_.name}</span><span class="cd">${why || (k === 'annual' ? 'Có lương, trừ vào ngày phép' : 'Không tính công')}</span></span></button>`; }).join('');
   } else if (!D.from) {
     const rs = leaveRanges(D.type);
-    html = `<p class="muted">${LEAVE_TYPE[D.type].name}: nghỉ khi nào?</p>` + (rs.length ? rs.map((r, i) => `<button class="choice" type="button" data-range="${i}"><span class="ci" aria-hidden="true">📅</span><span class="cb"><span class="cl">${r.label}</span></span></button>`).join('') : '<p class="ph-empty">Không còn ngày nào báo nghỉ được.</p>');
+    html = noteHTML + `<p class="muted">${LEAVE_TYPE[D.type].name}: nghỉ khi nào?</p>` + (rs.length ? rs.map((r, i) => `<button class="choice" type="button" data-range="${i}"><span class="ci" aria-hidden="true">📅</span><span class="cb"><span class="cl">${r.label}</span></span></button>`).join('') : '<p class="ph-empty">Không còn ngày nào báo nghỉ được.</p>');
   } else {
     html = `<p class="muted">${LEAVE_TYPE[D.type].name} ${rangeTxt(D.from, D.to)}. Nhắn chị Hạnh thế nào?</p>` + LEAVE_REASON.map((r, i) => `<button class="choice" type="button" data-reason="${i}"><span class="ci" aria-hidden="true">💬</span><span class="cb"><span class="cl">${r}</span></span></button>`).join('');
   }
@@ -241,3 +256,20 @@ TALKS.unshift(
   { who:'boss',  when:() => S.flags.backFromLeave === S.day, say:['Nghỉ xong rồi thì tăng tốc nhé em.', 'Dạ vâng ạ.'] },
   { who:'dung',  when:() => S.flags.backFromLeave === S.day, say:['Về rồi à. Việc trong nhóm chat.', 'Dạ.'] },
 );
+
+/* ----- Nhắc lịch nghỉ: trên màn chơi mỗi ngày, và trong Hồ sơ ----- */
+function leaveUpcoming(){ return S && S.job ? leaveList().filter(L => L.status === 'approved' && L.to >= S.day).sort((a, b) => a.from - b.from) : []; }
+function leaveBanner(){
+  if (!S || !S.job) return '';
+  if (S.leavePending) return `<p class="lv-banner wait">⏳ Chị Hạnh đang chờ bạn bàn giao việc trước khi nghỉ ${rangeTxt(S.leavePending.req.from, S.leavePending.req.to)}. Mở điện thoại để trả lời.</p>`;
+  const now = leaveOn();
+  if (now) { const n = leaveDays(now.from, now.to), k = leaveDays(now.from, S.day); let back = now.to + 1; while (isDayOff(back)) back++;
+    return `<p class="lv-banner on">🏖️ Đang ${LEAVE_TYPE[now.type].name.toLowerCase()}${n > 1 ? ` (ngày ${Math.max(1, k)}/${n})` : ''}. ${back <= LAST_DAY ? `Đi làm lại ${dayInfo(back).dow.toLowerCase()} ${fmtD(back)}.` : ''}</p>`; }
+  const L = leaveUpcoming()[0]; if (!L) return '';
+  const left = L.from - S.day;
+  return `<p class="lv-banner">📅 Đã xin ${LEAVE_TYPE[L.type].name.toLowerCase()} ${L.from === L.to ? fmtD(L.from) : `${fmtD(L.from)}–${fmtD(L.to)}`} · ${left === 1 ? 'từ ngày mai' : `còn ${left} ngày nữa`}${isWorkday() ? '. Hôm nay vẫn đi làm.' : '.'}</p>`;
+}
+function leaveProfileHTML(){
+  const list = leaveUpcoming(); if (!list.length) return '';
+  return `<span>Ngày nghỉ sắp tới</span><span>${list.map(L => `${L.from === L.to ? fmtD(L.from) : `${fmtD(L.from)}–${fmtD(L.to)}`} (${LEAVE_TYPE[L.type].name.toLowerCase()})`).join('<br>')}</span>`;
+}

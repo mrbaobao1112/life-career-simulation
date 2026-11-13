@@ -150,6 +150,7 @@ function openProfile(){
       <span>Gia cảnh</span><span>${(FAMILY[S.fam] || FAMILY.tb).name}</span>
       <span>Công việc</span><span>${job}</span>
       ${S.job ? `<span>Ngày phép</span><span>${inProbation() ? 'Đang thử việc, chưa có' : `Còn ${leaveBalance().left} (mỗi tháng cộng 1)`}</span>` : ''}
+      ${leaveProfileHTML()}
       <span>Giấc ngủ gần nhất</span><span>${S.day > 1 ? fmtH(S.sleep) : 'Chưa có'}</span>
       <span>Ăn uống dạo này</span><span>${nutrWord()}</span>
     </div>

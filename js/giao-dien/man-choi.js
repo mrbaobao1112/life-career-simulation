@@ -86,7 +86,7 @@ function boardHTML(done){
   const strip = SLOTS.map((s, k) => `<span class="${done || k < now ? 'done' : k === now ? 'now' : ''}">${SLOT_INFO[s][0]}</span>`).join('');
   const feed = S.feed || [], show = feed.slice(-4), more = feed.length - show.length;
   const line = e => `<li><span class="ft">${e.t}</span><span class="fi" aria-hidden="true">${e.icon}</span><span class="fx">${e.text}${e.wake && S.wakeInfo ? `<details class="fd"><summary>Vì sao năng lượng sáng nay như vậy?</summary>${wakeTable()}</details>` : ''}</span>${e.m ? `<span class="fm ${e.m > 0 ? 'good' : 'bad'}">${e.m > 0 ? '+' : '−'}${fmt(Math.abs(e.m))}</span>` : ''}</li>`;
-  return `<div class="board"><div class="slots" aria-label="Các buổi trong ngày">${strip}</div>
+  return `<div class="board">${leaveBanner()}<div class="slots" aria-label="Các buổi trong ngày">${strip}</div>
     ${feed.length ? `<ul class="feed" aria-label="Việc đã diễn ra hôm nay">${more > 0 ? `<li class="fmore">… và ${more} việc trước đó</li>` : ''}${show.map(line).join('')}</ul>` : ''}</div>`;
 }
 const speakerName = w => w === 'me' ? S.name : (NPC[w] ? NPC[w].name : w);

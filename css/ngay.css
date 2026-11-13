@@ -41,3 +41,9 @@
 .journal h3{font-family:'Patrick Hand','Comic Sans MS',cursive;font-weight:400;font-size:22px;margin:12px 0 2px}
 
 #fps{position:fixed;left:8px;bottom:8px;z-index:50;background:rgba(0,0,0,.72);color:#fff;font-size:12px;padding:4px 8px;border-radius:8px;font-variant-numeric:tabular-nums;pointer-events:none}
+
+/* nhắc lịch nghỉ trên màn chơi và trong form xin nghỉ */
+.lv-banner{margin:0 0 8px;padding:8px 12px;border-radius:10px;font-size:14px;line-height:1.45;background:var(--chip);color:var(--ink);border-left:3px solid var(--blue)}
+.lv-banner.on{border-left-color:var(--good)}
+.lv-banner.wait{border-left-color:var(--amber)}
+.lv-note{margin:4px 0 10px;padding:8px 12px;border-radius:10px;font-size:14px;line-height:1.45;background:var(--chip);border-left:3px solid var(--amber)}
