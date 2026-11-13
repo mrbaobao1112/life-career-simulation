@@ -160,7 +160,8 @@ for (const bg of ['tro', 'ghep', 'nha']) {
 
 // 11. Hệ thống nghỉ phép (v12.1): báo nghỉ, ngày công, tiền lương, lịch làm việc
 { const w = mk(); start(w, 'tro'); const d = w.document;
-  const reset = `S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.slot = 'evening'; S.stat.workDays = 5; S.unfinished = null; S.bugs = []; S.leaves = []; S.leave = null; S.leavePending = null; S.rel.boss = 60; S.rel.phong = 50; S.health = 75; S.energy = 70; S.flags.review = 'ok'; S.flags.fuel = null; S.cur = { id:'activity', arg:'evening' }; S.queue = [];`;
+  // bắt đầu đi làm 17/11 để ngày 24/11 đã qua tuần đầu (luật người mới được kiểm thử riêng ở mục 13)
+  const reset = `S.job = { co:'hotay', salary:1e7, start:2 }; S.day = 9; S.slot = 'evening'; S.stat.workDays = 5; S.unfinished = null; S.bugs = []; S.leaves = []; S.leave = null; S.leavePending = null; S.rel.boss = 60; S.rel.phong = 50; S.health = 75; S.energy = 70; S.flags.review = 'ok'; S.flags.fuel = null; S.cur = { id:'activity', arg:'evening' }; S.queue = [];`;
   const J = code => JSON.parse(w.eval(`(() => { ${reset} ${code} })()`));
   const U = `(f, t, r) => leaveSubmit({ type:'unpaid', from:f, to:t === undefined ? f : t, reason:r || 'Em có việc cá nhân ạ' })`;
   // thử việc = đang hưởng lương 85%: một định nghĩa duy nhất
@@ -232,8 +233,8 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   const seen = []; for (let i = 0; i < 40 && w.eval('S.day') === 10; i++) { seen.push(w.eval('S.cur ? S.cur.id : "kq"')); const ts = d.querySelector('#tSkip'); if (ts) { ts.click(); continue; } const nx = d.querySelector('#next'); if (nx) { nx.click(); continue; } const ch = [...d.querySelectorAll('#stage .choice')].filter(b => !b.disabled && !b.closest('[hidden]') && !b.textContent.includes('Tua đến')); if (!ch.length) break; ch[0].click(); }
   check('Ngày nghỉ: về quê cả ngày tốn tiền xe, thân hơn với bố mẹ, chiều và tối không còn giờ rảnh', !!home && w.eval('S.money') <= m0 - 180000 && w.eval('S.rel.family') > f0 && !seen.includes('activity') && !w.errs.length, seen.join(',') + (w.errs[0] || ''));
   // bản lưu cũ
-  r = J(`S.leaves = null; S.leave = { 10:true }; const p0 = 9; const on = !!leaveOn(10); S.leaves.push({ id:'s', type:'sick', from:11, to:11, paid:true, status:'approved' }); return JSON.stringify({ on, work:[isWorkday(10), isWorkday(11)], pay:payFor(25).days, line:(() => { S.day = 11; return todayLine(); })() });`);
-  check('Đơn của bản v11 và v12 (kể cả nghỉ ốm cũ) vẫn có hiệu lực và không làm đổi lương', r.on && r.work.join() === 'false,false' && r.pay === 9 && /nghỉ ốm/.test(r.line), r.line);
+  r = J(`const p0 = payFor(25).days; S.leaves = null; S.leave = { 10:true }; const on = !!leaveOn(10); S.leaves.push({ id:'s', type:'sick', from:11, to:11, paid:true, status:'approved' }); return JSON.stringify({ on, p0, work:[isWorkday(10), isWorkday(11)], pay:payFor(25).days, line:(() => { S.day = 11; return todayLine(); })() });`);
+  check('Đơn của bản v11 và v12 (kể cả nghỉ ốm cũ) vẫn có hiệu lực và không làm đổi lương', r.on && r.work.join() === 'false,false' && r.pay === r.p0 && /nghỉ ốm/.test(r.line), r.line);
   w.close(); }
 
 // 12. Màn hình mở đầu (v13.2): một nút chính, các chức năng phụ trong Cài đặt
@@ -258,6 +259,34 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   d2.querySelector('#setNew').click(); d2.querySelector('#setGo').click();
   check('Xác nhận: vào màn tạo nhân vật, hộp thoại đóng, bản lưu cũ vẫn còn cho đến khi tạo xong', !!d2.querySelector('#go') && !d2.querySelector('.title-scene') && !dlg.hasAttribute('open') && w2.localStorage.getItem('lcs-tuan-dau-tien-v6') === raw && w2.eval('stageTimers.size') === 0 && !w2.errs.length, w2.errs[0] || '');
   w.close(); w2.close(); }
+
+// 13. Người mới đi làm: tuần đầu chỉ báo nghỉ từng ngày một, không nghỉ đúng ngày đầu; game nhắc rõ lịch nghỉ
+{ const w = mk(); start(w, 'tro'); const d = w.document;
+  const J = code => JSON.parse(w.eval(`(() => { S.job = { co:'banhmi', salary:12.5e6, start:3 }; S.leaves = []; S.leavePending = null; S.unfinished = null; S.bugs = []; S.rel.boss = 60; ${code} })()`));
+  // sáng ngày đầu đi làm (18/11)
+  let r = J(`S.day = 2; S.slot = 'night'; S.queue = []; S.cur = null; S.fast = { from:3, until:3 }; startDay(); S.fast = null;
+    const rs = leaveRanges('unpaid').map(x => [x.from, x.n]); const b0 = S.rel.boss;
+    leaveSubmit({ type:'unpaid', from:8, to:12, reason:'Em về quê ạ' }); const week = { ok:!!leaveOn(8), msg:S.phone.threads.boss.slice(-1)[0].t, pend:!!S.leavePending };
+    leaveSubmit({ type:'unpaid', from:3, to:3, reason:'x' }); const today = { ok:!!leaveOn(3), msg:S.phone.threads.boss.slice(-1)[0].t };
+    leaveSubmit({ type:'unpaid', from:4, to:4, reason:'x' }); const one = { ok:!!leaveOn(4), msg:S.phone.threads.boss.slice(-1)[0].t, rel:b0 - S.rel.boss };
+    return JSON.stringify({ rs, week, today, one });`);
+  check('Ngày đầu đi làm: form chỉ có các lựa chọn nghỉ một ngày, không có “hôm nay”', r.rs.length >= 1 && r.rs.every(x => x[1] === 1 && x[0] !== 3), JSON.stringify(r.rs));
+  check('Ngày đầu đi làm xin nghỉ cả tuần sau (23–27/11): không được nhận, chị Hạnh giải thích', !r.week.ok && !r.week.pend && /tuần đầu/.test(r.week.msg), r.week.msg);
+  check('Không thể nghỉ đúng ngày đầu đi làm', !r.today.ok && /ngày đầu/.test(r.today.msg), r.today.msg);
+  check('Tuần đầu vẫn báo nghỉ được một ngày vì việc gấp; chị Hạnh nhắc khéo và kém vui hơn', r.one.ok && /mới vào/.test(r.one.msg) && r.one.rel === 2, `${r.one.msg} (quan hệ −${r.one.rel})`);
+  r = J(`S.day = 10; const rs = leaveRanges('unpaid').map(x => x.n); leaveSubmit({ type:'unpaid', from:12, to:16, reason:'x' }); return JSON.stringify({ rs, idx:workIndex(10), pend:S.leavePending && S.leavePending.kind });`);
+  check('Qua tuần đầu (ngày làm việc thứ 6): xin nghỉ nhiều ngày bình thường', r.idx === 6 && Math.max(...r.rs) > 1 && r.pend === 'handover', `ngày làm việc thứ ${r.idx}`);
+  // nhắc lịch nghỉ trên màn chơi
+  r = J(`S.day = 10; S.leaves = [{ id:'a', type:'unpaid', from:12, to:16, paid:false, status:'approved' }]; const before = leaveBanner();
+    S.day = 15; const during = leaveBanner(); S.day = 11; S.leavePending = { kind:'handover', req:{ type:'unpaid', from:15, to:15 } }; const wait = leaveBanner(); S.leavePending = null;
+    S.day = 17; const after = leaveBanner(); S.day = 10; const prof = leaveProfileHTML(); return JSON.stringify({ before, during, wait, after, prof });`);
+  check('Màn chơi nhắc lịch nghỉ sắp tới, và ghi rõ hôm nay vẫn đi làm', /27\/11–1\/12/.test(r.before) && /còn 2 ngày nữa/.test(r.before) && /vẫn đi làm/.test(r.before), r.before.replace(/<[^>]+>/g, ''));
+  check('Đang nghỉ: ghi ngày thứ mấy và ngày đi làm lại; đang chờ bàn giao cũng được nhắc', /ngày 2\/3/.test(r.during) && /Đi làm lại thứ tư 2\/12/.test(r.during) && /bàn giao/.test(r.wait) && r.after === '', r.during.replace(/<[^>]+>/g, ''));
+  check('Hồ sơ liệt kê các ngày nghỉ sắp tới', /Ngày nghỉ sắp tới/.test(r.prof) && /27\/11–1\/12/.test(r.prof), r.prof.replace(/<[^>]+>/g, ' '));
+  // form xin nghỉ ghi rõ hôm nay có đi làm không
+  w.eval(`S.day = 10; S.slot = 'afternoon'; S.cur = { id:'task', arg:{} }; S.leaves = []; openLeaveForm();`);
+  check('Form xin nghỉ ghi rõ hôm nay vẫn đi làm và cách nghỉ ngay trong ngày', /vẫn đi làm bình thường/.test(d.querySelector('#dlgBody').textContent) && !w.errs.length, w.errs[0] || '');
+  w.close(); }
 
 console.log(fail ? `\n${fail} mục KHÔNG đạt` : '\nTất cả đều đạt');
 process.exit(fail ? 1 : 0);

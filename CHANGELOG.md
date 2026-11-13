@@ -1,6 +1,13 @@
 # Lịch sử phiên bản
 
-## v13.2: Màn hình mở đầu gọn lại – một nút chính, một lối vào Cài đặt (hiện tại)
+## v13.3: Nghỉ phép rõ ràng hơn, luật cho người mới (hiện tại)
+Không đổi gameplay khác, tài chính, mô phỏng 56 ngày; không đổi cấu trúc bản lưu.
+- Người mới đi làm: trong 5 ngày làm việc đầu tiên chỉ báo nghỉ được từng ngày một (việc gấp), không được nghỉ đúng ngày đầu đi làm. Xin nghỉ nhiều ngày lúc này thì chị Hạnh giải thích và không nhận đơn; nghỉ một ngày thì được nhưng chị nhắc khéo và kém vui hơn một chút. Qua tuần đầu thì như cũ.
+- Màn chơi luôn nhắc lịch nghỉ: “Đã xin nghỉ … · còn N ngày nữa. Hôm nay vẫn đi làm.”; khi đang nghỉ thì ghi ngày thứ mấy và ngày đi làm lại; đang chờ bàn giao cũng được nhắc.
+- Form xin nghỉ ghi rõ hôm nay vẫn đi làm bình thường, muốn nghỉ ngay trong ngày thì báo lúc vừa ngủ dậy; người mới thì ghi rõ luật tuần đầu.
+- Hồ sơ liệt kê các ngày nghỉ sắp tới.
+- Kiểm thử: thêm 10 mục cho luật người mới và phần nhắc lịch nghỉ.
+## v13.2: Màn hình mở đầu gọn lại – một nút chính, một lối vào Cài đặt
 Chỉ thay giao diện màn hình mở đầu. Không đổi gameplay, tài chính, sức khỏe, nghỉ phép, mô phỏng 56 ngày; không đổi cấu trúc bản lưu.
 - Màn chính chỉ còn một nút hành động: “Chơi tiếp” khi có bản lưu, “Bắt đầu cuộc sống mới” khi chưa có. Bản lưu không đọc được thì báo rõ, nút chính hỏi xác nhận trước khi bắt đầu mới, không xóa dữ liệu cũ.
 - Đầu trang: tên game và một dòng giới thiệu bên trái; nút Cài đặt (bánh răng, 46×46 điểm ảnh) cố định ở góc trên bên phải, không trôi khi cuộn. Bỏ nút loa và nút chơi lại khỏi màn chính.
