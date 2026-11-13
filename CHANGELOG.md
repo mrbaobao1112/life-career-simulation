@@ -1,6 +1,26 @@
 # Lịch sử phiên bản
 
-## v13: Màn hình mở đầu – góc phố Hà Thành (hiện tại)
+## v13.1: Hoàn thiện màn hình mở đầu (hiện tại)
+Không đổi luật chơi, tài chính, sức khỏe, nghỉ phép; không đổi cấu trúc bản lưu.
+
+Lỗi thật đã sửa (đã tái hiện được trên v13):
+- Bản lưu hỏng hoặc thiếu dữ liệu làm màn mở đầu trắng trơn, không có nút nào để bấm. Giờ kiểm tra bản lưu trước khi đọc; không đọc được thì báo rõ, vẫn cho bắt đầu mới (phải bấm xác nhận) và không xóa hay sửa bản lưu.
+- Chuyển sang tab khác thì nhạc và hoạt cảnh vẫn chạy ngầm. Giờ dừng hẳn khi rời tab, quay lại thì dựng lại khung phố và bật lại nhạc nếu trước đó đang bật.
+- Bật nhạc lại trong lúc nhạc đang nhỏ dần thì bị bỏ qua, nhạc tắt luôn. Giờ dừng hẳn phần đang nhỏ dần rồi phát lại.
+- Có bản lưu thì nút “Chơi tiếp” nằm dưới mép màn hình ở 4/6 cỡ điện thoại đã thử (320, 360, 375 điểm ảnh), phải cuộn mới thấy.
+
+Cải tiến:
+- Thanh nút luôn nằm trong màn hình (kể cả màn hình thấp), nút cao 50 điểm ảnh dễ bấm; “Chơi tiếp” và “Chơi lại” nằm cạnh nhau.
+- Khung phố tràn hết bề ngang trên điện thoại và có thêm một dải trời: lớn hơn 12–15%. Màn hình máy tính giữ như cũ.
+- Chữ mô tả to hơn (16,5 điểm ảnh); người chơi quay lại thì không hiện lại phần giới thiệu; thu gọn khoảng trống.
+- Khung chờ hiện ngay trong lúc các file của game đang tải (trên 3G giả lập: có nội dung sau khoảng 0,2 giây thay vì màn trắng 2,9 giây), cùng kích thước với màn thật nên không nhảy bố cục. Font Google không còn chặn hiển thị trang.
+- Nhịp phố lúc đông lúc vắng thay vì đều tăm tắp; không để hai người cùng làm một việc đặc biệt; mỗi lúc chỉ một hoạt cảnh, xáo thứ tự.
+- Hành vi ngắn mới: người đi bộ dừng lại xem điện thoại hoặc đứng nghỉ rồi đi tiếp; hai người gặp nhau dừng lại hỏi han; khách dừng mua của hàng rong.
+- Nhiều nhất 2 bong bóng thoại cùng lúc, kể cả khi chạm vào nhân vật; không lặp lại câu vừa nói.
+- Bật tắt chế độ giảm chuyển động trong lúc đang ở màn mở đầu thì khung phố dựng lại theo chế độ mới.
+- Kiểm thử mới `kiem-thu-mo-dau.js` chạy trong trình duyệt thật.
+
+## v13: Màn hình mở đầu – góc phố Hà Thành
 Không đổi luật chơi.
 - Màn hình mở đầu thành một góc phố đang sống, dùng lại bộ máy cảnh sống: dãy nhà ống có biển hiệu, dây điện, cột đèn, cây bàng lá rơi, mây trôi, chim bay.
 - Người đi bộ hai chiều trên vỉa hè, mỗi người một dáng và tốc độ; có người dắt chó, người chạy bộ, người vừa đi vừa xem điện thoại. Trong một làn, người đi sau không bao giờ nhanh hơn người đi trước nên không ai đi xuyên qua ai.
