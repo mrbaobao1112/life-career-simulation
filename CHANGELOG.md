@@ -1,6 +1,22 @@
 # Lịch sử phiên bản
 
-## v12.1: Nghỉ phép gọn lại, đúng ngày công (hiện tại)
+## v13: Màn hình mở đầu – góc phố Hà Thành (hiện tại)
+Không đổi luật chơi.
+- Màn hình mở đầu thành một góc phố đang sống, dùng lại bộ máy cảnh sống: dãy nhà ống có biển hiệu, dây điện, cột đèn, cây bàng lá rơi, mây trôi, chim bay.
+- Người đi bộ hai chiều trên vỉa hè, mỗi người một dáng và tốc độ; có người dắt chó, người chạy bộ, người vừa đi vừa xem điện thoại. Trong một làn, người đi sau không bao giờ nhanh hơn người đi trước nên không ai đi xuyên qua ai.
+- Xe máy chạy hai làn ngược chiều, bánh xe quay. Có xe tấp vào lề, người bước xuống đi vào phố; có chủ xe từ quán đi ra, lên xe, nổ máy rời đi.
+- Quán trà đá: hai khách lần lượt nói và uống, thỉnh thoảng cùng cười; ấm trà bốc hơi.
+- Hàng rong gánh hàng, đội nón lá, dừng lại rao “Bánh mì nóng đây!”. Bạn bè (Tùng, Linh, chị Mai, Phong, mẹ) thỉnh thoảng đi ngang, dừng lại chào nhân vật chính, nhân vật vẫy tay đáp lời.
+- Trời, nắng, đèn đường, cửa sổ và biển hiệu đổi theo giờ thật trên máy: sáng, trưa, chiều, tối, đêm có sao.
+- Âm thanh 8-bit: nhạc nền vui lặp lại, tiếng phố rì rầm, xe máy xa gần, còi xe, chuông, tiếng rao, tiếng cười, chim hót buổi sáng. Bật sau lần chạm đầu tiên, có nút bật tắt riêng, nhỏ dần khi vào game.
+- Tên game hiện dần; tờ lịch lật vào, có bản lưu thì hiện đúng ngày đang chơi; nhân vật chính mặc đúng ngoại hình đã tạo.
+- Thẻ “Chơi tiếp”: ảnh nhân vật, nơi ở, ngày và tuần thứ mấy trên 8 tuần, công việc và lương, số dư và tình trạng tài chính, năng lượng, sức khỏe, tinh thần, mốc sắp tới, thời điểm lưu.
+- “Chơi lại từ đầu” khi đang có bản lưu phải bấm hai lần.
+- Hai bố cục: khung cảnh ở trên (mặc định) hoặc khung cảnh tràn viền với tên game nằm trên trời (đổi `TITLE.LAYOUT`).
+- Giảm chuyển động: khung cảnh tĩnh, đủ thông tin, không có gì tự chạy.
+- Rời màn hình là mọi hoạt cảnh, hẹn giờ và âm thanh đều dừng.
+
+## v12.1: Nghỉ phép gọn lại, đúng ngày công
 Sau khi rà soát v12. Không đổi giao diện, không thêm tính năng; không đổi công thức lương.
 - Xin nghỉ là báo cho cấp trên: chị Hạnh không còn từ chối hay đề xuất đổi ngày vì lý do, quan hệ hay “team thiếu người”. Lý do là chuyện riêng, không ảnh hưởng kết quả. Chỉ còn các chặn sổ sách: trùng đơn, không đủ ngày phép, tối đa 5 ngày làm việc.
 - Còn hai loại: nghỉ phép và nghỉ không lương. Bỏ loại nghỉ ốm (và điều kiện “phải thật sự ốm”, chuyện bị bắt gặp khi đi chơi).

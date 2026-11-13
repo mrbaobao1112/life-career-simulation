@@ -13,6 +13,8 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 
 ## Tính năng hiện có
 
+- **Màn hình mở đầu là một góc phố Hà Thành đang sống:** người đi bộ hai chiều (có người dắt chó, người chạy bộ, người cầm điện thoại), xe máy chạy qua, quán trà đá có khách, hàng rong gánh hàng rao bán, bạn bè đi ngang chào nhân vật. Trời và đèn đường đổi theo giờ thật. Nhạc 8-bit và tiếng phố bật sau lần chạm đầu tiên. Có bản lưu thì thẻ “Chơi tiếp” tóm tắt ngày, công việc, số dư, chỉ số và mốc sắp tới.
+
 - **Nếp sinh hoạt:** việc thường ngày (ăn, ngủ, họp đầu ngày, tắc đường) tự diễn ra theo nếp của nhân vật và hiện thành nhật ký trong ngày; người chơi chỉ quyết định việc đáng quyết định. Đổi nếp bất cứ lúc nào bằng nút “Nếp sinh hoạt”.
 - **Cảnh sống:** mọi cảnh có hình đều chuyển động. Ở nhà: thức dậy từ trên giường, ăn, học, chơi game, quét dọn, người ở cùng (bố mẹ hoặc Tùng) có việc riêng theo buổi. Ở công ty: đi xe máy tới, chào đồng nghiệp, ngồi gõ phím, đồng nghiệp đi lại và trò chuyện, OT buổi tối vắng người. Ngoài đường: cà phê, trà đá, bia hơi, chạy bộ quanh hồ, thư viện, trung tâm thương mại, có người qua lại; trời mưa thì cảnh ngoài trời cũng mưa. Chạm vào ai thì người đó phản ứng. Bật tắt trong “Nếp sinh hoạt”.
 - **Mỗi người một tính cách:** anh Dũng ít nói, hiếm khi rời bàn; chị Mai hay sang bàn người khác và hay cười; Phong hay chạy sang hỏi anh Dũng; chị Hạnh đi họp nhiều; Tùng hay đùa; mẹ hay hỏi han. Tính cách điều khiển hành vi thật trên màn hình, và hiện trong Hồ sơ.
@@ -77,6 +79,7 @@ Muốn sửa gì thì mở file nào:
 | Cảnh sống ở nhà và nơi khác: chỗ đứng, tư thế theo việc, lịch của người ở cùng | `js/hinh-anh/dia-diem.js` |
 | Các động tác (đi, ngồi, gõ phím, nghĩ, nói, nghe, cười, uống, đi xe…) | `css/dong-tac.css` |
 | Màu sắc, cỡ chữ | `css/giao-dien.css` |
+| Màn hình mở đầu: mật độ người và xe, bố cục, nhạc nền | `js/giao-dien/man-mo-dau.js`, `css/mo-dau.css` |
 
 Các file dùng chung biến với nhau và được nạp lần lượt theo danh sách trong `index.html`. Khi thêm file mới, nhớ thêm một dòng `<script src="...">` vào đúng vị trí, và tránh đặt trùng tên biến với file khác.
 

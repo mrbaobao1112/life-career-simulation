@@ -4,23 +4,36 @@
 function hideHUD(){ $('#top').hidden = true; $('#bars').hidden = true; $('#foot').hidden = true; $('#phoneFab').hidden = true; }
 
 function renderTitle(){
-  hideHUD();
+  hideHUD(); titleStop();
   const saved = load();
   const canResume = saved && (saved.v === 6 || saved.v === 7) && saved.phase;
-  const demo = { hair:'hair_short', hairColor:'#2B2321', skin:'#FFD6BA', outfit:{ kind:'shirt', color:'#FFFFFF' }, tie:true, acc:[] };
-  $('#stage').innerHTML = `<section class="title-wrap">
-    <div class="title-art">
-      <div class="title-cal"><div class="cal-page"><div class="cal-bind"><span></span><span></span></div>
-        <div class="cal-month">Tháng 11, 2026</div><div class="cal-num">16</div><div class="cal-dow">Thứ Hai</div></div></div>
-      <div class="title-chibi" role="button" tabindex="0" aria-label="Chạm vào nhân vật">${chibiSVG(demo, 'happy', { label:'Nhân vật chính' })}</div>
+  const demo = { g:'nam', hair:'hair_short', hairColor:'#2B2321', skin:'#FFD6BA', outfit:{ kind:'shirt', color:'#FFFFFF' }, tie:true, acc:[] };
+  // ngoại hình đã tạo, mặc đồ đi chơi
+  const look = canResume && saved.look ? lookToL(saved.look, 'casual', saved.gender) : demo, d = canResume ? saved.day || 1 : 1, di = dayInfo(d), slot = titleSlot();
+  const lay = TITLE.LAYOUT, h1 = '<h1>' + 'Life & Career Simulation'.split(' ').map(w => `<span class="w">${esc(w)}</span>`).join(' ') + '</h1>';
+  $('#stage').innerHTML = `<section class="title-wrap lay-${lay}">
+    <div class="t-scene panel stage title-scene">
+      ${lay === 'b' ? `<div class="t-over">${h1}</div>` : ''}
+      <div class="title-cal"><div class="cal-page enter ${di.wd === 0 ? 'sun' : ''}"><div class="cal-bind"><span></span><span></span></div>
+        <div class="cal-month">Tháng ${di.month}, ${di.year}</div><div class="cal-num">${di.date}</div><div class="cal-dow">${di.dow}</div></div></div>
+      <button class="t-sound" type="button" id="tSound">🔈</button><span class="t-hint" id="tHint">🎵 Chạm để nghe</span>
+      ${titleSceneSVG(slot)}
     </div>
-    <h1>Life &amp; Career Simulation</h1>
-    <p class="lead">Bản chơi thử: tám tuần đầu tiên sau khi tốt nghiệp, từ 16/11/2026 đến 10/1/2027. Một tấm bằng, một khoản tiết kiệm nhỏ, và tháng lương đầu tiên.</p>
-    ${canResume ? '<button class="btn" type="button" id="resume">Chơi tiếp</button><button class="btn alt" type="button" id="fresh">Chơi lại từ đầu</button>'
-                : '<button class="btn" type="button" id="fresh">Bắt đầu</button>'}
+    ${lay === 'a' ? h1 : ''}
+    <p class="lead">Tám tuần đầu tiên sau khi tốt nghiệp, ở Hà Thành, từ 16/11/2026 đến 10/1/2027. Một tấm bằng, một khoản tiết kiệm nhỏ, và tháng lương đầu tiên.</p>
+    ${canResume ? saveCardHTML(saved) + '<button class="btn alt" type="button" id="fresh">Chơi lại từ đầu</button>' : '<button class="btn" type="button" id="fresh">Bắt đầu</button>'}
   </section>`;
-  if (canResume) $('#resume').addEventListener('click', () => { S = saved; migrate(); resume(); });
-  $('#fresh').addEventListener('click', renderSetup);
+  titleMount($('#stage .t-scene'), look);
+  titleSoundBtn();
+  $('#tSound').addEventListener('click', () => { if (!SFX.on) { SFX.toggle(); titleAudioStart(); } else if (TA.on) { SFX.toggle(); titleAudioStop(true); } else titleAudioStart(); titleSoundBtn(); try { soundLabel(); } catch (e) {} });
+  if (canResume) $('#resume').addEventListener('click', () => { titleStop(); S = saved; migrate(); resume(); });
+  // có bản lưu thì “Chơi lại từ đầu” phải bấm hai lần, để tránh bấm nhầm mất bản lưu
+  let armed = null;
+  $('#fresh').addEventListener('click', e => {
+    const b = e.currentTarget;
+    if (canResume && !armed) { b.classList.add('armed'); b.textContent = 'Bấm lần nữa: bỏ bản lưu, chơi lại'; armed = setTimeout(() => { armed = null; b.classList.remove('armed'); b.textContent = 'Chơi lại từ đầu'; }, 3500); return; }
+    clearTimeout(armed); titleStop(); renderSetup();
+  });
 }
 
 // Bản lưu của bản chơi thử 7 ngày (v6): bổ sung dữ liệu mới để chơi tiếp sang ngày 8

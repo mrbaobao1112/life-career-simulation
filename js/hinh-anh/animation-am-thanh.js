@@ -52,6 +52,7 @@ const SFX = (() => {
   return {
     play(n, delay = 0){ if (!on || !lib[n]) return; const f = () => { try { lib[n](); } catch (e) {} }; delay ? setTimeout(f, delay) : f(); },
     get on(){ return on; },
+    raw:{ tone:(...a) => { try { tone(...a); } catch (e) {} }, noise:(...a) => { try { noise(...a); } catch (e) {} } },     // dùng cho nhạc nền màn hình mở đầu
     toggle(){ on = !on; try { localStorage.setItem('lcs-sound', on ? 'on' : 'off'); } catch (e) {} if (on) ac(); return on; },
   };
 })();
