@@ -28,6 +28,7 @@ function roamFor(ref){
 }
 // Cảnh nào chơi trong nhà
 function homeMatch(ref){
+  if (['activity','meal'].includes(ref.id) && typeof whereAt === 'function' && whereAt() !== 'home') return false;   // v16: đang ở ngoài phố
   if (ref.id === 'activity') return ['morning','afternoon','evening'].includes(ref.arg);
   if (ref.id === 'meal') return !(ref.arg === 'lunch' && isWorkday());
   return ['bedtime','wake','home_am','d1_cv'].includes(ref.id);
