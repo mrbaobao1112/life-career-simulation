@@ -97,7 +97,8 @@ SC.hangout_pick = (slot) => ({
       const locked = H.minRel && v < H.minRel;
       const hint = locked ? `🔒 Cần thân hơn (từ ${H.minRel})` : next ? (v >= next.need ? '✨ Có chuyện mới để kể' : `🔒 Chuyện tiếp theo cần thân từ ${next.need}`) : '💬 Tán gẫu';
       return { icon: PEOPLE[k].icon, label: k === 'family' ? 'Dành thời gian với bố mẹ' : `Rủ ${PEOPLE[k].name.replace(/^(Chị|Anh) /, m => m.toLowerCase())}`, desc:H.where, cost:H.cost || 0, disabled:locked, hints:[hint, `🤝 ${v}`],
-        fx:() => { S.queue.unshift({ id:'hangout', arg:k }); return { silent:true }; } };
+        fx:() => { if (typeof meetLater === 'function' && meetLater(k, slot)) return { silent:true };   // v16: đi lại tự do thì người được rủ đợi ở nơi hẹn
+          S.queue.unshift({ id:'hangout', arg:k }); return { silent:true }; } };
     }),
     { icon:'↩️', label:'Thôi, để hôm khác', fx:() => { S.queue.unshift({ id:'activity', arg:slot }); return { silent:true }; } } ],
 });

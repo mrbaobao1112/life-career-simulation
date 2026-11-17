@@ -6,7 +6,8 @@
    Hình nhân vật, động tác, bong bóng thoại dùng lại lõi sân khấu (san-khau.js).
    ========================================================= */
 let WORLD = null;       // thế giới đang mở (null khi không ở trong nhà)
-let ROAM_NOW = null;    // giờ hiện tại trong thế giới, để nhật ký ghi đúng giờ (xem feedTime)
+let ROAM_NOW = null;
+const npcName = a => a.label || (NPC[a.who] ? NPC[a.who].name : 'Người qua đường');    // giờ hiện tại trong thế giới, để nhật ký ghi đúng giờ (xem feedTime)
 
 function roamHTML(ref){
   const H = roamPlace(ref).map();
@@ -29,14 +30,16 @@ function roamMount(root, ref){
   const el = root.querySelector('#world'); if (!el) return;
   const P = roamPlace(ref), H = P.map(), sc = current, C = stageCore(el), svg = C.svg, pk = P.key();
   const [h0, h1] = P.span(ref), key = roamKey(ref), keep = S.roam && S.roam.d === S.day && (S.roam.place || 'home:' + S.roam.bg) === pk;
-  const rt = keep ? S.roam.t : -1;                       // cùng ngày: đồng hồ chạy tiếp từ cảnh trước, không nhảy lùi
+  const rt = S.roam && S.roam.d === S.day ? S.roam.t : -1;   // cùng ngày: đồng hồ chạy tiếp từ cảnh trước (kể cả khi vừa đổi nơi), không nhảy lùi
   const W = WORLD = { ref, sc, P, H, C, el, svg, cam:0, t: rt >= h0 * 60 && rt < h1 * 60 ? rt : h0 * 60, end:h1 * 60, hold:ref.id === 'wake', runT:0, gait:'',
     busy:false, path:null, arrive:null, menu:null, toast:false, near:null, moving:false, greeted:{}, npcs:[], lastSave:0, room:'', minute:-1 };
   const $w = s => el.querySelector(s) || root.querySelector(s);
   const run = C.run, alive = () => C.alive() && WORLD === W;
 
   /* --- nhân vật --- */
-  const start = keep && roamFree(H, S.roam.x, S.roam.y) ? { x:S.roam.x, y:S.roam.y } : H.spawn;
+  // chỗ đứng lúc vào: vừa đi qua cửa thì đứng ở cửa đó (P.enter), không thì chỗ cũ ở nơi này trong hôm nay, không nữa thì chỗ mặc định
+  const ent = P.enter && P.enter(), pp = ((S.roamPos || {})[pk]) || (keep ? S.roam : null);
+  const start = ent && roamFree(H, ent.x, ent.y) ? ent : pp && pp.d !== undefined && pp.d === S.day && roamFree(H, pp.x, pp.y) ? { x:pp.x, y:pp.y } : H.spawn;
   const me = W.me = C.add('me', start.x, start.y, 'world', '', undefined, { s:roamScale(start.y) });
   const cast = (P.id === 'home' && H.cast) || {};
   for (const [who, plan] of Object.entries(cast)) {
@@ -76,8 +79,8 @@ function roamMount(root, ref){
   const scr = (x, y) => ({ left:((x - W.cam) / ROAM.VIEW_W * 100) + '%', top:(y / ROAM.VIEW_H * 100) + '%' });
   const anchor = n => n.npc ? { x:n.npc.x, y:n.npc.y - 140 * n.npc.s - 6 } : { x:(n.o.hit[0] + n.o.hit[2]) / 2, y:Math.max(14, n.o.hit[1] - 4) };
   const label = n => {
-    const list = n.npc ? P.npcEntries(ref, sc, n.npc.who) : P.entries(ref, sc, n.o), main = list.filter(e => !e.minor || e.greet);
-    if (n.npc) return `${P.id === 'home' ? (n.npc.who === 'tung' ? '🍺' : '👪') : '💬'} ${esc(NPC[n.npc.who].name)}`;
+    const list = n.npc ? (n.npc.entries ? n.npc.entries(ref, sc) : P.npcEntries(ref, sc, n.npc.who)) : P.entries(ref, sc, n.o), main = list.filter(e => !e.minor || e.greet);
+    if (n.npc) return `${P.id === 'home' ? (n.npc.who === 'tung' ? '🍺' : '👪') : '💬'} ${esc(npcName(n.npc))}`;
     if (!main.length && !list.length) return `${n.o.icon} ${P.idle(ref, n.o)}`;
     const first = (main[0] || list[0]);
     return `${n.o.icon} ${main.length > 1 ? esc(n.o.name) : esc(first.label)}${main.length > 1 ? ` <small>· ${main.length} việc</small>` : ''}`;
@@ -99,12 +102,12 @@ function roamMount(root, ref){
   };
   const closeMenu = () => { W.menu = null; const m = $w('.w-menu'); m.hidden = true; m.innerHTML = ''; showPrompt(); };
   const openMenu = n => {
-    const list = n.npc ? P.npcEntries(ref, sc, n.npc.who) : P.entries(ref, sc, n.o);
+    const list = n.npc ? (n.npc.entries ? n.npc.entries(ref, sc) : P.npcEntries(ref, sc, n.npc.who)) : P.entries(ref, sc, n.o);
     if (!list.length) { C.say(me, P.idle(ref, n.o).replace(/^\S+\s/, ''), 1400); return; }
     W.menu = { n, list }; const m = $w('.w-menu'); if (W.tut && W.tut.k === 3) tutNext();
-    m.innerHTML = `<div class="w-mh">${n.npc ? esc(NPC[n.npc.who].name) : `${n.o.icon} ${esc(n.o.name)}`}<button type="button" class="w-x" aria-label="Đóng">✕</button></div>`
+    m.innerHTML = `<div class="w-mh">${n.npc ? esc(npcName(n.npc)) : `${n.o.icon} ${esc(n.o.name)}`}<button type="button" class="w-x" aria-label="Đóng">✕</button></div>`
       + list.map((e, k) => `<button type="button" role="menuitem" class="w-act ${e.minor ? 'minor' : ''}" data-k="${k}" ${e.off ? 'disabled' : ''}><span class="wi">${e.icon || '•'}</span><span class="wl">${esc(e.label)}</span>`
-        + `${e.cost ? `<span class="wc">${e.off ? e.why : fmt(e.cost)}</span>` : e.minor && e.min ? `<span class="wc">${e.min} phút</span>` : ''}<kbd>${k + 1}</kbd></button>`).join('');
+        + `${(t => t ? `<span class="wc">${t}</span>` : '')(e.off && e.why ? e.why : e.cost ? fmt(e.cost) : e.minor && e.min ? `${e.min} phút` : '')}<kbd>${k + 1}</kbd></button>`).join('');
     m.hidden = false; placeMenu(); $w('.w-prompt').hidden = true;
     m.querySelector('.w-x').addEventListener('click', closeMenu);
     m.querySelectorAll('.w-act').forEach(b => b.addEventListener('click', () => doEntry(n, list[+b.dataset.k])));
@@ -158,9 +161,14 @@ function roamMount(root, ref){
       if (a.home.lie) C.say(a, 'Khò… khò…', 1400); else { C.react(a, 'nod'); C.say(a, pick(NPC_QUIP[a.who] || ['Ừ.']), 1500); }
       await C.wait(C.still ? 0 : 1200); if (!alive()) return; W.busy = false; showPrompt(); return;
     }
+    if (e.go) {                                                // đi sang nơi khác (ra phố, vào quán, về nhà): đồng hồ chạy tiếp
+      saveRoam(true); if (P.leave) P.leave(W, e); roamGo(e.go, e.enter); return;
+    }
+    if (e.run) { W.busy = false; showPrompt(); e.run(W, api); return; }   // việc do nơi đó tự xử lý (dắt xe, bắt đầu chạy vòng hồ…)
     if (n.npc) {                                               // việc làm với một người: quay sang họ, nói một câu, rồi tính đúng lựa chọn
       const a = n.npc; C.face(me, a.x < me.x); if (!a.home.lie) C.face(a, me.x < a.x);
       if (e.talk) { await P.talk(a, api); if (!alive()) return; W.busy = false; showPrompt(); return; }
+      if (e.fx) { ROAM_NOW = W.t / 60; const line = e.fx(); ROAM_NOW = null; updateHUD(); C.say(a, line, 1700); SFX.play('pop'); await C.wait(C.still ? 0 : 900); if (!alive()) return; W.busy = false; showPrompt(); return; }
       C.say(me, e.say || '…', 1200); SFX.play('talk'); await C.wait(C.still ? 0 : 1100); if (!alive()) return;
       if (e.reply) { C.react(a, 'nod'); C.say(a, e.reply, 1300); await C.wait(C.still ? 0 : 1100); if (!alive()) return; }
       await spin(W.end, 600); if (!alive()) return; return commit(sc.choices[e.i], pre);
@@ -248,7 +256,14 @@ function roamMount(root, ref){
   if (touchFirst()) { $w('.w-pad').hidden = false; joyMount($w('.w-joy')); }       // điện thoại: joystick và nút dùng đồ nằm dưới khung, không che cảnh
 
   /* --- móc cho từng nơi (văn phòng: đồng nghiệp, kỷ luật) --- */
-  const api = { C, me, put, depthSort, alive, say:C.say, wait:C.wait, scr, showPrompt, closeMenu, toast, roomOf:x => (H.rooms.find(r => x >= r[1] && x < r[2]) || [''])[0] };
+  // thêm một người vào nơi này (người hẹn, người bán hàng, người qua đường…)
+  const npc = (who, x, y, act = '', left = false, o = {}) => {
+    const a = C.add(who, x, y, 'world', act, o.expr, { s:roamScale(y), look:o.look, id:o.id || who });
+    if (left) C.face(a, true); a.speed = o.speed || 50; a.home = { x, y, name:act, lie:false }; a.label = o.label; a.entries = o.entries;
+    put(a, x, y); W.npcs.push(a); depthSort(); return a;
+  };
+  const api = { C, me, put, depthSort, alive, say:C.say, wait:C.wait, scr, showPrompt, closeMenu, toast, npc, spin:(to, ms) => spin(to, ms), commit:(ch, pre) => commit(ch, pre), pose,
+    roomOf:x => (H.rooms.find(r => x >= r[1] && x < r[2]) || [''])[0], goTo:n => goTo(n), say2:(t, ms) => C.say(me, t, ms) };
   W.api = api;
   if (P.mount) P.mount(W, api);
 
@@ -306,9 +321,9 @@ function roamMount(root, ref){
     if (P.frame && !W.spin && !paused()) P.frame(W, dt, api);
     // di chuyển
     let vx = 0, vy = 0;
-    const wantRun = inputRun(), canRun = S.energy >= ROAM.RUN_MIN_ENERGY, running = wantRun && canRun && !W.busy;
+    const wantRun = inputRun() && !W.riding, canRun = S.energy >= ROAM.RUN_MIN_ENERGY, running = wantRun && canRun && !W.busy;   // đi xe thì không tính chạy
     if (wantRun && !canRun && !W.tired) { W.tired = true; C.say(me, 'Mệt quá, không chạy nổi…', 1500); }
-    const speed = ROAM.SPEED * (running ? ROAM.RUN : 1);
+    const speed = ROAM.SPEED * (running ? ROAM.RUN : 1) * (P.speed ? P.speed(W) : 1);   // P.speed: đi xe máy
     if (!W.busy && !W.toast) {
       const d = inputDir();
       if (d.x || d.y) { vx = d.x * speed * dt; vy = d.y * speed * ROAM.DEPTH * dt; roamStep(H, me, vx, vy); }
@@ -322,13 +337,13 @@ function roamMount(root, ref){
     if (moving) {
       if (Math.abs(vx) > .02 && (vx < 0) !== !!me.left) C.face(me, vx < 0);
       put(me, me.x, me.y);
-      const gait = running ? 'act-walk act-run' : 'act-walk', css = Math.round(STAGE.STEP * me.s * (running ? 3 : 2) / speed * 1000) + 'ms';
+      const gait = W.riding ? 'act-ride' : running ? 'act-walk act-run' : 'act-walk', css = Math.round(STAGE.STEP * me.s * (running ? 3 : 2) / speed * 1000) + 'ms';
       if (!W.moving || gait !== W.gait) { C.act(me, gait); W.moving = true; W.gait = gait; } if (css !== stepCss) { stepCss = css; me.el.querySelector('.cb').style.setProperty('--step', css); }
       depthSort();
       // chạy tốn năng lượng: chạy liên tục RUN_SEC giây thì −RUN_ENERGY
       if (running) { W.runT += dt; if (W.runT >= ROAM.RUN_SEC) { W.runT -= ROAM.RUN_SEC; S.energy -= ROAM.RUN_ENERGY; clampAll(); updateHUD(); } }
       if (W.tut) { if (W.tut.k === 0 && Math.hypot(me.x - W.tut.x, me.y - W.tut.y) > 30) tutNext(); else if (W.tut.k === 1 && running && (W.tut.run += dt) > .6) tutNext(); }
-    } else if (W.moving) { W.moving = false; W.gait = ''; if (!W.busy) C.act(me, ''); }
+    } else if (W.moving) { W.moving = false; W.gait = ''; if (!W.busy) C.act(me, W.riding ? 'act-ride' : ''); }
     if (!wantRun) W.tired = false;
     // camera bám theo nhân vật
     const target = Math.max(0, Math.min(H.W - ROAM.VIEW_W, me.x - ROAM.VIEW_W / 2));
@@ -352,7 +367,8 @@ function roamMount(root, ref){
     if (now - W.lastSave > 3000) { W.lastSave = now; saveRoam(); }
     W.raf = requestAnimationFrame(frame);
   }
-  function saveRoam(noWrite){ const at = W.rest || me; S.roam = { d:S.day, bg:S.bg, place:pk, key, t:Math.round(W.t), x:Math.round(at.x), y:Math.round(at.y) }; if (!noWrite) save(); }   // noWrite: chỉ ghi vào S, lát nữa game tự lưu
+  function saveRoam(noWrite){ const at = W.rest || me; S.roam = { d:S.day, bg:S.bg, place:pk, key, t:Math.round(W.t), x:Math.round(at.x), y:Math.round(at.y) };
+    (S.roamPos = S.roamPos || {})[pk] = { d:S.day, x:Math.round(at.x), y:Math.round(at.y) }; if (!noWrite) save(); }   // noWrite: chỉ ghi vào S, lát nữa game tự lưu
   W.cam = Math.max(0, Math.min(H.W - ROAM.VIEW_W, me.x - ROAM.VIEW_W / 2)); $w('.w-cam').setAttribute('transform', `translate(${-W.cam} 0)`);
   W.raf = requestAnimationFrame(frame);
   return W;

@@ -1,0 +1,13 @@
+/* ---------- v16: ra phố ---------- */
+.world .w-wave{animation:waveMove 3s ease-in-out infinite}
+@keyframes waveMove{50%{transform:translateX(6px)}}
+.world .w-rain{pointer-events:none;animation:rainFall .5s linear infinite}
+/* bản đồ nhỏ trên phố */
+.w-mini{position:relative;margin:8px 4px 0;height:34px;background:#1B2230;border-radius:999px}
+.w-mini-road{position:absolute;left:12px;right:12px;top:14px;height:3px;background:#9AA3AF;border-radius:2px}
+.w-mini-pin,.w-mini-home{position:absolute;top:3px;transform:translateX(-50%);width:24px;height:24px;border:0;border-radius:50%;background:transparent;font-size:15px;line-height:24px;padding:0;cursor:pointer}
+.w-mini-pin:hover,.w-mini-pin:focus-visible{background:rgba(255,255,255,.25);outline:none}
+.w-mini-home{pointer-events:none}
+.w-mini-me{position:absolute;top:6px;transform:translateX(-50%);color:#F6C85F;font-size:16px;line-height:18px;text-shadow:0 0 4px #000;pointer-events:none;transition:left .1s linear}
+@media (prefers-reduced-motion: reduce){ .world .w-wave,.world .w-rain{animation:none!important} .w-mini-me{transition:none} }
+html.rm .world .w-wave,html.rm .world .w-rain{animation:none!important}
