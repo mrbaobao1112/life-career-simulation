@@ -1,6 +1,52 @@
 # Lịch sử phiên bản
 
-## v15: Đi lại trong văn phòng, trò chơi nhỏ khi làm task, kỷ luật (hiện tại)
+## v16: Ra phố Hà Thành – 8 địa điểm đi lại được, xe máy, chuyện bất ngờ (hiện tại)
+Không đổi lương, nghỉ phép, sự kiện, công thức chỉ số, mô phỏng 56 ngày. Không đi xe, không mua đồ lặt vặt thì tiền và chỉ số y như trước. Bản lưu cũ mở bình thường.
+
+**Phố Hà Thành.** Ở chế độ đi lại, cửa nhà dẫn ra phố (“Ra phố”); “Rủ ai đó đi chơi” vẫn ở cửa nhà.
+- Mỗi hoàn cảnh một ngõ: ở với bố mẹ (cổng sắt, hoa giấy), ở trọ (dãy trọ), ở ghép (sảnh chung cư mini, thang máy).
+- Ngõ nối ra phố chính Bán Nguyệt có 9 điểm đến: cơm bụi, trà đá vỉa hè, cà phê trứng, bia hơi, UBND phường, thư viện quận, hồ Bán Nguyệt, trung tâm thương mại, bến xe khách. Có cột điện, đèn đường, cây, lòng đường, vỉa hè.
+- Bản đồ nhỏ ngay dưới khung: thấy mình đang ở đâu, chạm vào biểu tượng địa điểm để tự đi tới.
+- Đồng hồ chạy liên tục khi đi. Về nhà thì tiếp tục buổi ở nhà. Hết buổi mà còn ở ngoài thì buổi sau coi như đã về nhà (như trước).
+
+**Bên trong 8 địa điểm** (đi lại được). Người và đồ vật nối với đúng lựa chọn có sẵn, nên chỉ số tính y như bấm nút:
+- Quán cà phê: Linh ngồi chờ ở bàn → “Cà phê với Linh”. Ở quầy có cà phê trứng mang về (25.000đ, tinh thần +2, mỗi ngày một lần). Có ban công ngắm phố.
+- Trà đá vỉa hè: Tùng ngồi sẵn → “Trà đá với Tùng”. Bác bán trà cho xin cốc trà.
+- Bia hơi (mở từ 16:00): xem bóng đá ké; một cốc bia hơi (15.000đ, tinh thần +2, năng lượng −2, mỗi ngày một cốc).
+- Cơm bụi (giờ ăn): “Cơm bụi đầu ngõ”, ăn chịu khi hết tiền.
+- Thư viện: học, ôn phỏng vấn, sửa CV, xem tin tuyển dụng, tính tiền nong ở bàn đọc (y như ở nhà).
+- Hồ Bán Nguyệt: chạy bộ thật. Nhấn E ở cột “Xuất phát”, chạy đến cột “Quay đầu” rồi về thì tính là “Chạy bộ quanh hồ”. Có ghế đá, các cô chú tập dưỡng sinh.
+- Trung tâm thương mại: thử áo, ngắm cốc; “Đi mua sắm” ở quầy thu ngân.
+- Bến xe khách (buổi sáng): “Về quê thăm bố mẹ”, “Đi chơi cả ngày với bạn”. UBND phường: “Giải quyết giấy tờ”.
+- Nơi chưa mở cửa thì ghi rõ giờ mở. Thực đơn nay luôn ghi lý do khi một việc bị khóa.
+- **Rủ ai đó đi chơi:** người được rủ đợi ở nơi hẹn (quán cà phê hoặc trà đá); đến nơi “Ngồi nói chuyện” là vào cuộc trò chuyện cũ.
+
+**Xe máy:**
+- Ở chỗ để xe trong ngõ nhấn E để dắt xe ra. Đi xe nhanh gấp 2,5 lần đi bộ, có dáng ngồi xe (dùng lại hình xe của cảnh đi làm), không tính là chạy.
+- Đến cửa quán thì dựng xe trước cửa, đi bộ vào; ra khỏi quán thì lên xe đi tiếp. Về nhà thì cất xe.
+- Tiền xăng: ngày nghỉ có đi xe thì trừ một lần 15.000đ (đúng mức xăng có sẵn); ngày đi làm đã trừ rồi thì không trừ thêm.
+
+**Chuyện bất ngờ trên phố** (bảng `GAP`): mỗi lần ra phố có thể có một chuyện, mỗi loại tối đa một lần mỗi ngày, tua nhanh thì không có.
+- Gặp người quen: Tùng, Linh, hoặc đồng nghiệp vào ngày nghỉ, đi tới chào. Bắt chuyện theo tính cách, quan hệ cộng theo giới hạn mỗi ngày. Nói xong thì người đó đi tiếp.
+- Hàng rong: cô bán bánh mì mời mua (15.000đ, tinh thần +2).
+- Mưa bất chợt: đi xe thì dừng mặc áo mưa (5 phút). Đi bộ thì có 10 phút chạy vào mái hiên trú, không kịp thì tinh thần −2. Hôm trời mưa thì phố và hồ đều mưa.
+- Tắc đường khi đi xe: mất 10 phút.
+
+**Mã:**
+- Thêm `js/pho/` (8 file: đồ đạc phố, bản đồ phố, bên trong các quán, bên trong các nơi lớn, hồ, xe máy, chuyện bất ngờ, đi phố) và `css/pho.css`.
+- Bộ máy thế giới:
+  - đổi nơi giữa chừng mà đồng hồ chạy tiếp;
+  - nhớ chỗ đứng riêng ở từng nơi;
+  - thêm tốc độ đi xe và những người phụ (người bán hàng, người qua đường).
+- File dài nhất dưới 250 dòng.
+
+**Kiểm thử:** thêm `npm run ra-pho` (36 mục):
+- ba ngõ nhà; mọi nơi đi tới được;
+- 7 việc ở các địa điểm cho chỉ số giống hệt bấm nút;
+- xe máy và tiền xăng; giờ mở cửa; về nhà đồng hồ chạy tiếp;
+- 4 chuyện bất ngờ; hẹn gặp; trời mưa; tắt chế độ; tua nhanh; điện thoại.
+
+## v15: Đi lại trong văn phòng, trò chơi nhỏ khi làm task, kỷ luật
 Không đổi lương, OT, nghỉ phép, tài chính, sự kiện. Không chơi trò nhỏ thì công thức task y như cũ, nên mô phỏng 56 ngày không đổi. Bản lưu cũ mở bình thường.
 
 **Văn phòng đi lại được.** Ngày đi làm: họp đầu ngày, task sáng, ăn trưa, task chiều, tan làm đều diễn ra trong văn phòng. Bộ máy đi lại dùng chung với ở nhà: phím, Shift để chạy, joystick, chạm để tự đi tới, gợi ý [E].

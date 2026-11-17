@@ -21,6 +21,11 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
   - Đến chỗ họp nhấn E để họp đầu ngày; ngồi vào bàn nhấn E để làm task; muốn hỏi anh Dũng thì sang bàn anh ấy; ra cửa để ăn trưa và tan làm.
   - Làm task có trò chơi nhỏ (bắt bug, xếp code, gõ lệnh, nối dây API). Chơi tốt thì khả năng làm tốt nhích lên tối đa 6%; bỏ qua thì tính như cũ.
   - Bỏ bàn quá lâu trong giờ làm thì chị Hạnh nhắc: nhắn tin, đến tận nơi, rồi trừ hiệu suất.
+- **Ra phố Hà Thành (v16):**
+  - Bước ra cửa là ra ngõ nhà rồi ra phố Bán Nguyệt: cơm bụi, trà đá, cà phê, bia hơi, phường, thư viện, hồ, trung tâm thương mại, bến xe.
+  - Vào trong từng nơi đi lại được: ngồi cà phê với Linh, trà đá với Tùng, chạy hết một vòng hồ, trả tiền ở quầy thu ngân, mua vé về quê.
+  - Có xe máy: dắt xe ra ở ngõ, đi nhanh hơn, ngày nghỉ tốn 15.000đ xăng.
+  - Trên phố có chuyện bất ngờ: gặp người quen, hàng rong, mưa bất chợt, tắc đường.
 - **Nếp sinh hoạt:** việc thường ngày (ăn, ngủ, họp đầu ngày, tắc đường) tự diễn ra theo nếp của nhân vật và hiện thành nhật ký trong ngày; người chơi chỉ quyết định việc đáng quyết định. Đổi nếp bất cứ lúc nào bằng nút “Nếp sinh hoạt”.
 - **Cảnh sống:** mọi cảnh có hình đều chuyển động. Ở nhà: thức dậy từ trên giường, ăn, học, chơi game, quét dọn, người ở cùng (bố mẹ hoặc Tùng) có việc riêng theo buổi. Ở công ty: đi xe máy tới, chào đồng nghiệp, ngồi gõ phím, đồng nghiệp đi lại và trò chuyện, OT buổi tối vắng người. Ngoài đường: cà phê, trà đá, bia hơi, chạy bộ quanh hồ, thư viện, trung tâm thương mại, có người qua lại; trời mưa thì cảnh ngoài trời cũng mưa. Chạm vào ai thì người đó phản ứng. Bật tắt trong “Nếp sinh hoạt”.
 - **Mỗi người một tính cách:** anh Dũng ít nói, hiếm khi rời bàn; chị Mai hay sang bàn người khác và hay cười; Phong hay chạy sang hỏi anh Dũng; chị Hạnh đi họp nhiều; Tùng hay đùa; mẹ hay hỏi han. Tính cách điều khiển hành vi thật trên màn hình, và hiện trong Hồ sơ.
@@ -60,6 +65,7 @@ js/
   hinh-anh/       Danh mục đồ, nhân vật chibi, bối cảnh, animation và âm thanh (ANIM)
   the-gioi/       Bộ máy đi lại tự do (dùng chung cho nhà và văn phòng): bản đồ ba căn nhà, điều khiển, va chạm và tìm đường, nối đồ vật với lựa chọn
   van-phong/      Văn phòng đi lại được: đồ đạc, bốn kiểu văn phòng của các công ty, đồng nghiệp, kỷ luật, một ngày làm việc
+  pho/            Ra phố: bản đồ phố và ngõ nhà, bên trong 8 địa điểm, hồ Bán Nguyệt, xe máy, chuyện bất ngờ
   tro-choi/       Trò chơi nhỏ khi làm task: khung chung và bốn trò (bắt bug, xếp code, gõ lệnh, nối dây)
   giao-dien/      Màn chơi, tổng kết tuần, màn mở đầu, hồ sơ
 tests/            Kiểm thử tự động (chạy bằng Node.js)
@@ -95,6 +101,11 @@ Muốn sửa gì thì mở file nào:
 | Kỷ luật: rời bàn bao lâu thì bị nhắc, mức trừ | `js/van-phong/ky-luat.js` (bảng `KY_LUAT`) |
 | Trò chơi nhỏ: thời gian, mức cộng trừ tối đa | `js/tro-choi/khung-tro-choi.js` (bảng `MG`) |
 | Câu đố của trò chơi nhỏ cho từng task, task nào chơi trò nào | `js/du-lieu/tro-choi.js` |
+| Phố: vị trí, tên, màu các địa điểm; ngõ nhà từng hoàn cảnh | `js/pho/ban-do-pho.js` (`PHO_DOORS`, `PHO_LANE`) |
+| Bên trong các địa điểm: đồ đạc, người có mặt, việc nào làm ở đâu | `js/pho/noi-that-quan.js`, `js/pho/noi-that-lon.js`, `js/pho/ho-ban-nguyet.js` |
+| Giờ mở cửa, cà phê mang về, bia hơi, việc nhỏ ở các quán | `js/pho/di-pho.js` (`PHO_OPEN`, `PHOK`) |
+| Xe máy: tốc độ, tiền xăng | `js/pho/xe-may.js` (bảng `XE`) |
+| Chuyện bất ngờ trên phố: xác suất, giá bánh mì, mưa, tắc đường | `js/pho/gap-tren-pho.js` (bảng `GAP`) |
 | Nằm thêm sau báo thức, chuẩn bị nhanh nhất mất bao lâu | `js/du-lieu/can-bang.js` (`SNOOZE_*`, `PREP_FAST`) |
 | Các động tác (đi, ngồi, gõ phím, nghĩ, nói, nghe, cười, uống, đi xe…) | `css/dong-tac.css` |
 | Màu sắc, cỡ chữ | `css/giao-dien.css` |
@@ -114,6 +125,7 @@ npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, b�
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)
 npm run the-gioi      # tự đi lại trong nhà: phím, va chạm, đồng hồ, dùng đồ, đi ngủ, joystick trên điện thoại (cần Playwright, khoảng 1 phút)
 npm run van-phong-di-lai  # văn phòng đi lại được: 8 văn phòng, họp, task, 4 trò chơi nhỏ, kỷ luật, tan làm (cần Playwright, khoảng 3 phút)
+npm run ra-pho        # ra phố: ngõ nhà, 8 địa điểm, xe máy, chuyện bất ngờ, hẹn gặp (cần Playwright, khoảng 4 phút)
 npm run mo-dau        # màn hình mở đầu: âm thanh, ra vào, chuyển tab, bản lưu hỏng, giảm chuyển động, hiệu năng (cần Playwright, khoảng 3 phút; thêm DAI=1 để để yên 5 phút)
 npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày
 npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra cân bằng (mất vài phút)
