@@ -19,7 +19,7 @@ Không đổi lương, nghỉ phép, sự kiện, công thức chỉ số, mô p
 - Trung tâm thương mại: thử áo, ngắm cốc; “Đi mua sắm” ở quầy thu ngân.
 - Bến xe khách (buổi sáng): “Về quê thăm bố mẹ”, “Đi chơi cả ngày với bạn”. UBND phường: “Giải quyết giấy tờ”.
 - Nơi chưa mở cửa thì ghi rõ giờ mở. Thực đơn nay luôn ghi lý do khi một việc bị khóa.
-- **Rủ ai đó đi chơi:** người được rủ đợi ở nơi hẹn (quán cà phê hoặc trà đá); đến nơi “Ngồi nói chuyện” là vào cuộc trò chuyện cũ.
+- **Rủ ai đó đi chơi:** người được rủ đợi ở nơi hẹn (quán cà phê hoặc trà đá); đến nơi “Ngồi nói chuyện” là vào cuộc trò chuyện cũ. Đã hẹn rồi thì buổi đó không rủ thêm người khác.
 
 **Xe máy:**
 - Ở chỗ để xe trong ngõ nhấn E để dắt xe ra. Đi xe nhanh gấp 2,5 lần đi bộ, có dáng ngồi xe (dùng lại hình xe của cảnh đi làm), không tính là chạy.
@@ -40,7 +40,7 @@ Không đổi lương, nghỉ phép, sự kiện, công thức chỉ số, mô p
   - thêm tốc độ đi xe và những người phụ (người bán hàng, người qua đường).
 - File dài nhất dưới 250 dòng.
 
-**Kiểm thử:** thêm `npm run ra-pho` (36 mục):
+**Kiểm thử:** thêm `npm run ra-pho` (42 mục):
 - ba ngõ nhà; mọi nơi đi tới được;
 - 7 việc ở các địa điểm cho chỉ số giống hệt bấm nút;
 - xe máy và tiền xăng; giờ mở cửa; về nhà đồng hồ chạy tiếp;

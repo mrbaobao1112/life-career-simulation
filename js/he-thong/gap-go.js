@@ -86,7 +86,7 @@ function hangoutPeople(){
   if (S.job && S.day >= S.job.start) list.push('phong','mai','dung','boss');
   return list;
 }
-const HANGOUT_ACT = { id:'hangout', icon:'👋', label:'Rủ ai đó đi chơi', slots:['afternoon','evening'], cond:() => hangoutPeople().length > 0,
+const HANGOUT_ACT = { id:'hangout', icon:'👋', label:'Rủ ai đó đi chơi', slots:['afternoon','evening'], cond:() => hangoutPeople().length > 0 && !(S.meet && S.meet.d === S.day && S.meet.slot === S.slot),   // v16: đã hẹn ai trong buổi này thì thôi
   hints:['💬 Trò chuyện riêng','🤝 Thân hơn'], fx:() => { S.queue.unshift({ id:'hangout_pick', arg:S.slot }); return { silent:true }; } };
 
 SC.hangout_pick = (slot) => ({
