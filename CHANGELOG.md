@@ -1,6 +1,36 @@
 # Lịch sử phiên bản
 
-## v14: Tự đi lại trong nhà – Phase 1 của thế giới tương tác (hiện tại)
+## v14.1: Buổi sáng tự do – thức dậy trên giường, nằm thêm, ra khỏi nhà, chạy, hướng dẫn (hiện tại)
+Không đổi tài chính, lương, nghỉ phép, sự kiện. Bản lưu cũ mở bình thường.
+- Ngay khi vào game đã điều khiển được nhân vật: cảnh thức dậy diễn ra trong nhà, nhân vật nằm trên giường, đồng hồ đứng ở giờ báo thức.
+  - Hai bong bóng lớn chạm được (điện thoại) hoặc nhấn phím: ☀️ Dậy (E) và 😴 Nằm thêm 10 phút (R). Ngày nghỉ còn thêm “Ngủ nướng tới trưa” (T) như cũ.
+  - Lời trên lịch bóc, giấc ngủ đêm qua, việc hôm nay hiện gọn dưới khung.
+- Luật nằm thêm thống nhất cho mọi ngày (danh sách cũ cũng dùng luật này):
+  - Mỗi lần 10 phút, năng lượng +1, tối đa 3 lần. Lần cuối nhân vật lẩm bẩm “Thêm 5 phút nữa thôi…”.
+  - Ngày đi làm, đi phỏng vấn thì giờ đến lùi theo, tính bằng phần đi muộn có sẵn.
+  - Trước đây chỉ ngày đi làm có “Nằm thêm 15 phút” (năng lượng +5), một lần.
+- Ngày đầu tiên: dậy xong là đi lại được; mũi tên vàng chỉ bàn học, Tùng hoặc mẹ nhắc sửa CV. Đến bàn học nhấn E, chọn “Sửa CV, nộp hồ sơ” thì mở đúng hai cảnh cũ.
+- Ngày đi làm, ngày phỏng vấn: có thêm bước ở nhà chuẩn bị rồi ra cửa.
+  - Dưới khung ghi giờ phải ra khỏi nhà để kịp; quá giờ đó thì đồng hồ chuyển màu đỏ.
+  - Ra cửa lúc nào thì giờ đến lùi hoặc sớm hơn đúng chừng ấy, tính qua phần đi muộn có sẵn. Vội mấy cũng mất ít nhất 15 phút chuẩn bị (`BAL.PREP_FAST`).
+  - Quá giờ phải đi một tiếng mà chưa ra cửa thì tự đi.
+  - Ở chế độ danh sách, khi tua nhanh hoặc tắt thế giới tự do thì bước này tự qua, ra khỏi nhà đúng giờ như trước.
+  - Buổi sáng có thêm “Ăn sáng nhanh” ở bếp: 10 phút, năng lượng +2, mỗi ngày một lần.
+- Chạy: giữ Shift khi đi; trên điện thoại kéo joystick ra sát mép.
+  - Nhanh gấp 1,8 lần đi bộ, có dáng chạy.
+  - Tốn năng lượng: chạy liên tục 10 giây thì −1. Năng lượng dưới 8 thì không chạy nổi.
+  - Các con số nằm ở bảng `ROAM`.
+- Hướng dẫn 4 bước khi vào nhà lần đầu, bước sau hiện khi xong bước trước: đi lại → chạy → đến gần đồ vật → nhấn E (điện thoại: chạm ✋). Có nút “Bỏ qua”; xem lại bằng nút trong “Nếp sinh hoạt”.
+- Đồng hồ chạy nối tiếp giữa các cảnh trong ngày (dậy → chuẩn bị → buổi sáng), không nhảy lùi hay nhảy cóc.
+- Kiểm thử: thêm 20 mục vào `npm run the-gioi`:
+  - ngày đầu điều khiển được ngay, nằm thêm, hướng dẫn, sửa CV ở bàn học;
+  - nằm thêm 3 lần cộng ra khỏi nhà muộn 20 phút thì đến công ty muộn đúng 50 phút;
+  - chạy nhanh hơn và tốn năng lượng, mệt thì không chạy nổi;
+  - điện thoại: chạm để dậy, joystick kéo hết cỡ thì chạy.
+
+Để lại cho bản sau: văn phòng đi lại được (v15), ngoài phố và các địa điểm (v16).
+
+## v14: Tự đi lại trong nhà – Phase 1 của thế giới tương tác
 Không đổi luật chơi, công thức chỉ số, tài chính, lương, nghỉ phép, mô phỏng 56 ngày. Bản lưu cũ mở bình thường (chỉ thêm vị trí nhân vật trong nhà).
 - Giờ rảnh, bữa ăn ở nhà và giờ đi ngủ giờ được chơi trong một căn nhà có thể đi lại tự do, thay cho bảng chọn việc:
   - Bàn phím: WASD hoặc mũi tên để đi, giữ để đi liên tục, giữ hai phím để đi chéo (không nhanh hơn đi thẳng); E để dùng đồ, số 1–9 để chọn việc, Esc để đóng.

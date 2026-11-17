@@ -18,7 +18,7 @@ async function open(browser, bg = 'tro', opts = {}){
 }
 // Đưa game đến một cảnh ở nhà (mặc định: chiều rảnh của ngày 6, thứ Bảy)
 const scene = (page, ref = { id:'activity', arg:'afternoon' }, slot = 'afternoon') => page.evaluate(([ref, slot]) => {
-  S.day = 6; S.slot = slot; S.habit.bed = 'ask'; S.roam = null; S.queue = [ref]; S.cur = null; advance();
+  S.day = 6; S.slot = slot; S.habit.bed = 'ask'; S.roam = null; S.once.roamTut = true; S.queue = [ref]; S.cur = null; advance();
 }, [ref, slot]).then(() => page.waitForTimeout(400));
 const W = page => page.evaluate(() => ROAM_DEBUG());
 const hold = async (page, keys, ms) => { for (const k of keys) await page.keyboard.down(k); await page.waitForTimeout(ms); for (const k of keys) await page.keyboard.up(k); await page.waitForTimeout(120); };
@@ -141,6 +141,78 @@ const hold = async (page, keys, ms) => { for (const k of keys) await page.keyboa
     await page.emulateMedia({ reducedMotion:'reduce' }); await scene(page);
     const a = await W(page); await hold(page, ['KeyD'], 600); const b = await W(page);
     check('Giảm chuyển động: vẫn điều khiển được nhân vật', b.x > a.x + 20, `${Math.round(a.x)} → ${Math.round(b.x)}`);
+    check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
+
+  // 10. v14.1 – ngày đầu: điều khiển được ngay từ cảnh đầu tiên; nằm thêm; sửa CV ở bàn học; hướng dẫn 4 bước
+  { const page = await open(browser, 'ghep'); await page.waitForTimeout(500);
+    const a = await page.evaluate(() => ({ cur:S.cur.id, world:!!document.querySelector('#world .actor[data-who="me"]'), lie:WORLD.me.rot === -90, btn:[...document.querySelectorAll('.w-wk')].map(b => b.textContent.trim()), t:WORLD.t, e:S.energy }));
+    check('Ngày đầu: cảnh đầu tiên đã ở trong nhà, nhân vật nằm trên giường, có nút Dậy và Nằm thêm', a.cur === 'wake' && a.world && a.lie && a.btn.length === 2 && /Nằm thêm 10/.test(a.btn[1]), a.btn.join(' | '));
+    await page.keyboard.press('KeyR'); await page.waitForTimeout(1500);
+    const b = await page.evaluate(() => ({ cur:S.cur.id, t:WORLD.t, e:S.energy }));
+    check('Nhấn R: nằm thêm 10 phút, năng lượng +1, vẫn nằm trên giường', b.cur === 'wake' && b.t - a.t === 10 && b.e === a.e + 1, `${Math.round(a.t)} → ${Math.round(b.t)} phút, năng lượng ${a.e} → ${b.e}`);
+    await page.keyboard.press('KeyE'); await page.waitForTimeout(1200);
+    const c = await page.evaluate(() => ({ cur:S.cur.id, world:!!document.querySelector('#world'), t:WORLD.t, tut:document.querySelector('.w-tut').hidden ? '' : document.querySelector('.w-tut').textContent, arrow:!!document.querySelector('.w-arrow') }));
+    check('Nhấn E: dậy, đi lại được ngay; đồng hồ chạy tiếp từ giờ thức dậy; mũi tên chỉ bàn học', c.cur === 'd1_cv' && c.world && c.t >= b.t && c.t < b.t + 3 && c.arrow, JSON.stringify(c).slice(0, 120));
+    check('Hướng dẫn hiện lần đầu, bước 1/4', /^1\/4/.test(c.tut), c.tut);
+    await page.keyboard.down('KeyD'); await page.waitForTimeout(700); await page.keyboard.up('KeyD');
+    const t2 = await page.$eval('.w-tut', el => el.textContent);
+    check('Đi được một đoạn thì sang bước 2 (chạy)', /^2\/4/.test(t2), t2);
+    await page.click('.w-tskip'); await page.waitForTimeout(200);
+    const sk = await page.evaluate(() => ({ hidden:document.querySelector('.w-tut').hidden, once:S.once.roamTut }));
+    await page.evaluate(() => renderScene()); await page.waitForTimeout(300);
+    check('Bỏ qua hướng dẫn: ẩn ngay, vào lại cũng không hiện nữa', sk.hidden && sk.once && await page.$eval('.w-tut', el => el.hidden));
+    await page.evaluate(() => { WORLD.me.x = 300; WORLD.me.y = 166; }); await page.waitForTimeout(300);
+    await page.keyboard.press('KeyE'); await page.waitForTimeout(400); await page.keyboard.press('Digit1'); await page.waitForTimeout(500);
+    const d = await page.evaluate(() => ({ world:!!document.querySelector('#world'), cur:S.cur.id, choices:document.querySelectorAll('#stage .choice').length }));
+    check('Dùng bàn học: mở đúng cảnh sửa CV như trước', !d.world && d.cur === 'd1_cv' && d.choices > 0, JSON.stringify(d));
+    check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
+
+  // 11. v14.1 – ngày đi làm: nằm thêm và ra khỏi nhà muộn thì đến công ty muộn đúng chừng ấy
+  { const go = async (snooze, extra) => {
+      const page = await open(browser, 'tro');
+      await page.evaluate(() => { S.once.roamTut = true; S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 8; S.slot = 'night'; S.queue = []; S.cur = null; S.sleep = 8; Math.random = () => .99; startDay(); });
+      await page.waitForTimeout(400);
+      for (let i = 0; i < snooze; i++) { await page.keyboard.press('KeyR'); await page.waitForTimeout(1400); }
+      const n4 = await page.$$eval('.w-wk', b => b.length);
+      await page.keyboard.press('KeyE'); await page.waitForTimeout(1200);
+      const h = await page.evaluate(() => ({ cur:S.cur && S.cur.id, t:WORLD.t, plan:plannedLeave(), by:leaveBy() }));
+      await page.evaluate(x => { WORLD.t = plannedLeave() + x; WORLD.me.x = 520; WORLD.me.y = 166; }, extra); await page.waitForTimeout(300);
+      await page.keyboard.press('KeyE'); await page.waitForTimeout(400); await page.keyboard.press('Digit1'); await page.waitForTimeout(1200);
+      const r = await page.evaluate(() => ({ late:S.lateMin, arrive:S.am.arrive, cur:S.cur && S.cur.id, feed:S.feed.map(f => f.t + ' ' + f.text).join(' / ') }));
+      await page.context().close(); return { h, r, n4, errs:page.errs };
+    };
+    const a = await go(0, 0), b = await go(3, 20);
+    check('Ngày đi làm: dậy xong ở nhà chuẩn bị, có giờ phải ra khỏi nhà', a.h.cur === 'home_am' && a.h.by > a.h.plan, JSON.stringify(a.h));
+    check('Nằm thêm tối đa 3 lần (lần thứ 4 không còn nút)', b.n4 === 1, `${b.n4} nút`);
+    check('Nằm thêm 3 lần và ra khỏi nhà muộn 20 phút: đến công ty muộn hơn đúng 50 phút', b.r.arrive - a.r.arrive === 50, `${a.r.arrive} → ${b.r.arrive}, muộn ${a.r.late} → ${b.r.late} phút`);
+    check('Nhật ký ghi giờ ra khỏi nhà; ra cửa xong sang đường đi làm', /Ra khỏi nhà lúc/.test(b.r.feed) && b.r.cur !== 'home_am', b.r.feed.slice(-120));
+    check('Không lỗi', !a.errs.length && !b.errs.length, (a.errs[0] || b.errs[0] || '')); }
+
+  // 12. v14.1 – chạy: nhanh hơn đi bộ, tốn năng lượng; mệt thì không chạy nổi
+  { const page = await open(browser, 'nha'); await scene(page);
+    await page.evaluate(() => { WORLD.me.x = 140; WORLD.me.y = 190; ROAM.RUN_SEC = 1; S.energy = 60; });
+    const a = await W(page); await hold(page, ['KeyD'], 800); const b = await W(page);
+    await page.evaluate(() => { WORLD.me.x = 140; WORLD.me.y = 190; }); await page.waitForTimeout(100);
+    const e0 = await page.evaluate(() => S.energy);
+    await page.keyboard.down('Shift'); await page.keyboard.down('KeyD'); await page.waitForTimeout(400); const mid = await W(page); await page.waitForTimeout(1900); await page.keyboard.up('KeyD'); await page.keyboard.up('Shift'); await page.waitForTimeout(150);
+    const c = await W(page), e1 = await page.evaluate(() => S.energy);
+    const walk = b.x - a.x, run = (await page.evaluate(() => WORLD.me.x)) - 140;
+    check('Giữ Shift: chạy nhanh hơn đi bộ, đổi sang dáng chạy', run / 2.3 > walk / .8 * 1.4 && /act-run/.test(mid.act), `đi ${Math.round(walk / .8)}, chạy ${Math.round(run / 2.3)} đơn vị/giây`);
+    check('Chạy tốn năng lượng (thử với 1 giây = −1)', e0 - e1 >= 2, `${e0} → ${e1}`);
+    await page.evaluate(() => { S.energy = 5; WORLD.me.x = 140; }); await page.keyboard.down('Shift'); await page.keyboard.down('KeyD'); await page.waitForTimeout(500); const t = await W(page); await page.keyboard.up('KeyD'); await page.keyboard.up('Shift');
+    check('Năng lượng quá thấp thì không chạy nổi', !/act-run/.test(t.act), t.act);
+    check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
+
+  // 13. v14.1 – điện thoại: chạm để dậy; kéo joystick hết cỡ thì chạy
+  { const page = await open(browser, 'tro', { ...devices['iPhone 13'] }); await page.waitForTimeout(500);
+    await page.tap('.w-wk.main'); await page.waitForTimeout(1300);
+    check('Điện thoại: chạm bong bóng “Dậy” để dậy', await page.evaluate(() => S.cur.id === 'd1_cv' && !!WORLD), await page.evaluate(() => S.cur.id));
+    await page.evaluate(() => { S.once.roamTut = true; document.querySelector('.w-tut').hidden = true; WORLD.tut = null; });
+    const box = await (await page.$('.w-joy')).boundingBox(), cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+    const drag = async (frac, ms) => { await page.evaluate(() => { WORLD.me.x = 130; }); await page.waitForTimeout(80); const a = (await W(page)).x;
+      await page.mouse.move(cx, cy); await page.mouse.down(); await page.mouse.move(cx + box.width / 2 * frac, cy, { steps:3 }); await page.waitForTimeout(ms); const m = await W(page); await page.mouse.up(); await page.waitForTimeout(100); return { d:m.x - a, act:m.act }; };
+    const half = await drag(.6, 700), full = await drag(1.2, 700);
+    check('Kéo joystick nhẹ: đi bộ; kéo ra sát mép: chạy', !/act-run/.test(half.act) && /act-run/.test(full.act) && full.d > half.d * 1.5, `${Math.round(half.d)} so với ${Math.round(full.d)}`);
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
   await browser.close();

@@ -18,9 +18,10 @@ function roamHTML(ref){
     <div class="w-hud"><span class="w-clock" aria-live="off">🕘 <b>--:--</b></span><span class="w-left" aria-hidden="true"><i></i></span><span class="w-room"></span></div>
     <button class="w-prompt" type="button" hidden></button>
     <div class="w-menu" role="menu" hidden></div>
-    <div class="w-help" hidden></div>
+    <div class="w-wake" hidden></div>
+    <div class="w-tut" role="status" hidden></div>
   </div>
-  <div class="w-pad" hidden><div class="w-joy" aria-hidden="true"><i class="w-knob"></i></div><span class="w-padhint">Kéo vòng tròn để đi<br>Chạm vào đồ vật để tự đi tới</span><button class="w-use" type="button" disabled aria-label="Dùng đồ vật">✋</button></div>
+  <div class="w-pad" hidden><div class="w-joy" aria-hidden="true"><i class="w-knob"></i></div><span class="w-padhint">Kéo vòng tròn để đi, kéo sát mép để chạy<br>Chạm vào đồ vật để tự đi tới</span><button class="w-use" type="button" disabled aria-label="Dùng đồ vật">✋</button></div>
   <div class="w-toast" role="status" hidden></div>`;
 }
 
@@ -28,7 +29,8 @@ function roamMount(root, ref){
   const el = root.querySelector('#world'); if (!el) return;
   const H = house(), sc = current, C = stageCore(el), svg = C.svg;
   const [h0, h1] = roamSpan(ref), key = roamKey(ref), keep = S.roam && S.roam.d === S.day && S.roam.bg === S.bg;
-  const W = WORLD = { ref, sc, H, C, el, svg, cam:0, t: keep && S.roam.key === key ? Math.max(h0 * 60, Math.min(h1 * 60 - 1, S.roam.t)) : h0 * 60, end:h1 * 60,
+  const rt = keep ? S.roam.t : -1;                       // cùng ngày: đồng hồ chạy tiếp từ cảnh trước, không nhảy lùi
+  const W = WORLD = { ref, sc, H, C, el, svg, cam:0, t: rt >= h0 * 60 && rt < h1 * 60 ? rt : h0 * 60, end:h1 * 60, hold:ref.id === 'wake', runT:0, gait:'',
     busy:false, path:null, arrive:null, menu:null, toast:false, near:null, moving:false, greeted:{}, npcs:[], lastSave:0, room:'', minute:-1 };
   const $w = s => el.querySelector(s) || root.querySelector(s);
   const run = C.run, alive = () => C.alive() && WORLD === W;
@@ -63,6 +65,7 @@ function roamMount(root, ref){
   const hud = () => {
     const m = Math.floor(W.t); if (m === W.minute) return; W.minute = m;
     $w('.w-clock b').textContent = clockMin(m);
+    if (ref.id === 'home_am') $w('.w-clock').classList.toggle('late', m > leaveBy());
     const wm = document.querySelector('#who .who-meta'); if (wm) wm.textContent = wm.textContent.replace(/\d\d:\d\d/, clockMin(m));   // dòng giờ ở đầu trang cũng chạy theo
     $w('.w-left i').style.width = Math.max(0, Math.min(100, (W.end - W.t) / (W.end - h0 * 60) * 100)) + '%';
     if (m % 5 === 0 || W.minute < 0) light();
@@ -98,7 +101,7 @@ function roamMount(root, ref){
   const openMenu = n => {
     const list = n.npc ? npcEntries(ref, sc, n.npc.who) : objEntries(ref, sc, n.o);
     if (!list.length) { C.say(me, objIdle(ref, n.o).replace(/^\S+\s/, ''), 1400); return; }
-    W.menu = { n, list }; const m = $w('.w-menu');
+    W.menu = { n, list }; const m = $w('.w-menu'); if (W.tut && W.tut.k === 3) tutNext();
     m.innerHTML = `<div class="w-mh">${n.npc ? esc(NPC[n.npc.who].name) : `${n.o.icon} ${esc(n.o.name)}`}<button type="button" class="w-x" aria-label="Đóng">✕</button></div>`
       + list.map((e, k) => `<button type="button" role="menuitem" class="w-act ${e.minor ? 'minor' : ''}" data-k="${k}" ${e.off ? 'disabled' : ''}><span class="wi">${e.icon || '•'}</span><span class="wl">${esc(e.label)}</span>`
         + `${e.cost ? `<span class="wc">${e.off ? e.why : fmt(e.cost)}</span>` : e.minor && e.min ? `<span class="wc">${e.min} phút</span>` : ''}<kbd>${k + 1}</kbd></button>`).join('');
@@ -156,6 +159,7 @@ function roamMount(root, ref){
       await C.wait(C.still ? 0 : 1200); if (!alive()) return; W.busy = false; showPrompt(); return;
     }
     const o = n.o;
+    if (e.flat) { W.busy = false; ROAM_FLAT = S.cur; saveRoam(true); return renderScene(); }   // cảnh cốt truyện: mở bảng như cũ
     if (e.minor) {
       pose(o, true); await spin(Math.min(W.end - 1, W.t + e.min), 700); if (!alive()) return;
       ROAM_NOW = W.t / 60; const line = e.fx(); ROAM_NOW = null; pose(o, false); updateHUD(); C.say(me, line, 1600);
@@ -163,7 +167,8 @@ function roamMount(root, ref){
     }
     if (o.use.exit) {                                          // ra khỏi nhà: mở cửa, bước ra, rồi sang cảnh bên ngoài như cũ
       C.door(true); SFX.play('pop'); me.el.classList.add('gone'); await C.wait(C.still ? 0 : 500); if (!alive()) return;
-      await spin(W.end, 600); if (!alive()) return; ROAM_NOW = W.t / 60; saveRoam(true); choose(e.i); ROAM_NOW = null; return;
+      if (ref.id !== 'home_am') await spin(W.end, 600);       // đi chơi: hết buổi; đi làm: ra khỏi nhà đúng lúc này
+      if (!alive()) return; ROAM_NOW = W.t / 60; saveRoam(true); choose(e.i); ROAM_NOW = null; return;
     }
     pose(o, true);
     if (o.use.sweep && !C.still) (async () => { const [a, b] = o.use.sweep; me.speed = 44; C.act(me, 'act-sweep'); while (W.spin && alive()) { put(me, a + Math.random() * (b - a), 178); C.act(me, 'act-sweep'); await C.wait(400); } })();
@@ -179,7 +184,7 @@ function roamMount(root, ref){
     if (r.i < 0) { S.cur = null; return advance(); }
     const ch = sc.choices[r.i], o = H.objs.find(x => x.kind === choiceObj(ref, ch));
     if (o && !o.use.exit) pose(o, true);
-    if (o && o.use.exit) return choose(r.i);
+    if (o && o.use.exit) { ROAM_NOW = W.t / 60; saveRoam(true); choose(r.i); ROAM_NOW = null; return; }
     commit(ch, r.text);
   }
 
@@ -210,9 +215,10 @@ function roamMount(root, ref){
 
   /* --- bàn phím --- */
   INPUT.on = true; inputClear();
-  INPUT.onMove = () => { if (!alive()) return; W.path = null; W.arrive = null; if (W.menu) closeMenu(); hideHelp(); };
+  INPUT.onMove = () => { if (!alive()) return; W.path = null; W.arrive = null; if (W.menu) closeMenu(); };
   INPUT.onKey = e => {
     if (!alive()) return false;
+    if (ref.id === 'wake' && !W.wakeBusy && !W.toast) { const k = Object.entries(WAKE_KEY).find(([, v]) => 'Key' + v === e.code); const ch = k && sc.choices.find(c => c.key === k[0]); if (ch) { doWake(ch); return true; } return false; }
     if (W.toast) { const b = $w('.w-toast button'); if (b && (e.code === 'KeyE' || (['Space','Enter'].includes(e.code) && document.activeElement !== b))) { b.click(); return true; } return false; }
     if (W.busy) return false;
     if (W.menu) {
@@ -221,15 +227,52 @@ function roamMount(root, ref){
       if (e.code === 'KeyE') { const k = W.menu.list.findIndex(x => !x.off); if (k >= 0) doEntry(W.menu.n, W.menu.list[k]); return true; }
       return false;
     }
-    if (e.code === 'KeyE' && W.near) { openMenu(W.near); hideHelp(); return true; }
+    if (e.code === 'KeyE' && W.near) { openMenu(W.near); return true; }
     return false;
   };
 
-  /* --- lời nhắc cách chơi (lần đầu) --- */
-  const help = $w('.w-help');
-  function hideHelp(){ if (!help.hidden) { help.hidden = true; S.once.roamHelp = true; } }
   if (touchFirst()) { $w('.w-pad').hidden = false; joyMount($w('.w-joy')); }       // điện thoại: joystick và nút dùng đồ nằm dưới khung, không che cảnh
-  else if (!S.once.roamHelp) { help.innerHTML = '<kbd>WASD</kbd> hoặc mũi tên để đi · <kbd>E</kbd> để dùng đồ · bấm vào đồ vật để tự đi tới'; help.hidden = false; C.later(hideHelp, 9000); }
+
+  /* --- thức dậy: nằm trên giường, chọn dậy ngay hay nằm thêm (bong bóng chạm được, hoặc phím) --- */
+  const bedObj = H.objs.find(o => o.kind === 'bed');
+  const WAKE_KEY = { up:'E', snooze:'R', late:'T' };
+  async function doWake(ch){
+    if (!ch || W.wakeBusy) return; W.wakeBusy = true; $w('.w-wake').hidden = true;
+    if (ch.key === 'snooze') {
+      C.say(me, snoozeN() >= BAL.SNOOZE_MAX - 1 ? 'Thêm 5 phút nữa thôi…' : 'Thêm 10 phút nữa…', 1200); SFX.play('pop');
+      await C.wait(C.still ? 0 : 1000); if (!alive()) return; return commit(ch);
+    }
+    if (ch.key === 'late') return commit(ch);
+    pose(bedObj, false); C.react(me, 'jump'); SFX.play('hop'); W.rest = bedObj.spot;
+    await C.wait(C.still ? 0 : 700); if (!alive()) return; commit(ch);
+  }
+  if (ref.id === 'wake') {
+    W.busy = true; pose(bedObj, true); W.rest = bedObj.spot;
+    const box = $w('.w-wake');
+    box.innerHTML = sc.choices.map((c, i) => `<button type="button" class="w-wk ${c.key === 'up' ? 'main' : ''}" data-i="${i}"><span class="wi">${c.icon}</span><span>${esc(c.label)}</span>${WAKE_KEY[c.key] ? `<kbd>${WAKE_KEY[c.key]}</kbd>` : ''}</button>`).join('');
+    box.hidden = false; box.querySelectorAll('.w-wk').forEach(b => b.addEventListener('click', () => doWake(sc.choices[+b.dataset.i])));
+    const f = box.querySelector('.w-wk.main'); if (f) f.focus({ preventScroll:true });
+  }
+
+  /* --- ngày đầu tiên: mũi tên chỉ bàn học, người nhà nhắc --- */
+  if (ref.id === 'd1_cv') {
+    const desk = H.objs.find(o => o.kind === 'desk'), g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'w-arrow'); g.innerHTML = `<path d="M${(desk.hit[0] + desk.hit[2]) / 2 - 7} ${desk.hit[1] - 22} h14 v8 h7 l-14 13 l-14 -13 h7Z" fill="#F6C85F" stroke="#1B2230" stroke-width="1.4"/>`;
+    $w('.w-hits').appendChild(g);
+    C.later(() => { const a = W.npcs[0]; if (a && !a.home.lie) C.say(a, a.who === 'tung' ? 'Sửa CV rồi nộp đi mày!' : 'Sửa CV rồi nộp hồ sơ đi con!', 2200); else C.say(me, 'Ra máy tính sửa CV thôi.', 2000); }, 700);
+  }
+
+  /* --- hướng dẫn 4 bước (lần đầu, bỏ qua được, xem lại trong Nếp sinh hoạt) --- */
+  const TUT = touchFirst()
+    ? ['Đi lại: kéo vòng tròn bên dưới', 'Chạy: kéo vòng tròn ra sát mép (chạy tốn năng lượng)', 'Đi đến gần một đồ vật, hoặc chạm thẳng vào nó', 'Chạm nút ✋ để xem việc làm được ở đó']
+    : ['Đi lại: giữ <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> hoặc phím mũi tên', 'Chạy: giữ thêm <kbd>Shift</kbd> (chạy tốn năng lượng)', 'Đi đến gần một đồ vật: giường, máy tính, bếp…', 'Nhấn <kbd>E</kbd> để xem việc làm được ở đó'];
+  const tutBox = $w('.w-tut');
+  const tutShow = () => { tutBox.innerHTML = `<span class="w-tn">${W.tut.k + 1}/4</span><span class="w-tt">${TUT[W.tut.k]}</span><button type="button" class="w-tskip">Bỏ qua</button>`;
+    tutBox.querySelector('.w-tskip').addEventListener('click', tutEnd); tutBox.hidden = false; };
+  function tutEnd(){ W.tut = null; tutBox.hidden = true; S.once.roamTut = true; save(); }
+  const tutNext = () => { W.tut.k++; SFX.play('pop'); if (W.tut.k < 4) return tutShow();
+    tutBox.innerHTML = '<span class="w-tt">🎉 Xong rồi! Giờ bạn tự do sinh hoạt trong nhà.</span>'; W.tut = null; S.once.roamTut = true; save(); C.later(() => { tutBox.hidden = true; }, 2600); };
+  if (!S.once.roamTut && ref.id !== 'wake') { W.tut = { k:0, x:me.x, y:me.y, run:0 }; tutShow(); }
 
   /* --- vòng lặp 60 hình mỗi giây --- */
   let last = performance.now(), stepCss = '';
@@ -239,15 +282,18 @@ function roamMount(root, ref){
     const dt = Math.min(.05, Math.max(0, (now - last) / 1000)); last = now;
     // đồng hồ
     if (W.spin) { const k = Math.min(1, (now - W.spin.t0) / W.spin.ms); W.t = W.spin.from + (W.spin.to - W.spin.from) * k; if (k >= 1) { const r = W.spin.res; W.spin = null; r(); } }
-    else if (!W.busy && !paused()) { W.t += dt * ROAM.MIN_PER_SEC; if (W.t >= W.end) { W.t = W.end; timeUp(); } }
+    else if (!W.busy && !W.hold && !paused()) { W.t += dt * ROAM.MIN_PER_SEC; if (W.t >= W.end) { W.t = W.end; if (roamStory(ref)) W.hold = true; else timeUp(); } }
     hud();
     // di chuyển
     let vx = 0, vy = 0;
+    const wantRun = inputRun(), canRun = S.energy >= ROAM.RUN_MIN_ENERGY, running = wantRun && canRun && !W.busy;
+    if (wantRun && !canRun && !W.tired) { W.tired = true; C.say(me, 'Mệt quá, không chạy nổi…', 1500); }
+    const speed = ROAM.SPEED * (running ? ROAM.RUN : 1);
     if (!W.busy && !W.toast) {
       const d = inputDir();
-      if (d.x || d.y) { vx = d.x * ROAM.SPEED * dt; vy = d.y * ROAM.SPEED * ROAM.DEPTH * dt; roamStep(H, me, vx, vy); }
+      if (d.x || d.y) { vx = d.x * speed * dt; vy = d.y * speed * ROAM.DEPTH * dt; roamStep(H, me, vx, vy); }
       else if (W.path && W.path.length) {
-        const tg = W.path[0], dx = tg.x - me.x, dy = tg.y - me.y, dist = Math.hypot(dx, dy), step = ROAM.SPEED * dt;
+        const tg = W.path[0], dx = tg.x - me.x, dy = tg.y - me.y, dist = Math.hypot(dx, dy), step = speed * dt;
         if (dist <= Math.max(1, step)) { me.x = tg.x; me.y = tg.y; W.path.shift(); if (!W.path.length) { W.path = null; const a = W.arrive; W.arrive = null; if (a) a(); } }
         else { vx = dx / dist * step; vy = dy / dist * step; if (!roamStep(H, me, vx, vy)) { W.path = null; W.arrive = null; } }
       }
@@ -256,10 +302,14 @@ function roamMount(root, ref){
     if (moving) {
       if (Math.abs(vx) > .02 && (vx < 0) !== !!me.left) C.face(me, vx < 0);
       put(me, me.x, me.y);
-      const css = Math.round(STAGE.STEP * me.s * 2 / ROAM.SPEED * 1000) + 'ms';
-      if (!W.moving) { C.act(me, 'act-walk'); W.moving = true; } if (css !== stepCss) { stepCss = css; me.el.querySelector('.cb').style.setProperty('--step', css); }
+      const gait = running ? 'act-walk act-run' : 'act-walk', css = Math.round(STAGE.STEP * me.s * (running ? 3 : 2) / speed * 1000) + 'ms';
+      if (!W.moving || gait !== W.gait) { C.act(me, gait); W.moving = true; W.gait = gait; } if (css !== stepCss) { stepCss = css; me.el.querySelector('.cb').style.setProperty('--step', css); }
       depthSort();
-    } else if (W.moving) { W.moving = false; if (!W.busy) C.act(me, ''); }
+      // chạy tốn năng lượng: chạy liên tục RUN_SEC giây thì −RUN_ENERGY
+      if (running) { W.runT += dt; if (W.runT >= ROAM.RUN_SEC) { W.runT -= ROAM.RUN_SEC; S.energy -= ROAM.RUN_ENERGY; clampAll(); updateHUD(); } }
+      if (W.tut) { if (W.tut.k === 0 && Math.hypot(me.x - W.tut.x, me.y - W.tut.y) > 30) tutNext(); else if (W.tut.k === 1 && running && (W.tut.run += dt) > .6) tutNext(); }
+    } else if (W.moving) { W.moving = false; W.gait = ''; if (!W.busy) C.act(me, ''); }
+    if (!wantRun) W.tired = false;
     // camera bám theo nhân vật
     const target = Math.max(0, Math.min(H.W - ROAM.VIEW_W, me.x - ROAM.VIEW_W / 2));
     const cam = C.still ? target : W.cam + (target - W.cam) * Math.min(1, dt * 7);
@@ -275,6 +325,7 @@ function roamMount(root, ref){
         if (dd < ROAM.GREET_R && !W.greeted[a.id] && !a.home.lie) { W.greeted[a.id] = true; C.face(a, me.x < a.x); C.say(a, pick(NPC_QUIP[a.who] || ['Chào!']), 1500); } });
       const same = best && W.near && (best.o ? best.o === W.near.o : best.npc === W.near.npc);
       if (!same && (best || W.near)) { W.near = best; showPrompt(); }
+      if (W.tut && W.tut.k === 2 && best) tutNext();
       else if (best && moving) Object.assign($w('.w-prompt').style, scr(anchor(best).x, anchor(best).y));
       else if (best && Math.abs(cam - target) > .05) Object.assign($w('.w-prompt').style, scr(anchor(best).x, anchor(best).y));
     }

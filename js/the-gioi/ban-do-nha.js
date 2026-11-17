@@ -17,6 +17,11 @@ const ROAM = {
   MIN_PER_SEC:2,             // đồng hồ trong game: 1 giây ngoài đời = 2 phút trong game (buổi sáng chừng 1,5–2 phút chơi)
   ACT_MS:1500,               // thời gian diễn động tác khi dùng đồ (đồng hồ quay nhanh đến cuối buổi)
   SHOWER_MIN:20, SHOWER_MOOD:2,   // tắm: mất 20 phút, tinh thần +2, mỗi ngày tính một lần
+  RUN:1.8,                   // chạy (giữ Shift, hoặc kéo joystick ra sát mép): nhanh gấp chừng này lần đi bộ
+  JOY_RUN:.9,                // kéo joystick quá 90% bán kính thì chạy
+  RUN_SEC:10, RUN_ENERGY:1,  // chạy liên tục 10 giây thì năng lượng −1
+  RUN_MIN_ENERGY:8,          // năng lượng dưới mức này thì không chạy nổi
+  BFAST_MIN:10, BFAST_ENERGY:2,   // ăn sáng nhanh ở bếp (buổi sáng, mỗi ngày một lần): 10 phút, năng lượng +2
   SIP_MIN:5, LOOK_MIN:10,    // uống cốc nước, ngắm phố qua cửa sổ: chỉ tốn ít phút, không đổi chỉ số
   GREET_R:46,                // người nhà chào khi bạn đi đến gần chừng này
 };
