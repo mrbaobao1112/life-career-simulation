@@ -12,7 +12,8 @@
     "can-bang": "node can-bang-chien-luoc.js",
     "tai-chinh": "node kiem-thu-tai-chinh.js",
     "hai-thang": "node mo-phong-hai-thang.js",
-    "the-gioi": "node kiem-thu-the-gioi.js"
+    "the-gioi": "node kiem-thu-the-gioi.js",
+    "van-phong-di-lai": "node kiem-thu-van-phong-di-lai.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3"

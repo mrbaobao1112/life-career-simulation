@@ -1,0 +1,11 @@
+/* ---------- v15: văn phòng đi lại được ---------- */
+.world .w-cat{animation:catWalk 26s linear infinite}
+.world .w-cat-b{animation:catFlip 26s steps(1) infinite;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes catWalk{0%{transform:translate(var(--cx1),196px)}45%{transform:translate(var(--cx2),196px)}50%{transform:translate(var(--cx2),190px)}95%{transform:translate(var(--cx1),190px)}100%{transform:translate(var(--cx1),196px)}}
+@keyframes catFlip{0%{transform:none}47%{transform:scaleX(-1)}97%{transform:none}}
+.world .w-fan{animation:fanSpin .5s linear infinite;transform-box:view-box}
+@keyframes fanSpin{to{transform:rotate(360deg)}}
+.world[data-place="office"]{background:#EEF2F7}
+@media (prefers-reduced-motion: reduce){ .world .w-cat,.world .w-cat-b,.world .w-fan{animation:none!important} .world .w-cat{transform:translate(var(--cx1),196px)} }
+html.rm .world .w-cat,html.rm .world .w-cat-b,html.rm .world .w-fan{animation:none!important}
+html.rm .world .w-cat{transform:translate(var(--cx1),196px)}

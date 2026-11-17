@@ -85,13 +85,13 @@ SC.task = (arg) => {
   const choices = [
     { key:'fast', icon:'⚡', label:'Làm nhanh cho xong', hints:['⏱ Khoảng 1 giờ','⚠️ Có thể sót lỗi','⚡ −8'], fx:() => {
       S.energy -= 8; S.stat.tasks++; S.perf += 1;
-      if (chance(.62 + S.tech/200 - t.d*.12 - lowE))
+      if (chance(.62 + S.tech/200 - t.d*.12 - lowE + mgBonus()))   // mgBonus: kết quả trò chơi nhỏ (0 nếu không chơi)
         return `Bạn xử lý “${t.title}” trong chưa đầy một tiếng. Chị Mai kiểm tra lại, không thấy vấn đề gì. Hôm nay vũ trụ đứng về phía bạn.`;
       S.stat.bugsMade++; S.bugs.push({ id:t.id, title:t.title, due:S.day + 1 });
       return `Xong “${t.title}” trong 40 phút, đẩy code lên luôn. Có một cảm giác mơ hồ là bạn đã quên kiểm tra trường hợp nào đó. Cảm giác này thường đúng.`; } },
     { key:'careful', icon:'🔬', label:'Làm kỹ từng bước', hints:['⏱ Khoảng 3 giờ','🧠 +2 Chuyên môn','⚡ −15'], fx:() => {
       S.energy -= 15; S.tech += 2; S.stat.tasks++;
-      if (chance(.9 + S.tech/300 - t.d*.13 - lowE)) { S.perf += 2;
+      if (chance(.9 + S.tech/300 - t.d*.13 - lowE + mgBonus())) { S.perf += 2;
         return `Bạn làm “${t.title}” cẩn thận từng bước, viết cả ghi chú. Chị Mai test xong nhắn: “Sạch sẽ ghê.” Bạn học thêm được vài điều.`; }
       S.unfinished = t.title;
       return `Bạn làm kỹ đến mức… chưa xong. “${t.title}” khó hơn bạn tưởng. Hết giờ mà vẫn còn dang dở.`; } },

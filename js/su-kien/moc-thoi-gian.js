@@ -17,7 +17,7 @@ SC.review = () => {
                  ok:'“Nhìn chung em bắt nhịp ổn. Còn vài chỗ cần chắc tay hơn.”',
                  warn:'“Chị nói thẳng nhé: mấy tuần đầu của em chưa ổn lắm.”' }[lv];
   const detail = [ st.bugsMade >= 2 ? `Có ${st.bugsMade} lần code của em để lại lỗi.` : st.tasks >= 4 && !st.bugsMade ? 'Code của em đến giờ chưa để lại lỗi nào.' : '',
-                   st.lateWork >= 2 ? `Em đi muộn ${st.lateWork} lần rồi.` : '', st.ot >= 2 ? 'Chị có để ý những buổi em ở lại muộn.' : '' ].filter(Boolean).join(' ');
+                   st.lateWork >= 2 ? `Em đi muộn ${st.lateWork} lần rồi.` : '', st.ot >= 2 ? 'Chị có để ý những buổi em ở lại muộn.' : '', st.klWarn ? 'Có hôm chị phải nhắc em quay về bàn làm việc. Giờ làm thì tập trung em nhé.' : '' ].filter(Boolean).join(' ');
   const done = () => { S.flags.review = lv; if (lv === 'good') { S.mood += 6; rel('boss', 3); } else if (lv === 'warn') S.mood -= 6;
     memo({ good:'Được chị Hạnh khen trong buổi nhận xét đầu tiên', ok:'Buổi nhận xét đầu tiên: tạm ổn', warn:'Bị nhắc nhở trong buổi nhận xét đầu tiên' }[lv]); };
   return { icon:'🧭', title:'Chị Hạnh nhận xét',
