@@ -46,7 +46,7 @@ Không đổi lương, OT, nghỉ phép, tài chính, sự kiện. Không chơi 
 - File dài nhất dưới 300 dòng.
 
 **Kiểm thử:**
-- Thêm `npm run van-phong-di-lai` (54 mục):
+- Thêm `npm run van-phong-di-lai` (62 mục):
   - đủ 8 văn phòng, họp, họp muộn, task ở bàn, hỏi anh Dũng;
   - bỏ qua trò chơi cho kết quả giống hệt bấm nút; 4 trò chơi giỏi +6%, chơi kém âm;
   - ba mức kỷ luật, mỗi ngày một lần; tan làm, ăn trưa, tua nhanh; điện thoại.
