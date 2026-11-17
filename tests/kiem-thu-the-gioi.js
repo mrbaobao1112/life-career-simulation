@@ -215,6 +215,18 @@ const hold = async (page, keys, ms) => { for (const k of keys) await page.keyboa
     check('Kéo joystick nhẹ: đi bộ; kéo ra sát mép: chạy', !/act-run/.test(half.act) && /act-run/.test(full.act) && full.d > half.d * 1.5, `${Math.round(half.d)} so với ${Math.round(full.d)}`);
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
+  // 14. v16.1 – không đè lên nhau: Tùng nằm gọn trên sofa, sofa bị khóa; ngồi sofa khi Tùng ngồi chơi game thì dịch sang bên
+  { const page = await open(browser, 'ghep'); await scene(page, { id:'activity', arg:'morning' }, 'morning');
+    const r = await page.evaluate(() => { const a = WORLD.npcs.find(n => n.who === 'tung'), o = WORLD.H.objs.find(x => x.id === 'sofa');
+      return { x:a && a.x, lie:a && a.home.lie, hit:o.hit, e:objEntries(S.cur, current, o).map(e => (e.off ? 'khóa:' : '') + (e.why || e.label)) }; });
+    check('Ở ghép buổi sáng: Tùng nằm gọn trên sofa (không thò ra ngoài), sofa khóa có lý do', r.lie && r.x >= r.hit[0] + 60 && r.x <= r.hit[2] && r.e.every(t => /^khóa:Tùng đang ngủ/.test(t)), JSON.stringify(r));
+    await scene(page, { id:'activity', arg:'evening' }, 'evening');
+    await page.evaluate(() => { const o = WORLD.H.objs.find(x => x.id === 'sofa'); WORLD.me.x = o.spot.x; WORLD.me.y = o.spot.y; }); await page.waitForTimeout(300);
+    await page.keyboard.press('KeyE'); await page.waitForTimeout(250); await page.keyboard.press('Digit1'); await page.waitForTimeout(350);
+    const d = await page.evaluate(() => { const a = WORLD.npcs.find(n => n.who === 'tung'); return a ? Math.abs(a.x - WORLD.me.x) : 99; });
+    check('Ở ghép buổi tối: ngồi sofa khi Tùng đang ngồi chơi game thì ngồi chỗ trống bên cạnh', d >= 32, `cách Tùng ${Math.round(d)}`);
+    check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
+
   await browser.close();
   console.log(fail ? `\n${fail} mục chưa đạt` : '\nTất cả đều đạt');
   process.exit(fail ? 1 : 0);

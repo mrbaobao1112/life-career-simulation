@@ -1,6 +1,15 @@
 # Lịch sử phiên bản
 
-## v16: Ra phố Hà Thành – 8 địa điểm đi lại được, xe máy, chuyện bất ngờ (hiện tại)
+## v16.1: Sửa lỗi nhân vật đè lên nhau, đồng hồ nhảy khi rủ đi chơi (hiện tại)
+- Ở ghép, buổi sáng Tùng ngủ trên sofa: trước đây Tùng nằm lệch, đầu thò ra đè lên tủ TV. Nay nằm gọn trên đệm sofa.
+- Chỗ nào có người đang nằm ngủ (sofa, giường) thì khóa, ghi lý do “Tùng đang ngủ ở đây”.
+- Dùng đồ ở chỗ đã có người thì nhân vật tự ngồi sang chỗ trống bên cạnh, không đứng đè lên nhau. Ví dụ ngồi sofa khi Tùng đang chơi game, uống trà khi bố mẹ đang ngồi.
+- Rủ ai đó đi chơi ở cửa nhà: trước đây nhân vật bước ra cửa, đồng hồ quay đến 18:30 rồi lại lùi về 13:30. Nay nhân vật rút điện thoại gọi hẹn (5 phút, `ROAM.CALL_MIN`) rồi tiếp tục đúng giờ đang chơi.
+- Đồng hồ không bao giờ quay lùi về đầu buổi khi vào lại cùng một buổi.
+- Gồm cả bản sửa cuối của v16: đã hẹn ai trong buổi thì không rủ thêm người khác.
+- Kiểm thử: thêm 3 mục vào `npm run the-gioi` (sofa, chỗ ngồi), 3 mục vào `npm run ra-pho` (rủ đi chơi không làm đồng hồ nhảy).
+
+## v16: Ra phố Hà Thành – 8 địa điểm đi lại được, xe máy, chuyện bất ngờ
 Không đổi lương, nghỉ phép, sự kiện, công thức chỉ số, mô phỏng 56 ngày. Không đi xe, không mua đồ lặt vặt thì tiền và chỉ số y như trước. Bản lưu cũ mở bình thường.
 
 **Phố Hà Thành.** Ở chế độ đi lại, cửa nhà dẫn ra phố (“Ra phố”); “Rủ ai đó đi chơi” vẫn ở cửa nhà.
@@ -19,7 +28,7 @@ Không đổi lương, nghỉ phép, sự kiện, công thức chỉ số, mô p
 - Trung tâm thương mại: thử áo, ngắm cốc; “Đi mua sắm” ở quầy thu ngân.
 - Bến xe khách (buổi sáng): “Về quê thăm bố mẹ”, “Đi chơi cả ngày với bạn”. UBND phường: “Giải quyết giấy tờ”.
 - Nơi chưa mở cửa thì ghi rõ giờ mở. Thực đơn nay luôn ghi lý do khi một việc bị khóa.
-- **Rủ ai đó đi chơi:** người được rủ đợi ở nơi hẹn (quán cà phê hoặc trà đá); đến nơi “Ngồi nói chuyện” là vào cuộc trò chuyện cũ.
+- **Rủ ai đó đi chơi:** người được rủ đợi ở nơi hẹn (quán cà phê hoặc trà đá); đến nơi “Ngồi nói chuyện” là vào cuộc trò chuyện cũ. Đã hẹn rồi thì buổi đó không rủ thêm người khác.
 
 **Xe máy:**
 - Ở chỗ để xe trong ngõ nhấn E để dắt xe ra. Đi xe nhanh gấp 2,5 lần đi bộ, có dáng ngồi xe (dùng lại hình xe của cảnh đi làm), không tính là chạy.
@@ -40,7 +49,7 @@ Không đổi lương, nghỉ phép, sự kiện, công thức chỉ số, mô p
   - thêm tốc độ đi xe và những người phụ (người bán hàng, người qua đường).
 - File dài nhất dưới 250 dòng.
 
-**Kiểm thử:** thêm `npm run ra-pho` (36 mục):
+**Kiểm thử:** thêm `npm run ra-pho` (42 mục):
 - ba ngõ nhà; mọi nơi đi tới được;
 - 7 việc ở các địa điểm cho chỉ số giống hệt bấm nút;
 - xe máy và tiền xăng; giờ mở cửa; về nhà đồng hồ chạy tiếp;

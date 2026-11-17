@@ -30,8 +30,8 @@ function roamMount(root, ref){
   const el = root.querySelector('#world'); if (!el) return;
   const P = roamPlace(ref), H = P.map(), sc = current, C = stageCore(el), svg = C.svg, pk = P.key();
   const [h0, h1] = P.span(ref), key = roamKey(ref), keep = S.roam && S.roam.d === S.day && (S.roam.place || 'home:' + S.roam.bg) === pk;
-  const rt = S.roam && S.roam.d === S.day ? S.roam.t : -1;   // cùng ngày: đồng hồ chạy tiếp từ cảnh trước (kể cả khi vừa đổi nơi), không nhảy lùi
-  const W = WORLD = { ref, sc, P, H, C, el, svg, cam:0, t: rt >= h0 * 60 && rt < h1 * 60 ? rt : h0 * 60, end:h1 * 60, hold:ref.id === 'wake', runT:0, gait:'',
+  const rt = S.roam && S.roam.d === S.day ? S.roam.t : -1;   // cùng ngày: đồng hồ chạy tiếp từ cảnh trước (kể cả khi vừa đổi nơi); không bao giờ quay lùi về đầu buổi
+  const W = WORLD = { ref, sc, P, H, C, el, svg, cam:0, t: rt >= h0 * 60 ? Math.min(rt, h1 * 60 - 1) : h0 * 60, end:h1 * 60, hold:ref.id === 'wake', runT:0, gait:'',
     busy:false, path:null, arrive:null, menu:null, toast:false, near:null, moving:false, greeted:{}, npcs:[], lastSave:0, room:'', minute:-1 };
   const $w = s => el.querySelector(s) || root.querySelector(s);
   const run = C.run, alive = () => C.alive() && WORLD === W;
@@ -131,7 +131,10 @@ function roamMount(root, ref){
       ['.w-scr','.w-steam','.w-dish','.w-water'].forEach(s => { const g = partOf(s, o); if (g) { g.classList.remove('on'); if (s !== '.w-scr') g.setAttribute('opacity', 0); } });
       W.rest = null; put(me, o.spot.x, o.spot.y); depthSort(); return;
     }
-    const x = u.x ?? o.spot.x, y = u.y ?? o.spot.y; W.rest = o.spot;      // đứng dậy thì về chỗ đứng trước đồ vật
+    let x = u.x ?? o.spot.x; const y = u.y ?? o.spot.y; W.rest = o.spot;      // đứng dậy thì về chỗ đứng trước đồ vật
+    // chỗ đó đã có người (bố mẹ ngồi uống trà, Tùng ngồi chơi game…): dịch sang chỗ trống bên cạnh, không đứng đè lên nhau
+    if (!u.lie && !u.hide) { const taken = xx => W.npcs.some(a => !a.home.lie && document.body.contains(a.el) && Math.abs(a.x - xx) < 32 && Math.abs(a.y - y) < 18);
+      for (const d of [0, 38, -38, 76, -76]) if (!taken(x + d) && x + d > H.x0 + 10 && x + d < H.x1 - 10) { x += d; break; } }
     if (u.lie) { me.rot = -90; put(me, x, y, .5); C.act(me, 'act-sleep');
       blanket = document.createElementNS('http://www.w3.org/2000/svg', 'g'); blanket.innerHTML = `<path d="M${x - 46} ${y - 14} Q${x - 18} ${y - 22} ${x + 12} ${y - 14} L${x + 14} ${y + 4} L${x - 48} ${y + 4}Z" fill="${S.bg === 'nha' ? '#F6C85F' : '#9FC2F2'}" stroke="#00000018"/>`;
       C.layer('world').appendChild(blanket); }
@@ -179,6 +182,11 @@ function roamMount(root, ref){
       pose(o, true); await spin(Math.min(W.end - 1, W.t + e.min), 700); if (!alive()) return;
       ROAM_NOW = W.t / 60; const line = e.fx(); ROAM_NOW = null; pose(o, false); updateHUD(); C.say(me, line, 1600);
       W.busy = false; showPrompt(); saveRoam(); return;
+    }
+    if (e.call) {                                              // gọi điện hẹn (rủ đi chơi): vài phút, không hết buổi
+      C.act(me, 'act-phone'); C.say(me, 'Alo, rảnh không?', 1300); SFX.play('talk');
+      await spin(Math.min(W.end - 1, W.t + ROAM.CALL_MIN), 900); if (!alive()) return;
+      C.act(me, ''); ROAM_NOW = W.t / 60; saveRoam(true); choose(e.i); ROAM_NOW = null; return;
     }
     if (o.use.exit) {                                          // ra khỏi nhà: mở cửa, bước ra, rồi sang cảnh bên ngoài như cũ
       C.door(true); SFX.play('pop'); me.el.classList.add('gone'); await C.wait(C.still ? 0 : 500); if (!alive()) return;

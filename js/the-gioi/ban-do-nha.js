@@ -22,6 +22,7 @@ const ROAM = {
   RUN_SEC:10, RUN_ENERGY:1,  // chạy liên tục 10 giây thì năng lượng −1
   RUN_MIN_ENERGY:8,          // năng lượng dưới mức này thì không chạy nổi
   BFAST_MIN:10, BFAST_ENERGY:2,   // ăn sáng nhanh ở bếp (buổi sáng, mỗi ngày một lần): 10 phút, năng lượng +2
+  CALL_MIN:5,                // gọi điện rủ ai đó đi chơi: chỉ mất vài phút, không hết buổi
   SIP_MIN:5, LOOK_MIN:10,    // uống cốc nước, ngắm phố qua cửa sổ: chỉ tốn ít phút, không đổi chỉ số
   GREET_R:46,                // người nhà chào khi bạn đi đến gần chừng này
 };
@@ -161,7 +162,7 @@ const HOUSES = {
     deco(){ return FURN.part(110) + FURN.part(330) + FURN.shower(12) + FURN.sink(70) + FURN.bed(118, '#9FC2F2') + FURN.desk(236) + FURN.chair(320, 152)
       + FURN.tv(344, true) + FURN.sofa(432, 94, '#E07A5F') + FURN.broom(540) + FURN.fridge(602) + FURN.stove(644, 68) + FURN.table(556, 40) + FURN.door(716, '#5B8DEF') + FURN.plant(422, 148); },
     cast:{ tung:{ morning:[['sofa','sleep']], noon:[['tvPlay','act-game']], afternoon:[['tvPlay','act-game'],['kitchen','act-phone']], evening:[['tvPlay','act-game'],['tableR','act-eat']], night:[['tvPlay','act-game']] } },
-    spots:{ sofa:{ x:480, y:136, lie:true }, tvPlay:{ x:500, y:152, face:true }, kitchen:{ x:690, y:178 }, tableR:{ x:590, y:160, face:true } },
+    spots:{ sofa:{ x:512, y:142, lie:true }, tvPlay:{ x:500, y:152, face:true }, kitchen:{ x:690, y:178 }, tableR:{ x:590, y:160, face:true } },
   },
 
   /* Nhà bố mẹ: rộng hơn, có bàn thờ, bộ ấm chén, mẹ hay ở trong bếp, bố đọc báo ở phòng khách */

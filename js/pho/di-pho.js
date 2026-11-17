@@ -102,7 +102,7 @@ function meetStart(k){ S.meet = null; S.where = null; S.queue.unshift({ id:'hang
   HP.enter = placeEnter;
   HP.entries = (ref, sc, o) => {
     const list = base(ref, sc, o); if (o.kind !== 'door' || !phoRef(ref)) return list;
-    return [{ icon:'🚶', label:'Ra phố', go:'street', enter:{ x:66, y:172 } }, ...list.filter(e => e.i !== undefined && sc.choices[e.i].actId === 'hangout')];
+    return [{ icon:'🚶', label:'Ra phố', go:'street', enter:{ x:66, y:172 } }, ...list.filter(e => e.i !== undefined && sc.choices[e.i].actId === 'hangout').map(e => ({ ...e, call:true }))];   // rủ đi chơi = gọi điện hẹn, không phải ra khỏi nhà
   };
 })();
 
