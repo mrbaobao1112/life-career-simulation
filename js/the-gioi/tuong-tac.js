@@ -73,6 +73,9 @@ function objEntries(ref, sc, o){
   if (ref.id === 'bedtime' && o.kind === 'bed') { out.length = 0; out.push({ icon:'🛌', label:'Đi ngủ', bed:true }); }
   if (ref.id === 'd1_cv' && o.kind === 'desk') out.push({ icon:'📄', label:'Sửa CV, nộp hồ sơ', flat:true });
   if (MINOR[o.kind]) out.push({ ...MINOR[o.kind](), minor:true });
+  // có người đang nằm ngủ ở đây (Tùng ngủ trên sofa…): khóa, ghi lý do
+  const occ = WORLD && WORLD.npcs && WORLD.npcs.find(a => a.home && a.home.lie && a.x >= o.hit[0] - 10 && a.x <= o.hit[2] + 10);
+  if (occ) out.forEach(e => { e.off = true; e.why = `${npcName(occ)} đang ngủ ở đây`; });
   return out;
 }
 // Đồ vật không có việc gì lúc này: một câu ngắn giải thích

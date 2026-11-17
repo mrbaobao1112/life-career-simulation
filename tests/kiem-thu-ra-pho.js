@@ -157,6 +157,17 @@ const menu = page => page.keyboard.press('KeyE').then(() => page.waitForTimeout(
     check('Không tràn ngang màn hình điện thoại', fits);
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
+  // 9. v16.1 – rủ đi chơi lúc 13:30 chỉ là gọi điện hẹn: đồng hồ tăng vài phút, không nhảy đến 18:30 rồi lùi về 13:30
+  { const page = await open(browser, 'tro'); await scene(page);
+    await at(page, () => { const d = WORLD.H.objs.find(o => o.kind === 'door'); WORLD.me.x = d.spot.x; WORLD.me.y = d.spot.y; });
+    const t0 = (await W(page)).t; await menu(page); await page.keyboard.press('Digit2'); await page.waitForTimeout(1500);
+    const mid = await page.evaluate(() => ({ cur:S.cur.id, t:S.roam.t }));
+    await page.evaluate(() => choose(current.choices.length - 1)); await page.waitForTimeout(500);   // “Thôi, để hôm khác”
+    const t1 = (await W(page)).t;
+    check('Rủ đi chơi: gọi điện hẹn (bảng chọn người), đồng hồ chỉ tăng vài phút', mid.cur === 'hangout_pick' && mid.t - t0 < 10, `${Math.round(t0)} → ${mid.t}`);
+    check('Chọn “Thôi, để hôm khác”: quay lại đúng giờ đang chơi, không lùi, không nhảy cuối buổi', t1 >= mid.t && t1 - t0 < 12, `${Math.round(t0)} → ${Math.round(t1)}`);
+    check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
+
   await browser.close();
   console.log(fail ? `\n${fail} mục chưa đạt` : '\nTất cả đều đạt');
   process.exit(fail ? 1 : 0);

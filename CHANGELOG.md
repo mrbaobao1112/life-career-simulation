@@ -1,6 +1,15 @@
 # Lịch sử phiên bản
 
-## v16: Ra phố Hà Thành – 8 địa điểm đi lại được, xe máy, chuyện bất ngờ (hiện tại)
+## v16.1: Sửa lỗi nhân vật đè lên nhau, đồng hồ nhảy khi rủ đi chơi (hiện tại)
+- Ở ghép, buổi sáng Tùng ngủ trên sofa: trước đây Tùng nằm lệch, đầu thò ra đè lên tủ TV. Nay nằm gọn trên đệm sofa.
+- Chỗ nào có người đang nằm ngủ (sofa, giường) thì khóa, ghi lý do “Tùng đang ngủ ở đây”.
+- Dùng đồ ở chỗ đã có người thì nhân vật tự ngồi sang chỗ trống bên cạnh, không đứng đè lên nhau. Ví dụ ngồi sofa khi Tùng đang chơi game, uống trà khi bố mẹ đang ngồi.
+- Rủ ai đó đi chơi ở cửa nhà: trước đây nhân vật bước ra cửa, đồng hồ quay đến 18:30 rồi lại lùi về 13:30. Nay nhân vật rút điện thoại gọi hẹn (5 phút, `ROAM.CALL_MIN`) rồi tiếp tục đúng giờ đang chơi.
+- Đồng hồ không bao giờ quay lùi về đầu buổi khi vào lại cùng một buổi.
+- Gồm cả bản sửa cuối của v16: đã hẹn ai trong buổi thì không rủ thêm người khác.
+- Kiểm thử: thêm 3 mục vào `npm run the-gioi` (sofa, chỗ ngồi), 3 mục vào `npm run ra-pho` (rủ đi chơi không làm đồng hồ nhảy).
+
+## v16: Ra phố Hà Thành – 8 địa điểm đi lại được, xe máy, chuyện bất ngờ
 Không đổi lương, nghỉ phép, sự kiện, công thức chỉ số, mô phỏng 56 ngày. Không đi xe, không mua đồ lặt vặt thì tiền và chỉ số y như trước. Bản lưu cũ mở bình thường.
 
 **Phố Hà Thành.** Ở chế độ đi lại, cửa nhà dẫn ra phố (“Ra phố”); “Rủ ai đó đi chơi” vẫn ở cửa nhà.
