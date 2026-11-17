@@ -46,6 +46,7 @@ function autoPick(ref, sc){
   const cheapest = () => { let best = -1; sc.choices.forEach((c, i) => { if (ok(c) && (best < 0 || (c.cost || 0) < (sc.choices[best].cost || 0))) best = i; }); return best; };
   switch (ref.id) {
     case 'wake': return fast ? 0 : -1;
+    case 'home_am': return roamFor(ref) ? -1 : 0;           // không ở thế giới tự do: ra khỏi nhà đúng giờ
     case 'cut': return fast || !stageOn() || reduceMotion() ? 0 : -1;   // phân cảnh chỉ để xem: bỏ qua khi tua, khi tắt sân khấu, khi giảm chuyển động
     case 'meal': {
       const ctx = mealCtx(ref.arg); let k = h[ctx];
@@ -139,7 +140,7 @@ function runAuto(ref, sc, i){
   current = sc;
   const ch = sc.choices[i];
   const { before } = applyChoice(ch);
-  if (ref.id !== 'cut') feedAdd(ref, ch.icon || sc.icon, feedText(ref, sc, ch), S.money - before.money);
+  if (!['cut','home_am'].includes(ref.id)) feedAdd(ref, ch.icon || sc.icon, feedText(ref, sc, ch), S.money - before.money);
   S.cur = null;
 }
 
@@ -206,6 +207,7 @@ function openHabits(){
     <label class="hrow chk"><input type="checkbox" id="optDetail" ${S.opt && S.opt.detail ? 'checked' : ''}><span>Hiện chi tiết cộng trừ chỉ số trên từng lựa chọn</span></label>
     <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Cảnh sống: nhân vật đi lại, làm việc, trò chuyện ở nhà, công ty và các nơi khác</span></label>
     <label class="hrow chk"><input type="checkbox" id="optRoam" ${!(S.opt && S.opt.roam === false) ? 'checked' : ''}><span>Tự đi lại trong nhà: điều khiển nhân vật bằng phím hoặc joystick, chạm vào đồ vật để dùng (tắt thì chọn việc bằng danh sách)</span></label>
+    <button class="ghost sm" type="button" id="optTut">🎓 Xem lại hướng dẫn đi lại trong nhà</button>
     <label class="hrow chk"><input type="checkbox" id="optFps" ${S.opt && S.opt.fps ? 'checked' : ''}><span>Hiện số khung hình mỗi giây (để đo độ mượt trên máy này)</span></label>`;
   const dlg = $('#dlg'); dlg.classList.remove('phone-dlg');
   $('#closeDlg').addEventListener('click', () => { closeDlg(); if (S && S.cur && S.phase === 'play') renderScene(); });
@@ -214,6 +216,7 @@ function openHabits(){
     h[k] = k === 'bed' && v !== 'ask' ? +v : v; save(); }));
   $('#optDetail').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.detail = e.target.checked; save(); });
   $('#optStage').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.stage = e.target.checked; save(); });
+  $('#optTut').addEventListener('click', e => { S.once.roamTut = false; save(); e.target.textContent = '🎓 Hướng dẫn sẽ hiện lại lần tới vào nhà'; });
   $('#optRoam').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.roam = e.target.checked; save(); });
   $('#optFps').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.fps = e.target.checked; save(); fpsMeter(); });
   if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');

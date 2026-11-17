@@ -6,9 +6,9 @@ const mk = () => new JSDOM(html, { runScripts:'dangerously', pretendToBeVisual:t
 { const w = mk(); const r = w.eval(`newGame('A','nam','tro', defaultLook('nam'), 'tb'); S.money = 10e6; const log=[];
   for (let d=2; d<=31; d++){ S.day=d; processFinance(); if (d===16||d===31){ const before=S.money; const saved=JSON.parse(JSON.stringify(S)); S.finDay=0; processFinance(); const again=S.money; S=saved; S.finDay=0; processFinance(); log.push({d, sauTaiLai:S.money, lan2:again, truoc:before}); } }
   JSON.stringify({ hoaDon:S.bills.map(b=>b.id+':'+(b.paid?'đã trả ngày '+b.paidDay:'chưa')), soDu:S.money, kiemTraTaiLai:log })`);
-  console.log('SỔ HÓA ĐƠN:', r); }
+  console.log('SỔ HÓA ĐƠN:', r); w.close(); }
 // số dư đúng bằng hóa đơn, nhiều hóa đơn cùng ngày
-{ const w = mk(); console.log('BIÊN:', w.eval(`newGame('A','nam','tro', defaultLook('nam'), 'tb'); S.day=16; S.money=500000; const e=processFinance(); JSON.stringify({ soDu:S.money, suKien:e.map(x=>x.id), traDu:S.bills.filter(b=>b.paid).length })`)); }
+{ const w = mk(); console.log('BIÊN:', w.eval(`newGame('A','nam','tro', defaultLook('nam'), 'tb'); S.day=16; S.money=500000; const e=processFinance(); JSON.stringify({ soDu:S.money, suKien:e.map(x=>x.id), traDu:S.bills.filter(b=>b.paid).length })`)); w.close(); }
 // 2. Mô phỏng cả tháng
 const SPEND = { 'Tiết kiệm':'SAVER', 'Bình thường':'NORMAL', 'Thoải mái':275000 };
 const rows = [], famRows = [];

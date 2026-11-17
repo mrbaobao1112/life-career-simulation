@@ -35,6 +35,8 @@ const BAL = {
   REVIEW_DAY: 12,         // nhận xét đầu tiên của trưởng nhóm: thứ Sáu đầu tiên từ ngày này (27/11)
   REVIEW_MIN_DAYS: 5,     // phải đi làm ít nhất chừng này ngày mới có nhận xét
   // Buổi sáng (phút)
+  PREP_FAST: 15,               // ra khỏi nhà sớm (thế giới tự do): chuẩn bị nhanh nhất cũng mất 15 phút
+  SNOOZE_MIN: 10, SNOOZE_ENERGY: 1, SNOOZE_MAX: 3,   // nằm thêm sau báo thức: mỗi lần 10 phút, năng lượng +1, nhiều nhất 3 lần
   PREP_MIN: 35, BUFFER_MIN: 25, APPOINT: 9 * 60,
   COMMUTE: { nha:{ hotay:20, banhmi:30, cudem:15, loren:25 }, tro:{ hotay:40, banhmi:35, cudem:45, loren:30 }, ghep:{ hotay:25, banhmi:20, cudem:30, loren:35 } },
 };

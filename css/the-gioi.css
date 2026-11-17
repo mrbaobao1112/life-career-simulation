@@ -50,8 +50,6 @@
 .w-toast .chips{margin:0 0 8px}
 .w-toast .btn{margin:0;width:100%}
 @keyframes toastUp{from{transform:translateY(16px);opacity:0}}
-.w-help{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:2;background:rgba(27,34,48,.82);color:#fff;font-size:12.5px;padding:5px 12px;border-radius:999px;white-space:nowrap;pointer-events:none}
-@media (max-width:420px){ .w-help{white-space:normal;width:86%;text-align:center;border-radius:12px} }
 
 /* điện thoại: thanh điều khiển nằm ngay dưới khung (joystick bên trái, nút dùng đồ bên phải) */
 .w-pad{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding:6px 4px}
@@ -72,3 +70,20 @@
   .world .w-obj.near,.w-prompt,.w-menu,.w-toast,.w-room.pop,.world .w-steam path,.world .w-water path,.world .w-smoke path,.world .w-scr.on .w-glow{animation:none!important}
 }
 html.rm .world .w-obj.near,html.rm .w-prompt,html.rm .w-menu,html.rm .w-toast{animation:none!important}
+
+/* v14.1: thức dậy trên giường – bong bóng chọn dậy hay nằm thêm, chạm được trên điện thoại */
+.w-wake{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:4;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:calc(100% - 16px)}
+.w-wk{display:flex;align-items:center;gap:8px;min-height:48px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22);animation:promptIn .2s ease-out}
+.w-wk.main{background:#F6C85F;color:#1B2230;border-color:#E0B24A}
+.w-wk .wi{font-size:20px}
+.w-wk:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+/* hướng dẫn 4 bước */
+.w-tut{position:absolute;left:50%;top:44px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:8px;width:max-content;max-width:calc(100% - 16px);background:rgba(27,34,48,.9);color:#fff;font-size:13.5px;line-height:1.4;padding:6px 6px 6px 10px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.25);animation:promptIn .2s ease-out}
+.w-tn{flex:none;font-weight:800;color:#F6C85F}
+.w-tt{flex:1;min-width:0}
+.w-tskip{flex:none;border:0;border-radius:8px;background:rgba(255,255,255,.16);color:#fff;font:inherit;font-size:12.5px;padding:6px 10px;min-height:32px;cursor:pointer}
+.w-arrow{animation:arrowBob 1s ease-in-out infinite;pointer-events:none}
+@keyframes arrowBob{50%{transform:translateY(5px)}}
+.w-clock.late{background:#C0392B}
+@media (prefers-reduced-motion: reduce){ .w-wk,.w-tut,.w-arrow{animation:none!important} }
+html.rm .w-wk,html.rm .w-tut,html.rm .w-arrow{animation:none!important}

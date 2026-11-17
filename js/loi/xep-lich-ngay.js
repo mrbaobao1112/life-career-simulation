@@ -27,6 +27,7 @@ function buildSlot(){
   const work = isWorkday(), first = work && d === S.job.start;
   if (s === 'morning') {
     q.push({ id:'wake' });
+    if (d === S.ivDay || (work && d !== 1)) q.push({ id:'home_am' });     // chuẩn bị ở nhà rồi ra cửa (chỉ dừng lại khi chơi trong thế giới tự do)
     if (di.date === 1 && d > 1) q.push({ id:'monthReport' });
     if ((S.sleepDebt || 0) >= 3 && !S.once['sd' + d]) { S.once['sd' + d] = true; q.push({ id:'ev', arg:'sleepdebt' }); }
     if (d === 1) q.push({ id:'d1_cv' }, { id:'apply' });

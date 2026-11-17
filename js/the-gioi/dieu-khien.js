@@ -7,6 +7,7 @@ const INPUT = {
   on:false,            // đang ở trong thế giới tự do (chỉ khi đó mới bắt phím)
   held:new Set(),      // các phím hướng đang giữ
   joy:null,            // hướng của joystick: { x, y } trong khoảng −1…1
+  shift:false,         // đang giữ Shift (chạy)
   onKey:null,          // thế giới xử lý các phím khác (E, Esc, số 1–9); trả về true nếu đã dùng phím
   onMove:null,         // gọi khi người chơi bắt đầu tự đi (để hủy việc đang tự đi đến đồ vật)
 };
@@ -25,15 +26,18 @@ function inputDir(){
   return { x, y };
 }
 // Thả hết phím: khi mất focus, chuyển tab, mở hộp thoại, rời thế giới
-function inputClear(){ INPUT.held.clear(); INPUT.joy = null; document.querySelectorAll('.w-knob').forEach(k => { k.style.transform = ''; }); }
+// Người chơi đang muốn chạy: giữ Shift, hoặc kéo joystick ra sát mép
+const inputRun = () => INPUT.shift || (!!INPUT.joy && Math.hypot(INPUT.joy.x, INPUT.joy.y) >= ROAM.JOY_RUN);
+function inputClear(){ INPUT.held.clear(); INPUT.joy = null; INPUT.shift = false; document.querySelectorAll('.w-knob').forEach(k => { k.style.transform = ''; }); }
 
 document.addEventListener('keydown', e => {
+  if (e.key === 'Shift') INPUT.shift = true;
   if (!INPUT.on || e.ctrlKey || e.metaKey || e.altKey) return;
   if (inputBusy(e)) { inputClear(); return; }
   if (ROAM_KEYS[e.code]) { e.preventDefault(); if (!INPUT.held.has(e.code)) { INPUT.held.add(e.code); if (INPUT.onMove) INPUT.onMove(); } return; }
   if (!e.repeat && INPUT.onKey && INPUT.onKey(e)) e.preventDefault();
 });
-document.addEventListener('keyup', e => { INPUT.held.delete(e.code); });
+document.addEventListener('keyup', e => { INPUT.held.delete(e.code); if (e.key === 'Shift') INPUT.shift = false; });
 window.addEventListener('blur', inputClear);
 document.addEventListener('visibilitychange', () => { if (document.hidden) inputClear(); });
 

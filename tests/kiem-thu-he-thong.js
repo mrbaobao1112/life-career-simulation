@@ -19,3 +19,4 @@ d.querySelector('.gopt[data-g="nam"]').click(); d.querySelectorAll('.hairopt')[0
 console.log('random hair lệch giới tính:', bad, '| thứ tự kiểu tóc khi chọn Nữ:', (d.querySelector('.gopt[data-g="nu"]').click(), [...d.querySelectorAll('.hairopt span')].map(x=>x.textContent).join(', ')));
 // 3. Bữa ăn: một bữa mì tôm không làm dinh dưỡng giảm mạnh
 const w3 = mk(); console.log('dinh dưỡng:', w3.eval(`newGame('A','nam','tro'); const a=S.nutr; logMeal('noodle'); const b=S.nutr; for(let i=0;i<6;i++) logMeal('noodle'); JSON.stringify({start:a, sau1MiTom:b, sau7MiTom:S.nutr, hoso:foodProfile().rows.map(r=>r[0]+': '+r[2]).join('; ')})`));
+w3.close(); w.close();   // đóng cửa sổ: thế giới tự do có vòng lặp hình chạy liên tục, không đóng thì kiểm thử không tự thoát
