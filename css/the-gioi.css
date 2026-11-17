@@ -87,3 +87,4 @@ html.rm .world .w-obj.near,html.rm .w-prompt,html.rm .w-menu,html.rm .w-toast{an
 .w-clock.late{background:#C0392B}
 @media (prefers-reduced-motion: reduce){ .w-wk,.w-tut,.w-arrow{animation:none!important} }
 html.rm .w-wk,html.rm .w-tut,html.rm .w-arrow{animation:none!important}
+.w-tut[hidden],.w-wake[hidden],.w-pad[hidden]{display:none}

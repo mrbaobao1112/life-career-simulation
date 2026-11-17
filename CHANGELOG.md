@@ -1,6 +1,58 @@
 # Lịch sử phiên bản
 
-## v14.1: Buổi sáng tự do – thức dậy trên giường, nằm thêm, ra khỏi nhà, chạy, hướng dẫn (hiện tại)
+## v15: Đi lại trong văn phòng, trò chơi nhỏ khi làm task, kỷ luật (hiện tại)
+Không đổi lương, OT, nghỉ phép, tài chính, sự kiện. Không chơi trò nhỏ thì công thức task y như cũ, nên mô phỏng 56 ngày không đổi. Bản lưu cũ mở bình thường.
+
+**Văn phòng đi lại được.** Ngày đi làm: họp đầu ngày, task sáng, ăn trưa, task chiều, tan làm đều diễn ra trong văn phòng. Bộ máy đi lại dùng chung với ở nhà: phím, Shift để chạy, joystick, chạm để tự đi tới, gợi ý [E].
+- Bốn kiểu văn phòng, mỗi công ty trang trí riêng:
+  - Văn phòng lớn (Hồ Tây Soft, Sông Hồng Tech): lễ tân, máy chấm công, phòng họp vách kính.
+  - Không gian mở (Bánh Mì Pay, Trà Sữa Số): bảng trắng đầy sơ đồ, góc sofa có TV, quầy bánh mì hoặc trà sữa ở pantry.
+  - Startup (Cú Đêm Lab, Xe Ôm Xanh): tường tối, chữ neon, ghế lười, bàn dài chung; Cú Đêm có con mèo đi lang thang, Xe Ôm Xanh có giá mũ bảo hiểm.
+  - Văn phòng nhỏ (Lò Rèn, Giấy Tốt Agency): máy in, giấy tờ chồng chất, quạt cây.
+- Đồng nghiệp ngồi ở bàn riêng với tư thế theo tính cách. Thỉnh thoảng một người ra pantry rồi quay về, đi vòng qua bàn ghế, không ai đứng trùng chỗ. Người nghỉ phép thì vắng, bàn có biển “Nghỉ phép” (theo lịch văn phòng có sẵn).
+- Họp đầu ngày: mũi tên chỉ chỗ họp, chị Hạnh gọi “Cả nhà ra họp nhé!”; đến nơi nhấn E là vào cảnh họp cũ.
+- Task: ngồi vào bàn nhấn E, chọn làm nhanh, làm kỹ hoặc để tối OT. “Hỏi anh Dũng” thì phải đi sang bàn anh Dũng. Task buổi chiều cũng tự làm ở bàn; ở chế độ danh sách và khi tua nhanh thì vẫn tự làm theo nếp như cũ.
+- Ăn trưa: ra cửa cùng team hoặc ăn bún chả; ăn bánh mì hay ngủ trưa thì ở bàn. Tan làm: ra cửa ở sảnh, gặp các lựa chọn về nhà, trà đá, OT như cũ.
+- Việc nhỏ ở văn phòng: uống nước, pha cà phê (10 phút, năng lượng +2, mỗi ngày một lần), chấm công, gỡ giấy kẹt máy in, xem bảng công việc.
+- Bắt chuyện với đồng nghiệp: câu nói theo tính cách, quan hệ cộng theo giới hạn mỗi ngày đã có từ v11.
+
+**Bốn trò chơi nhỏ khi làm task** (chọn làm nhanh hoặc làm kỹ thì mới có trò chơi):
+- 🐞 Bắt bug: chạm đúng dòng code sai.
+- 🧩 Xếp code: kéo thả hoặc bấm ▲ ▼ để đưa các bước về đúng thứ tự.
+- ⌨️ Gõ lệnh: gõ đúng vài lệnh `npm`, `git`.
+- 🔌 Nối dây API: nối hàm với kết quả, hoặc khái niệm với nghĩa của nó.
+- Mỗi task gắn với một trò hợp loại việc, có câu đố riêng (`js/du-lieu/tro-choi.js`).
+- Làm nhanh thì ít thời gian hơn. Làm kỹ thì có gợi ý: chỉ chỗ cần nhìn, đặt sẵn dòng đầu, nối sẵn một cặp, không phân biệt chữ hoa thường. Task khó hơn và Chuyên môn thấp hơn thì ít thời gian hơn.
+- Kết quả chỉ nhích nhẹ: điểm 0–1 đổi thành ±6 điểm phần trăm cộng vào khả năng làm task thành công (`MG.MAX`). Kết quả ghi ngay trong khung kết quả.
+- Nút “Để nhân vật tự làm” và nút “Xong” để dừng sớm. Bỏ qua thì được tính ±0, giống hệt bấm nút như cũ.
+- Chơi được bằng chuột, bàn phím, chạm. Đồng hồ trò chơi dừng khi chuyển tab.
+
+**Kỷ luật** (bảng `KY_LUAT`). Đang có task mà rời bàn liên tục thì bị nhắc theo ba mức:
+- 30 phút game: chị Hạnh nhắn tin nhắc.
+- 60 phút: chị đến tận nơi nhắc, quan hệ −1.
+- 90 phút: hiệu suất −1, ghi vào nhật ký và buổi nhận xét có nhắc lại.
+- Vào công ty rồi mà 15 phút không tới chỗ họp: chị Hạnh gọi tên trước cả nhóm, quan hệ −1.
+- Hết giờ mà chưa làm task thì tính thêm một lần nhắc.
+- Mỗi loại tối đa một lần mỗi ngày. Lúc đang nói chuyện, đang chọn việc, đang mở điện thoại thì không tính.
+
+**Sửa lỗi:**
+- (Từ v14) Ở nhà bố mẹ, chạm vào bố hoặc mẹ rồi chọn “Uống trà với bố mẹ” thì game báo lỗi. Nay đã chạy đúng.
+- (Từ v14.1) Khung hướng dẫn đã ẩn vẫn hiện thành một chấm tối nhỏ ở đầu khung.
+
+**Mã:**
+- Thêm `js/van-phong/` (5 file: đồ đạc, bản đồ công ty, đồng nghiệp, kỷ luật, ngày làm việc).
+- Thêm `js/tro-choi/` (khung chung và 4 trò), `js/du-lieu/tro-choi.js`, `css/van-phong.css`, `css/tro-choi.css`.
+- Bộ máy thế giới nhận nhiều “nơi chơi” (`ROAM_PLACES`): nhà, văn phòng; thêm nơi mới chỉ cần thêm một mục.
+- File dài nhất dưới 300 dòng.
+
+**Kiểm thử:**
+- Thêm `npm run van-phong-di-lai` (54 mục):
+  - đủ 8 văn phòng, họp, họp muộn, task ở bàn, hỏi anh Dũng;
+  - bỏ qua trò chơi cho kết quả giống hệt bấm nút; 4 trò chơi giỏi +6%, chơi kém âm;
+  - ba mức kỷ luật, mỗi ngày một lần; tan làm, ăn trưa, tua nhanh; điện thoại.
+- Phần văn phòng cũ trong kiểm thử 56 ngày chạy ở chế độ danh sách.
+
+## v14.1: Buổi sáng tự do – thức dậy trên giường, nằm thêm, ra khỏi nhà, chạy, hướng dẫn
 Không đổi tài chính, lương, nghỉ phép, sự kiện. Bản lưu cũ mở bình thường.
 - Ngay khi vào game đã điều khiển được nhân vật: cảnh thức dậy diễn ra trong nhà, nhân vật nằm trên giường, đồng hồ đứng ở giờ báo thức.
   - Hai bong bóng lớn chạm được (điện thoại) hoặc nhấn phím: ☀️ Dậy (E) và 😴 Nằm thêm 10 phút (R). Ngày nghỉ còn thêm “Ngủ nướng tới trưa” (T) như cũ.

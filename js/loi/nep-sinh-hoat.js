@@ -58,7 +58,7 @@ function autoPick(ref, sc){
       if (!b || b === 'ask') { if (!fast) return -1; b = HABIT_DEF.bed; }
       const i = sc.choices.findIndex(c => c.h >= b); return i >= 0 ? i : sc.choices.length - 1;
     }
-    case 'standup': return 0;
+    case 'standup': return roamFor(ref) ? -1 : 0;          // văn phòng đi lại được: tự đi đến chỗ họp
     case 'ev':
       if (ref.arg === 'traffic') return 1;                 // kiên nhẫn nhích từng chút
       if (ref.arg === 'rain') return 2;                    // mặc áo mưa
@@ -66,10 +66,11 @@ function autoPick(ref, sc){
       if (ref.arg === 'sleepdebt' || ref.arg === 'morebattle') return fast ? 1 : -1;
       return -1;
     case 'task': {
-      if (!fast && !(ref.arg && ref.arg.auto)) return -1;
+      if (!fast && (!(ref.arg && ref.arg.auto) || roamFor(ref))) return -1;   // văn phòng đi lại được: task chiều cũng tự làm ở bàn
       const i = byKey(h.work || HABIT_DEF.work); return i >= 0 ? i : 1;
     }
     case 'endwork':
+      if (!fast && roamFor(ref)) return -1;                // văn phòng đi lại được: tự ra cửa
       if (sc.choices.length === 1) return 0;               // đã nhận OT từ trước
       if (sc.plain) return fast || !(ref.arg && ref.arg.invite) ? 0 : -1;
       return fast ? 1 : -1;                                // được nhờ OT hoặc task dang dở: khi tua thì từ chối / xin lùi hạn

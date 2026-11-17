@@ -24,6 +24,10 @@ const roamOn = () => stageOn() && !(S.opt && S.opt.roam === false) && typeof req
 let ROAM_FLAT = null;    // cảnh cốt truyện đang được mở thành bảng (sau khi người chơi dùng đồ vật dẫn tới nó)
 function roamFor(ref){
   if (!S || !ref || !roamOn() || S.fast || ref === ROAM_FLAT) return false;
+  return !!roamPlace(ref);
+}
+// Cảnh nào chơi trong nhà
+function homeMatch(ref){
   if (ref.id === 'activity') return ['morning','afternoon','evening'].includes(ref.arg);
   if (ref.id === 'meal') return !(ref.arg === 'lunch' && isWorkday());
   return ['bedtime','wake','home_am','d1_cv'].includes(ref.id);
@@ -84,7 +88,7 @@ function objIdle(ref, o){
 // Người trong nhà: chào hỏi; bố mẹ thì có thể ngồi uống trà (nếu lúc này có lựa chọn đó)
 function npcEntries(ref, sc, who){
   const out = [{ icon:'👋', label:'Chào', minor:true, greet:true, min:0 }];
-  if (who === 'mom' || who === 'dad') sc.choices.forEach((ch, i) => { if (ch.actId === 'family2') out.unshift({ icon:ch.icon, label:ch.short || ch.label, i }); });
+  if (who === 'mom' || who === 'dad') sc.choices.forEach((ch, i) => { if (ch.actId === 'family2') out.unshift({ icon:ch.icon, label:ch.short || ch.label, i, say:'Bố mẹ uống trà với con nhé!', reply:'Ừ, ngồi đây con.' }); });
   return out;
 }
 const GREET = { mom:'Con chào mẹ!', dad:'Con chào bố!', tung:'Ê Tùng!' };
@@ -97,3 +101,11 @@ function roamTimeoutChoice(ref, sc){
   let i = sc.choices.findIndex(c => c.actId === 'film'); if (i < 0) i = sc.choices.findIndex(c => c.actId === 'rest');
   return { i, text:'Mải lướt điện thoại, buổi này trôi qua lúc nào không hay.' };
 }
+
+/* ----- Nơi chơi tự do (v15) -----
+   Mỗi nơi (nhà, văn phòng…) khai báo: cảnh nào chơi ở đó (match), bản đồ (map), đồ vật nào làm được gì (entries, idle),
+   người ở đó làm được gì (npcEntries), khung giờ (span), hết giờ thì chọn gì (timeout). Thêm nơi mới = thêm một mục. */
+const ROAM_PLACES = [];
+const roamPlace = ref => ROAM_PLACES.find(p => p.match(ref)) || null;
+ROAM_PLACES.push({ id:'home', match:homeMatch, map:house, entries:objEntries, idle:objIdle, npcEntries, choiceObj, span:roamSpan, timeout:roamTimeoutChoice,
+  story:roamStory, greet:who => GREET[who] || 'Chào!', key:() => 'home:' + S.bg });
