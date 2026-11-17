@@ -101,6 +101,8 @@ for (const bg of ['tro', 'ghep', 'nha']) {
 { const w = mk(); start(w, 'tro'); const d = w.document;
   w.eval(`S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; S.job = { co:'hotay', salary:10000000, start:3 }; S.deck = shuffle(TASKS.map(t => t.id)); OFFICE_BAL.ABSENT = 0; S.day = 8; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);
   d.querySelector('#stage .choice').click();                                   // thức dậy
+  const home = w.eval('S.cur.id'); if (home === 'home_am') d.querySelector('#stage .choice').click();   // v14.1: chuẩn bị ở nhà rồi ra cửa
+  check('Ngày đi làm: dậy xong là bước chuẩn bị ở nhà, bấm “Ra khỏi nhà” thì đi làm', home === 'home_am');
   const id1 = w.eval('S.cur.id'), actors = d.querySelectorAll('.panel.stage svg .actor').length;
   check('Ngày đi làm: cảnh task hiện trên sân khấu với 5 nhân vật', id1 === 'task' && actors === 5 && !w.errs.length, `cảnh ${id1}, ${actors} nhân vật ${w.errs[0] || ''}`);
   check('Phân cảnh đến công ty tự bỏ qua khi bật giảm chuyển động', w.eval(`(S.feed || []).length >= 0 && !S.queue.some(r => r.id === 'cut' && r.arg === 'arrive')`));
