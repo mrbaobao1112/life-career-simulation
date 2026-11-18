@@ -1,6 +1,43 @@
 # Lịch sử phiên bản
 
-## v17.1: Thế giới sống – Phase 2: đời sống xã hội giữa các NPC (hiện tại)
+## v17.2: Thế giới sống – Phase 3: thành phố sống (hiện tại)
+Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu (chỉ thêm một mục nhỏ `S.flags.wev` ghi sự kiện trong ngày), nên không cần chuyển đổi bản lưu.
+
+**Dân số theo giờ trong các quán và địa điểm** (`js/song/dan-so.js`):
+- Mỗi nơi có bảng mật độ 24 giờ, hệ số cuối tuần, số chỗ tối đa (`DS_PLACE`). Ví dụ: cà phê đông chiều và tối, bia hơi từ 16 giờ, cơm bụi đông lúc 12 giờ và 18 giờ, nửa đêm vắng.
+- Khách vãng lai có vòng đời: vào → gọi đồ ở quầy (xếp hàng nếu đã có người) → ngồi → về. Ở trung tâm thương mại thì xem hàng rồi ra quầy thu ngân; ở bến xe thì mua vé, ngồi chờ, lên xe.
+- Có khách đi theo nhóm hai người, ngồi cạnh nhau và nói chuyện.
+- Vào quán giữa giờ đông thì đã có sẵn người ngồi; ghế không bao giờ có hai người.
+- Hồ Bán Nguyệt: người chạy bộ, đi dạo, ngồi ghế đá; sáng sớm và chiều muộn có nhóm tập dưỡng sinh.
+- Nhân viên quán (chị pha chế, bác trà đá, cô bán cơm, thủ thư, thu ngân) vẫn ở chỗ cũ. Khách đứng yên một chỗ cũ được thay bằng khách vãng lai.
+
+**Phố và ngõ** (`js/song/pho-song.js`):
+- Người đi bộ hai chiều trên vỉa hè; có người rẽ vào quán. Xe máy chạy dưới đường, giờ cao điểm 7–8 giờ và 17–18 giờ đông hơn; có xe dừng trước quán một lát.
+- Hai người đi ngược chiều thỉnh thoảng dừng lại nói vài câu.
+- Trời mưa: người đi bộ chạy vào mái hiên trú (☔), một lúc sau mới đi tiếp. Hàng xóm, trẻ con vào nhà.
+- Ngõ nhà: hàng xóm đứng nói chuyện sáng sớm và chiều tối, trẻ con chơi buổi chiều (cuối tuần cả buổi sáng), người dắt chó đi dạo.
+
+**Người quen ngoài thành phố** (`js/song/thanh-pho.js`):
+- Tùng: ngày thường 13:30–21:30 đứng quầy ở trung tâm thương mại; chiều cuối tuần ngồi trà đá. Khớp với lịch ở nhà (lúc đó Tùng “ra ngoài”).
+- Linh: ngày thường học ở thư viện, tối hay ngồi cà phê; sáng cuối tuần ngồi cà phê.
+- Lại gần thì họ chào một câu. Hẹn gặp và hoạt động cần người này vẫn như cũ, không xếp trùng người.
+
+**Sự kiện thế giới** (`js/song/su-kien-the-gioi.js`, bảng `WORLD_EV`):
+- Ở văn phòng: hai đồng nghiệp tranh luận kỹ thuật (💢) rồi làm lành (🤝), độ tin giữa hai người giảm nhẹ; chị Hạnh giao task mới; họp đột xuất. Có ngày một đồng nghiệp đến muộn, lỡ họp đầu ngày, vào bàn thì xin lỗi (😅).
+- Có giãn cách (45 phút game giữa hai sự kiện ở một nơi) và tối đa 6 sự kiện mỗi ngày, để không dày đặc. Thêm sự kiện mới chỉ cần thêm một mục vào bảng.
+
+**Hiệu năng:** không thêm vòng lặp vẽ hay hẹn giờ lặp mới; mọi thứ chạy theo vòng lặp sẵn có của thế giới. Mỗi nơi dựng sẵn một nhóm nhỏ nhân vật (quán tối đa 7 khách, phố 6 người đi bộ và 3 xe máy) rồi dùng lại. Ngoài khung nhìn thì dịch chuyển thẳng, không diễn đi bộ. Chuyển tab thì dừng hẳn. Giảm chuyển động thì không diễn đi bộ.
+
+**Sửa nhỏ:** người qua đường và khách vãng lai được ưu tiên thấp hơn đồ vật và người quen khi hiện gợi ý [E], nên đám đông không che mất cửa, quầy hay bạn bè. Xe máy chạy qua thì không bấm vào được.
+
+**Kiểm thử:** thêm `npm run thanh-pho` (38 mục):
+- mật độ theo giờ và cuối tuần; khách có sẵn, đến rồi về; không quá số chỗ; không ngồi chung ghế, không đè lên nhau; số nhân vật không tăng;
+- nhóm tập dưỡng sinh; phố theo giờ; trú mưa; ngõ nhà; gợi ý cửa nhà không bị che;
+- Tùng, Linh đúng nơi đúng giờ; tranh luận, giãn cách, giới hạn mỗi ngày, đến muộn, tắt sự kiện;
+- chuyển tab, giảm chuyển động, điện thoại.
+- Hai bài kiểm thử cũ `the-gioi-song` và `xa-giao` tắt sự kiện thế giới (`WEV.ON = false`) để kiểm riêng hành vi của từng phase.
+
+## v17.1: Thế giới sống – Phase 2: đời sống xã hội giữa các NPC
 Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày, quan hệ của người chơi (`S.rel`).
 
 **Quan hệ giữa các NPC** (`js/song/quan-he-npc.js`):

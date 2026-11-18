@@ -9,7 +9,7 @@ PHO_ROOMS['in:lake'] = { name:'Hồ Bán Nguyệt', W:960, wall:['#BFE0FF','#A9C
     + PFURN.benchSeat(300, 70) + PFURN.benchSeat(560, 70) + PFURN.post(HO.START, 'XUẤT PHÁT') + PFURN.post(HO.TURN, 'QUAY ĐẦU'),
   objs:() => [obj('start', 'lap', 'Cột xuất phát', '🏃', [HO.START - 26, 88, HO.START + 26, 146], null, { x:HO.START, y:172 }, { acts:['run'] }),
               obj('bench', 'minor', 'Ghế đá', '🪑', [296, 110, 374, 156], null, { x:336, y:170 }, { minor:'lakeView' })],
-  npcs:() => [{ who:'p', x:480, y:176, act:'', look:PASSER(1), label:'Cô tập dưỡng sinh' }, { who:'p', x:510, y:176, act:'', look:PASSER(2), label:'Chú tập dưỡng sinh' }],
+  npcs:() => [],                 // người chạy bộ, đi dạo, nhóm tập dưỡng sinh: do dân số theo giờ đưa đến (song/dan-so.js)
 };
 // Bắt đầu chạy một vòng: đánh dấu, rồi theo dõi trong vòng lặp (hoFrame)
 function hoStart(W, api){

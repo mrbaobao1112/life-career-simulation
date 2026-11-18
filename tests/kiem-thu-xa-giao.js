@@ -15,7 +15,7 @@ async function open(browser, bg = 'tro'){
   page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load/.test(m.text())) page.errs.push(m.text().slice(0, 200)); });
   await page.goto(URL); await page.click('#fresh'); await page.click('.bgopt[data-f] >> nth=1'); await page.click(`.bgopt[data-b="${bg}"]`); await page.click('#go');
   // ghi lại mọi câu nói hiện trên sân khấu
-  await page.evaluate(() => { S.once.roamTut = true; window.__said = []; new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.classList && n.classList.contains('say')) window.__said.push(n.textContent); }))).observe(document.body, { childList:true, subtree:true }); });
+  await page.evaluate(() => { S.once.roamTut = true; WEV.ON = false; window.__said = []; new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.classList && n.classList.contains('say')) window.__said.push(n.textContent); }))).observe(document.body, { childList:true, subtree:true }); });
   return page;
 }
 const office = (page, h = 10) => page.evaluate(h => { S.job = { co:'hotay', salary:1e7, start:3 }; OFFICE_BAL.ABSENT = 0; S.day = 9; S.slot = h < 12 ? 'morning' : 'afternoon'; S.roam = { d:9, t:h * 60 }; S.queue = [{ id:'task', arg:{ tid:102 } }]; S.cur = null; advance(); WORLD.t = h * 60; WORLD.end = 1e9;

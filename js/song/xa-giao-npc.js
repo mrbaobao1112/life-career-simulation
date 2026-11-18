@@ -112,7 +112,7 @@ async function songSnackTick(W, api){
   }
 }
 // Gọi mỗi nhịp nghĩ của bộ máy hành vi
-function songSocialTick(W, api){ songGreetTick(W, api); songSnackTick(W, api); }
+function songSocialTick(W, api){ songGreetTick(W, api); songSnackTick(W, api); if (typeof wevTick === 'function') wevTick(W, api); }
 // Dành cho kiểm thử: bắt một NPC làm ngay một việc xen (visit, chat, water…)
 function SONG_FORCE(who, key, withWho){
   const W = WORLD, a = W && W.npcs.find(x => x.ai && x.who === who); if (!a) return null;

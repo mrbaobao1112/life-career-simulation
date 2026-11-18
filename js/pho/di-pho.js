@@ -112,13 +112,13 @@ const phoPlace = (id, map, extra = {}) => ({ id, match:ref => phoRef(ref) && whe
   greet:who => VP_GREET[who] || 'Chào!', talk:officeTalk, key:() => map().key, enter:placeEnter, ...extra });
 ROAM_PLACES.push(phoPlace('street', phoMap, {
   speed:W => W.riding ? XE.SPEED : 1,
-  mount(W, api){ if (bikeState() === 'ride') bikeLook(W, api, true); gapMount(W, api); phoMiniMount(W, api);
+  mount(W, api){ if (bikeState() === 'ride') bikeLook(W, api, true); gapMount(W, api); streetMount(W, api); phoMiniMount(W, api);
     const m = S.meet; if (m && m.d === S.day && m.slot === S.slot) api.C.later(() => api.say(api.me, `Hẹn ${PEOPLE[m.who].name} ở ${PHO_ROOMS[m.at].name}.`, 2000), 500); },
-  frame(W, dt, api){ if (W.riding) bikeFit(W); gapFrame(W, dt, api); phoMiniFrame(W); },
+  frame(W, dt, api){ if (W.riding) bikeFit(W); gapFrame(W, dt, api); streetFrame(W, dt, api); phoMiniFrame(W); },
 }));
 Object.keys(PHO_ROOMS).forEach(id => ROAM_PLACES.push(phoPlace(id, () => phoRoom(id), {
-  mount(W, api){ roomNpcs(W, api, id); if (S.flags.rainDay === S.day && id === 'in:lake') { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = rainSVG(); W.svg.appendChild(g); } },
-  frame(W, dt, api){ if (id === 'in:lake') hoFrame(W, api); },
+  mount(W, api){ roomNpcs(W, api, id); popMount(W, api, id); cityMount(W, api, id); if (S.flags.rainDay === S.day && id === 'in:lake') { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = rainSVG(); W.svg.appendChild(g); } },
+  frame(W, dt, api){ if (id === 'in:lake') hoFrame(W, api); popFrame(W, dt, api); cityFrame(W, api); },
 })));
 
 /* ----- Bản đồ nhỏ trên phố: vị trí của bạn và các địa điểm; chạm vào địa điểm để tự đi tới ----- */
