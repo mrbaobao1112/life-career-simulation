@@ -37,7 +37,7 @@ PHO_ROOMS['in:bia'] = { name:'Bia hơi Hà Thành', W:440, wall:['#F6E7C8','#E0C
   paint:() => PFURN.tv(190, 30) + PFURN.keg(90) + PFURN.keg(124) + PFURN.lowTable(200, 120, '#3E8ED0') + PFURN.stool(196) + PFURN.stool(330, '#E07A5F') + PFURN.sign(220, 82, 'BIA HƠI 15K', '#E9A23B') + FURN.lamp(220),
   objs:() => [obj('tv', 'minor', 'TV bóng đá', '⚽', [186, 26, 254, 80], null, { x:220, y:170 }, { minor:'football' }),
               obj('kegs', 'minor', 'Két bia', '🍺', [86, 96, 158, 152], [86, 0, 158, 154], { x:122, y:166 }, { minor:'beer' })],
-  npcs:() => [{ who:'p', x:300, y:162, act:'act-drink', look:PASSER(2), left:true }, { who:'p', x:240, y:162, act:'act-laugh', look:PASSER(0) }],
+  npcs:() => [],                 // khách do dân số theo giờ đưa đến
 };
 /* ----- Cơm bụi đầu ngõ: tủ kính thức ăn, cô bán hàng, bàn ghế ----- */
 PHO_ROOMS['in:com'] = { name:'Cơm bụi đầu ngõ', W:400, wall:['#FBE9D2','#E7C9A3'], floor:'tiles', fl:['#E8DCC8','#D6C7AE'],

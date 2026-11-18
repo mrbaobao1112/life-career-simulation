@@ -364,8 +364,9 @@ function roamMount(root, ref){
     if (!W.busy && !W.menu) {
       let best = null, bd = ROAM.NEAR;
       H.objs.forEach(o => { const dd = Math.hypot(o.spot.x - me.x, (o.spot.y - me.y) * 1.4); if (dd < bd) { bd = dd; best = { o }; } });
-      W.npcs.forEach(a => { if (a.gone) return; const dd = Math.hypot(a.x - me.x, (Math.max(ROAM.Y0, a.y) - me.y) * 1.2); if (dd < bd + 10) { bd = dd - 10; best = { npc:a }; }
-        if (dd < ROAM.GREET_R && !W.greeted[a.id] && !a.home.lie) { W.greeted[a.id] = true; C.face(a, me.x < a.x); C.say(a, pick(NPC_QUIP[a.who] || ['Chào!']), 1500); } });
+      W.npcs.forEach(a => { if (a.gone || a.ghost) return; const dd = Math.hypot(a.x - me.x, (Math.max(ROAM.Y0, a.y) - me.y) * 1.2), k = a.crowd ? 12 : -10;   // người qua đường, khách vãng lai: ưu tiên thấp hơn đồ vật và người quen
+        if (dd + k < bd) { bd = dd + k; best = { npc:a }; }
+        if (dd < ROAM.GREET_R && !a.crowd && !W.greeted[a.id] && !a.home.lie) { W.greeted[a.id] = true; C.face(a, me.x < a.x); C.say(a, pick(NPC_QUIP[a.who] || ['Chào!']), 1500); } });
       const same = best && W.near && (best.o ? best.o === W.near.o : best.npc === W.near.npc);
       if (!same && (best || W.near)) { W.near = best; showPrompt(); }
       if (W.tut && W.tut.k === 2 && best) tutNext();

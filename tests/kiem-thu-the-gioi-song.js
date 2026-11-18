@@ -14,7 +14,7 @@ async function open(browser, bg = 'ghep', opts = {}){
   page.on('pageerror', e => page.errs.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load/.test(m.text())) page.errs.push(m.text().slice(0, 200)); });
   await page.goto(URL); await page.click('#fresh'); await page.click('.bgopt[data-f] >> nth=1'); await page.click(`.bgopt[data-b="${bg}"]`); await page.click('#go');
-  await page.evaluate(() => { S.once.roamTut = true; });
+  await page.evaluate(() => { S.once.roamTut = true; WEV.ON = false; });
   return page;
 }
 const home = (page, day, slot = 'morning') => page.evaluate(([day, slot]) => { S.day = day; S.slot = slot; S.roam = null; S.roamPos = {}; S.where = null; S.queue = [{ id:'activity', arg:slot }]; S.cur = null; advance(); }, [day, slot]).then(() => page.waitForTimeout(400));

@@ -78,7 +78,10 @@ function npcDay(who, kind){
   const base = kind === 'office' ? VP_DAY[who] : (HOME_DAY[who] || {})[songWeekend() ? 'weekend' : 'weekday'];
   if (!base) return [];
   const r = songRng('day:' + who), out = [];
-  base.forEach(([h, act], i) => {
+  let list = base;
+  if (kind === 'office' && typeof wevLateWho === 'function' && wevLateWho() === who)      // hôm nay đến muộn: lỡ họp đầu ngày, vào thẳng bàn
+    list = [[9.35, 'desk'], ...base.filter(([h, act]) => h > 9.3)];
+  list.forEach(([h, act], i) => {
     let x = i === 0 || act === 'meet' ? h : h + (r() * 2 - 1) * SONG.JIT;
     if (out.length) x = Math.max(x, out[out.length - 1][0] + SONG.MIN_GAP);   // không để việc sau chen lên trước việc trước
     out.push([x, act]);
