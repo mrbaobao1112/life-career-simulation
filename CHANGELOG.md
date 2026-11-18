@@ -1,6 +1,34 @@
 # Lịch sử phiên bản
 
-## v17: Thế giới sống – Phase 1: NPC tự sống theo lịch (hiện tại)
+## v17.1: Thế giới sống – Phase 2: đời sống xã hội giữa các NPC (hiện tại)
+Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày, quan hệ của người chơi (`S.rel`).
+
+**Quan hệ giữa các NPC** (`js/song/quan-he-npc.js`):
+- Mỗi cặp có độ thân, độ tin, số lần nói chuyện, số lần nhờ vả trong ngày. Ví dụ ban đầu: bố–mẹ 82, chị Mai–chị Hạnh 62, Phong–anh Dũng 55.
+- Độ thân mỗi ngày thay đổi tổng cộng tối đa ±2, nên không trôi quá nhanh.
+- Lưu gọn trong bản lưu (`S.npcRel`, mỗi cặp dưới 80 ký tự). Bản lưu cũ chưa có thì tự tạo mặc định khi cần.
+- Không hiện con số cho người chơi; chỉ thể hiện qua hành vi và câu nói.
+
+**Giao tiếp giữa NPC** (`js/song/xa-giao-npc.js`, câu nói ở `js/du-lieu/xa-giao.js`):
+- Sang chỗ nhau nói chuyện: hai bên quay mặt vào nhau, câu chạy qua lại. Câu chọn theo mức thân (thân, bình thường, lạnh nhạt) và theo cặp, có dùng các câu có sẵn. Nói xong thì thân hơn một chút.
+- Người đang bận (đang đi, đang làm việc xen, đang tập trung) thì từ chối khéo (🙅), người hỏi quay về.
+- Phong hỏi anh Dũng: hai lần đầu trong ngày anh Dũng chỉ tận tình. Từ lần thứ ba anh Dũng mệt (“Lần thứ mấy rồi?”, “Tự đọc log trước đi.”) và độ thân giảm. Nếu hai người đã lạnh nhạt thì anh Dũng từ chối luôn.
+- Đi ngang qua nhau thì chào (👋), câu theo mức thân; lạnh nhạt thì chỉ gật đầu. Đã chào thì 40 phút game sau mới chào lại.
+- Ở nhà bố mẹ: bố mẹ ngồi nói chuyện với nhau (giỗ bác Ba, giá rau, bóng đá…).
+- Câu nói không lặp: nhớ vài câu vừa dùng cho mỗi loại.
+
+**Sự kiện xã hội nhỏ:**
+- Hết giờ làm, người thân nhau rủ nhau về cùng (“Đi cùng không?” – “Đợi tí, tắt máy đã.”) rồi cùng ra cửa. Đang dở việc thì từ chối.
+- Chị Mai mang bánh: chiều có hôm chị Mai mang bánh ra pantry (🍰) gọi cả nhóm. Ai thân với chị Mai thì ra ăn cùng; người tập trung cao (anh Dũng) có thể xin để phần. Mỗi ngày một lần.
+
+**Sửa lỗi:** người được bắt chuyện nay đứng yên lắng nghe đến hết câu chuyện (trước đây có thể bỏ đi giữa chừng). Sau đó người đó quay lại đúng việc và hướng ngồi cũ.
+
+**Kiểm thử:** thêm `npm run xa-giao` (24 mục):
+- quan hệ mặc định, giới hạn mỗi ngày, lưu và tải lại, bản lưu cũ;
+- nói chuyện tăng độ thân; Phong hỏi nhiều lần thì anh Dũng mệt; người bận từ chối;
+- câu không lặp; chào không lặp liên tục; bố mẹ nói chuyện; rủ nhau về; chị Mai mang bánh mỗi ngày một lần.
+
+## v17: Thế giới sống – Phase 1: NPC tự sống theo lịch
 Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày, bản lưu (phase này không lưu thêm gì). Chỉ thay phần hình của người ở cùng nhà và đồng nghiệp trong thế giới đi lại.
 
 **Lịch sinh hoạt theo giờ** (`js/song/lich-npc.js`):
