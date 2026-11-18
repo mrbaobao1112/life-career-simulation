@@ -1,6 +1,35 @@
 # Lịch sử phiên bản
 
-## v16.1: Sửa lỗi nhân vật đè lên nhau, đồng hồ nhảy khi rủ đi chơi (hiện tại)
+## v17: Thế giới sống – Phase 1: NPC tự sống theo lịch (hiện tại)
+Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày, bản lưu (phase này không lưu thêm gì). Chỉ thay phần hình của người ở cùng nhà và đồng nghiệp trong thế giới đi lại.
+
+**Lịch sinh hoạt theo giờ** (`js/song/lich-npc.js`):
+- Mỗi người có lịch ngày thường và cuối tuần (ngày lễ tính như cuối tuần):
+  - Tùng (bán hàng ca chiều): ngủ nướng, tắm, nấu mì, chơi game, 13:30 đi làm, tối về chơi tiếp; cuối tuần chiều đi trà đá.
+  - Mẹ: nấu ăn, đi chợ, quét nhà, uống trà, xem thời sự; cuối tuần chiều sang hàng xóm.
+  - Bố: ngày thường đi làm; cuối tuần uống trà, đọc báo, thắp hương.
+  - Đồng nghiệp: đến công ty dần từ 8:24, họp đầu ngày 9:00, làm việc, ra ngoài ăn trưa, chiều quay lại, về lúc 17:30–18:15.
+- Mỗi ngày các mốc lệch ngẫu nhiên tối đa ±15 phút nhưng luôn giữ đúng thứ tự. Cùng một ngày thì luôn ra cùng một lịch: dùng bộ ngẫu nhiên riêng theo ngày, không đụng phần ngẫu nhiên của luật chơi.
+- Sắp ra ngoài hoặc từ ngoài về thì đi sớm 15 phút cho kịp đường. Các việc trong phòng (họp, về bàn) thì đúng giờ.
+
+**Bộ máy hành vi** (`js/song/hanh-vi-npc.js`):
+- NPC tự đi đến chỗ, ngồi, nằm, làm động tác, ra cửa rồi vắng hẳn, quay về.
+- Trong một việc dài, cứ 25–70 phút có việc xen ngắn: lấy nước, nghe điện thoại, vươn vai, nghĩ, sang bàn bạn nói chuyện (dùng câu trao đổi có sẵn). Còn lại là ngồi yên hoặc đứng quan sát vài phút. Xong việc xen thì quay về việc chính.
+- Giữ chỗ: hai người không chọn cùng một chỗ, không đứng đè lên người chơi. Người đã ra ngoài thì không bắt chuyện được, không chắn đường.
+- Một nhịp chung với vòng lặp thế giới, nghĩ 4 lần mỗi giây; không có vòng lặp hay hẹn giờ riêng. Thời lượng tính theo phút game, nên mở điện thoại hoặc chuyển tab thì NPC dừng theo.
+- Đang mở thực đơn nói chuyện với ai thì người đó đứng yên.
+- NPC ở ngoài khung nhìn, hoặc khi bật giảm chuyển động, thì dịch chuyển thẳng, không diễn đi bộ.
+- Kỷ luật (chị Hạnh đi nhắc) vẫn chạy như cũ: lúc đó bộ máy không điều khiển chị Hạnh.
+
+**Dấu hiệu nhỏ trên đầu:** 💻 làm việc, 🗣️ họp, 😴 ngủ, 🚿 tắm, 🍳 nấu ăn, 🎮 chơi game, 🍜 ăn, 🍵 uống trà, 📺 xem thời sự, 📱 điện thoại, 💬 đang nói chuyện, 💭 đang nghĩ… Tắt được trong “Nếp sinh hoạt”.
+
+**Kiểm thử:** thêm `npm run the-gioi-song` (27 mục):
+- lịch theo ngày; Tùng làm đủ việc trong ngày, không kẹt, không nhân bản, ra ngoài thì vắng;
+- việc xen rồi quay về; bố đi làm ngày thường, ở nhà cuối tuần;
+- văn phòng họp, về bàn, đi ăn trưa, quay lại; dấu hiệu bật tắt;
+- đứng yên khi đang nói chuyện; chuyển tab thì dừng; giảm chuyển động; điện thoại.
+
+## v16.1: Sửa lỗi nhân vật đè lên nhau, đồng hồ nhảy khi rủ đi chơi
 - Ở ghép, buổi sáng Tùng ngủ trên sofa: trước đây Tùng nằm lệch, đầu thò ra đè lên tủ TV. Nay nằm gọn trên đệm sofa.
 - Chỗ nào có người đang nằm ngủ (sofa, giường) thì khóa, ghi lý do “Tùng đang ngủ ở đây”.
 - Dùng đồ ở chỗ đã có người thì nhân vật tự ngồi sang chỗ trống bên cạnh, không đứng đè lên nhau. Ví dụ ngồi sofa khi Tùng đang chơi game, uống trà khi bố mẹ đang ngồi.
