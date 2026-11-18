@@ -21,7 +21,7 @@ Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, 
 - NPC ở ngoài khung nhìn, hoặc khi bật giảm chuyển động, thì dịch chuyển thẳng, không diễn đi bộ.
 - Kỷ luật (chị Hạnh đi nhắc) vẫn chạy như cũ: lúc đó bộ máy không điều khiển chị Hạnh.
 
-**Dấu hiệu nhỏ trên đầu:** 💻 làm việc, 🗣️ họp, 😴 ngủ, 🚿 tắm, 🍳 nấu ăn, 🎮 chơi game, 🍜 ăn, 🍵 uống trà, 📺 xem thời sự, 📱 điện thoại, 💬 đang nói chuyện, 💭 đang nghĩ… Tắt được trong “Nếp sinh hoạt”.
+**Dấu hiệu nhỏ trên đầu:** 💻 làm việc, 👥 họp, 😴 ngủ, 🚿 tắm, 🍳 nấu ăn, 🎮 chơi game, 🍜 ăn, 🍵 uống trà, 📺 xem thời sự, 📱 điện thoại, 💬 đang nói chuyện, 💭 đang nghĩ… Tắt được trong “Nếp sinh hoạt”.
 
 **Kiểm thử:** thêm `npm run the-gioi-song` (27 mục):
 - lịch theo ngày; Tùng làm đủ việc trong ngày, không kẹt, không nhân bản, ra ngoài thì vắng;

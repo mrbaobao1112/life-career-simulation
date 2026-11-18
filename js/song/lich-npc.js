@@ -70,7 +70,7 @@ const VP_DAY = {
 };
 // Việc xen trong giờ làm theo tính cách (người hòa đồng hay sang bàn bạn; Phong hay sang hỏi anh Dũng)
 const VP_BEATS = { boss:['board', 'visit', 'phone', 'water'], dung:['water', 'think'], mai:['visit', 'water', 'visit', 'phone'], phong:['visit', 'water', 'think'] };
-const VP_ACT = { desk:{ spot:'desk', sign:'💻' }, meet:{ spot:'meet', act:'act-listen', sign:'🗣️' }, out:{ out:true } };
+const VP_ACT = { desk:{ spot:'desk', sign:'💻' }, meet:{ spot:'meet', act:'act-listen', sign:'👥' }, out:{ out:true } };
 
 // Lịch hôm nay của một người: các mốc đã lệch theo ngày; mốc “meet” không lệch (họp đúng giờ)
 function npcDay(who, kind){
