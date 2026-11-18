@@ -38,8 +38,8 @@ const HOME_DAY = {
 const HOME_ACT = {
   sleep:{ spot:'sofa', lie:true, sign:'😴' }, bath:{ spot:'bath', hide:true, sign:'🚿' }, cook:{ spot:'stove', act:'act-cook', sign:'🍳' },
   game:{ spot:'tvPlay', act:'act-game', sign:'🎮', beats:['drink', 'phone', 'stretch'] }, eat:{ spot:'tableR', act:'act-eat', sign:'🍜' },
-  sweep:{ spot:'mid', act:'act-sweep', sign:'🧹', roam:60 }, tea:{ spot:'tea', act:'act-drink', sign:'🍵', beats:['phone'] },
-  news:{ spot:'sofaR', act:'act-read', sign:'📺', beats:['drink'] }, read:{ spot:'sofaL', act:'act-read', sign:'📰', beats:['stretch', 'drink'] },
+  sweep:{ spot:'mid', act:'act-sweep', sign:'🧹', roam:60 }, tea:{ spot:'tea', act:'act-drink', sign:'🍵', beats:['phone', 'chat'] },
+  news:{ spot:'sofaR', act:'act-read', sign:'📺', beats:['drink', 'chat'] }, read:{ spot:'sofaL', act:'act-read', sign:'📰', beats:['stretch', 'drink', 'chat'] },
   altar:{ spot:'altar', act:'act-think', sign:'🙏' }, out:{ out:true },
 };
 // Việc xen ngắn (phút game): làm xong thì quay về việc chính
@@ -50,6 +50,7 @@ const SONG_BEAT = {
   water:  { spot:'pantry', act:'act-drink', sign:'☕', dur:[5, 10] },
   think:  { spot:null, act:'act-think', sign:'💭', dur:[4, 9] },
   visit:  { spot:'visit', act:'act-talk', sign:'💬', dur:[5, 10] },
+  chat:   { spot:'partner', act:'act-talk', sign:'💬', dur:[6, 12] },        // bố mẹ ngồi nói chuyện với nhau
   board:  { spot:'meet', act:'act-read', sign:'🗂️', dur:[6, 12] },
 };
 // Chỗ trong từng nhà (thêm cho các việc mới; chỗ nằm trong đồ đạc thì đi đến chỗ trống gần nhất rồi ngồi vào)

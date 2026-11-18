@@ -26,7 +26,7 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
   - Vào trong từng nơi đi lại được: ngồi cà phê với Linh, trà đá với Tùng, chạy hết một vòng hồ, trả tiền ở quầy thu ngân, mua vé về quê.
   - Có xe máy: dắt xe ra ở ngõ, đi nhanh hơn, ngày nghỉ tốn 15.000đ xăng.
   - Trên phố có chuyện bất ngờ: gặp người quen, hàng rong, mưa bất chợt, tắc đường.
-- **Thế giới sống (v17, phase 1):** người ở cùng nhà và đồng nghiệp có lịch sinh hoạt theo giờ riêng, khác giữa ngày thường và cuối tuần. Họ tự đi lại, làm việc, ăn uống, ra ngoài rồi quay về, có việc xen và lúc ngồi yên, kể cả khi bạn không làm gì. Dấu hiệu nhỏ trên đầu cho biết họ đang làm gì (tắt được).
+- **Thế giới sống (v17, phase 1):** người ở cùng nhà và đồng nghiệp có lịch sinh hoạt theo giờ riêng, khác giữa ngày thường và cuối tuần. Họ tự đi lại, làm việc, ăn uống, ra ngoài rồi quay về, có việc xen và lúc ngồi yên, kể cả khi bạn không làm gì. Dấu hiệu nhỏ trên đầu cho biết họ đang làm gì (tắt được). Từ phase 2 họ còn nói chuyện với nhau, chào nhau khi đi ngang, từ chối khi đang bận, rủ nhau về sau giờ làm; mỗi cặp có độ thân riêng thay đổi dần theo những lần gặp (ví dụ Phong hỏi anh Dũng nhiều quá thì anh Dũng bớt nhiệt tình).
 - **Nếp sinh hoạt:** việc thường ngày (ăn, ngủ, họp đầu ngày, tắc đường) tự diễn ra theo nếp của nhân vật và hiện thành nhật ký trong ngày; người chơi chỉ quyết định việc đáng quyết định. Đổi nếp bất cứ lúc nào bằng nút “Nếp sinh hoạt”.
 - **Cảnh sống:** mọi cảnh có hình đều chuyển động. Ở nhà: thức dậy từ trên giường, ăn, học, chơi game, quét dọn, người ở cùng (bố mẹ hoặc Tùng) có việc riêng theo buổi. Ở công ty: đi xe máy tới, chào đồng nghiệp, ngồi gõ phím, đồng nghiệp đi lại và trò chuyện, OT buổi tối vắng người. Ngoài đường: cà phê, trà đá, bia hơi, chạy bộ quanh hồ, thư viện, trung tâm thương mại, có người qua lại; trời mưa thì cảnh ngoài trời cũng mưa. Chạm vào ai thì người đó phản ứng. Bật tắt trong “Nếp sinh hoạt”.
 - **Mỗi người một tính cách:** anh Dũng ít nói, hiếm khi rời bàn; chị Mai hay sang bàn người khác và hay cười; Phong hay chạy sang hỏi anh Dũng; chị Hạnh đi họp nhiều; Tùng hay đùa; mẹ hay hỏi han. Tính cách điều khiển hành vi thật trên màn hình, và hiện trong Hồ sơ.
@@ -105,6 +105,9 @@ Muốn sửa gì thì mở file nào:
 | Câu đố của trò chơi nhỏ cho từng task, task nào chơi trò nào | `js/du-lieu/tro-choi.js` |
 | Lịch sinh hoạt của Tùng, bố mẹ, đồng nghiệp; chỗ ngồi trong nhà; việc xen | `js/song/lich-npc.js` (`HOME_DAY`, `VP_DAY`, `SONG_SPOTS`, `SONG_BEAT`, bảng `SONG`) |
 | NPC tự làm việc của mình: đi, ngồi, giữ chỗ, dấu hiệu | `js/song/hanh-vi-npc.js` |
+| Quan hệ giữa các NPC: mức ban đầu, giới hạn mỗi ngày, ngưỡng thân / lạnh | `js/song/quan-he-npc.js` (bảng `NPCREL`) |
+| Câu nói giữa các NPC: chào, nói chuyện, hỏi việc, từ chối, bố mẹ, rủ về, ăn bánh | `js/du-lieu/xa-giao.js` |
+| NPC giao tiếp với nhau, sự kiện nhỏ (rủ về, chị Mai mang bánh) | `js/song/xa-giao-npc.js` (bảng `XGK`) |
 | Phố: vị trí, tên, màu các địa điểm; ngõ nhà từng hoàn cảnh | `js/pho/ban-do-pho.js` (`PHO_DOORS`, `PHO_LANE`) |
 | Bên trong các địa điểm: đồ đạc, người có mặt, việc nào làm ở đâu | `js/pho/noi-that-quan.js`, `js/pho/noi-that-lon.js`, `js/pho/ho-ban-nguyet.js` |
 | Giờ mở cửa, cà phê mang về, bia hơi, việc nhỏ ở các quán | `js/pho/di-pho.js` (`PHO_OPEN`, `PHOK`) |
@@ -131,6 +134,7 @@ npm run the-gioi      # tự đi lại trong nhà: phím, va chạm, đồng h�
 npm run van-phong-di-lai  # văn phòng đi lại được: 8 văn phòng, họp, task, 4 trò chơi nhỏ, kỷ luật, tan làm (cần Playwright, khoảng 3 phút)
 npm run ra-pho        # ra phố: ngõ nhà, 8 địa điểm, xe máy, chuyện bất ngờ, hẹn gặp (cần Playwright, khoảng 4 phút)
 npm run the-gioi-song # thế giới sống: lịch theo giờ, NPC tự sinh hoạt ở nhà và công ty (cần Playwright, khoảng 3 phút)
+npm run xa-giao       # thế giới sống phase 2: quan hệ, nói chuyện, chào, từ chối, rủ về, ăn bánh (cần Playwright, khoảng 3 phút)
 npm run mo-dau        # màn hình mở đầu: âm thanh, ra vào, chuyển tab, bản lưu hỏng, giảm chuyển động, hiệu năng (cần Playwright, khoảng 3 phút; thêm DAI=1 để để yên 5 phút)
 npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày
 npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra cân bằng (mất vài phút)
