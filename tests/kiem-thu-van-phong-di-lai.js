@@ -78,6 +78,7 @@ async function solve(page, good){
 
   // 3. Task ở bàn: đúng các cách làm cũ; hỏi anh Dũng thì phải sang bàn anh Dũng
   { const page = await open(browser, 'cudem'); await scene(page, [{ id:'task', arg:{ tid:102 } }]);
+    await page.evaluate(() => WORLD.npcs.forEach(a => { if (a.ai) a.ai.until = Infinity; }));   // thế giới sống: tạm dừng việc xen để mọi người ngồi yên ở bàn trong mục này
     await page.evaluate(() => { WORLD.me.x = WORLD.H.desks.me.x; WORLD.me.y = 164; }); await page.waitForTimeout(400);
     await page.keyboard.press('KeyE'); await page.waitForTimeout(300);
     const desk = await page.$$eval('.w-menu .w-act', b => b.map(x => x.textContent.trim())); await page.keyboard.press('Escape');

@@ -37,6 +37,11 @@ function songSpot(W, a, key){
   }
   return null;
 }
+// Việc lúc này của một NPC ở nơi này. Ở công ty: bạn họp đầu ngày xong (sang cảnh khác) thì cả nhóm cũng tan họp, về bàn
+function songWantW(W, who){
+  const w = songWant(who, W.song.kind, W.t);
+  return W.song.kind === 'office' && w.act === 'meet' && W.ref.id !== 'standup' ? { ...w, act:'desk', i:'desk' + w.i } : w;
+}
 const songDef = (W, act) => (W.song.kind === 'home' ? HOME_ACT : VP_ACT)[act] || { spot:null };
 
 /* ----- Dấu hiệu nhỏ trên đầu ----- */
@@ -111,7 +116,7 @@ function songMount(W, api, kind){
     const door = kind === 'office' ? W.H.spawn : (SONG_SPOTS[S.bg] || {}).door || W.H.spawn;
     const a = api.npc(who, door.x, door.y, '', false, { id:who, speed:SONG.SPEED });
     a.ai = { who, block:null, until:0, busy:false, act:null };
-    const now = songWant(who, kind, W.t); a.ai.block = now.i; songGo(W, api, a, now, true);
+    const now = songWantW(W, who); a.ai.block = now.i; songGo(W, api, a, now, true);
   });
   W.el.classList.toggle('no-signs', !songSignsOn());
 }
@@ -121,7 +126,7 @@ function songFrame(W, dt, api){
   for (const a of W.npcs) {
     const ai = a.ai; if (!ai || ai.busy || a.lock || a.left_) continue;
     if (W.menu && W.menu.n.npc === a) continue;                                 // đang nói chuyện với người chơi: đứng yên
-    const now = songWant(ai.who, G.kind, W.t);                                 // có tính trước thời gian đi đường
+    const now = songWantW(W, ai.who);                                         // có tính trước thời gian đi đường
     if (now.i !== ai.block) { ai.block = now.i; ai.inBeat = false; songGo(W, api, a, now); continue; }
     if (ai.inBeat) { if (W.t >= ai.beatEnd) songEndBeat(W, api, a); continue; }
     if (W.t >= ai.until && !a.gone) songBeat(W, api, a);
