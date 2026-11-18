@@ -208,6 +208,7 @@ function openHabits(){
     <label class="hrow chk"><input type="checkbox" id="optDetail" ${S.opt && S.opt.detail ? 'checked' : ''}><span>Hiện chi tiết cộng trừ chỉ số trên từng lựa chọn</span></label>
     <label class="hrow chk"><input type="checkbox" id="optStage" ${stageOn() ? 'checked' : ''}><span>Cảnh sống: nhân vật đi lại, làm việc, trò chuyện ở nhà, công ty và các nơi khác</span></label>
     <label class="hrow chk"><input type="checkbox" id="optRoam" ${!(S.opt && S.opt.roam === false) ? 'checked' : ''}><span>Tự đi lại trong nhà: điều khiển nhân vật bằng phím hoặc joystick, chạm vào đồ vật để dùng (tắt thì chọn việc bằng danh sách)</span></label>
+    <label class="hrow chk"><input type="checkbox" id="optSigns" ${!(S.opt && S.opt.signs === false) ? 'checked' : ''}><span>Dấu hiệu nhỏ trên đầu mọi người (💬 đang nói chuyện, 😴 đang ngủ, 🍜 đang ăn…)</span></label>
     <button class="ghost sm" type="button" id="optTut">🎓 Xem lại hướng dẫn đi lại trong nhà</button>
     <label class="hrow chk"><input type="checkbox" id="optFps" ${S.opt && S.opt.fps ? 'checked' : ''}><span>Hiện số khung hình mỗi giây (để đo độ mượt trên máy này)</span></label>`;
   const dlg = $('#dlg'); dlg.classList.remove('phone-dlg');
@@ -217,6 +218,7 @@ function openHabits(){
     h[k] = k === 'bed' && v !== 'ask' ? +v : v; save(); }));
   $('#optDetail').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.detail = e.target.checked; save(); });
   $('#optStage').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.stage = e.target.checked; save(); });
+  $('#optSigns').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.signs = e.target.checked; save(); });
   $('#optTut').addEventListener('click', e => { S.once.roamTut = false; save(); e.target.textContent = '🎓 Hướng dẫn sẽ hiện lại lần tới vào nhà'; });
   $('#optRoam').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.roam = e.target.checked; save(); });
   $('#optFps').addEventListener('change', e => { S.opt = S.opt || {}; S.opt.fps = e.target.checked; save(); fpsMeter(); });

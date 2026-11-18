@@ -41,7 +41,7 @@ function roamMount(root, ref){
   const ent = P.enter && P.enter(), pp = ((S.roamPos || {})[pk]) || (keep ? S.roam : null);
   const start = ent && roamFree(H, ent.x, ent.y) ? ent : pp && pp.d !== undefined && pp.d === S.day && roamFree(H, pp.x, pp.y) ? { x:pp.x, y:pp.y } : H.spawn;
   const me = W.me = C.add('me', start.x, start.y, 'world', '', undefined, { s:roamScale(start.y) });
-  const cast = (P.id === 'home' && H.cast) || {};
+  const cast = (P.id === 'home' && !(typeof songHomeOn === 'function' && songHomeOn()) && H.cast) || {};   // có lịch sinh hoạt (thế giới sống) thì người ở cùng do lịch điều khiển
   for (const [who, plan] of Object.entries(cast)) {
     if ((S.day * 7 + who.length * 13 + SLOTS.indexOf(S.slot) * 5) % 10 < 2) continue;          // có buổi người này đi vắng
     const opts = plan[S.slot] || plan.evening, [spot, name] = opts[(S.day + who.length) % opts.length], P = H.spots[spot];
@@ -133,7 +133,7 @@ function roamMount(root, ref){
     }
     let x = u.x ?? o.spot.x; const y = u.y ?? o.spot.y; W.rest = o.spot;      // đứng dậy thì về chỗ đứng trước đồ vật
     // chỗ đó đã có người (bố mẹ ngồi uống trà, Tùng ngồi chơi game…): dịch sang chỗ trống bên cạnh, không đứng đè lên nhau
-    if (!u.lie && !u.hide) { const taken = xx => W.npcs.some(a => !a.home.lie && document.body.contains(a.el) && Math.abs(a.x - xx) < 32 && Math.abs(a.y - y) < 18);
+    if (!u.lie && !u.hide) { const taken = xx => W.npcs.some(a => !a.home.lie && !a.gone && document.body.contains(a.el) && Math.abs(a.x - xx) < 32 && Math.abs(a.y - y) < 18);
       for (const d of [0, 38, -38, 76, -76]) if (!taken(x + d) && x + d > H.x0 + 10 && x + d < H.x1 - 10) { x += d; break; } }
     if (u.lie) { me.rot = -90; put(me, x, y, .5); C.act(me, 'act-sleep');
       blanket = document.createElementNS('http://www.w3.org/2000/svg', 'g'); blanket.innerHTML = `<path d="M${x - 46} ${y - 14} Q${x - 18} ${y - 22} ${x + 12} ${y - 14} L${x + 14} ${y + 4} L${x - 48} ${y + 4}Z" fill="${S.bg === 'nha' ? '#F6C85F' : '#9FC2F2'}" stroke="#00000018"/>`;
@@ -364,7 +364,7 @@ function roamMount(root, ref){
     if (!W.busy && !W.menu) {
       let best = null, bd = ROAM.NEAR;
       H.objs.forEach(o => { const dd = Math.hypot(o.spot.x - me.x, (o.spot.y - me.y) * 1.4); if (dd < bd) { bd = dd; best = { o }; } });
-      W.npcs.forEach(a => { const dd = Math.hypot(a.x - me.x, (Math.max(ROAM.Y0, a.y) - me.y) * 1.2); if (dd < bd + 10) { bd = dd - 10; best = { npc:a }; }
+      W.npcs.forEach(a => { if (a.gone) return; const dd = Math.hypot(a.x - me.x, (Math.max(ROAM.Y0, a.y) - me.y) * 1.2); if (dd < bd + 10) { bd = dd - 10; best = { npc:a }; }
         if (dd < ROAM.GREET_R && !W.greeted[a.id] && !a.home.lie) { W.greeted[a.id] = true; C.face(a, me.x < a.x); C.say(a, pick(NPC_QUIP[a.who] || ['Chào!']), 1500); } });
       const same = best && W.near && (best.o ? best.o === W.near.o : best.npc === W.near.npc);
       if (!same && (best || W.near)) { W.near = best; showPrompt(); }
