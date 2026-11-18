@@ -24,6 +24,10 @@ function seatFor(W, a, p){
 /* ----- Chỗ theo từng nơi ----- */
 function songSpot(W, a, key){
   const H = W.H;
+  if (key === 'partner') {                                                   // người nhà đang ở nhà, không bận
+    const b = W.npcs.find(x => x !== a && x.ai && !x.gone && !x.ai.busy && !x.ai.inBeat && !(x.home && x.home.lie));
+    if (!b) return null; a.ai.with = b; return { x:b.x + (b.x > W.H.W / 2 ? -34 : 34), y:b.y + 4 };
+  }
   if (W.song.kind === 'home') { const sp = (SONG_SPOTS[S.bg] || {})[key]; return sp ? { ...sp } : null; }
   const k = W.song.order.indexOf(a.who);
   if (key === 'desk') { const d = H.desks[a.who]; return { x:d.x, y:d.y, face:true }; }
@@ -39,6 +43,8 @@ function songSpot(W, a, key){
 }
 // Việc lúc này của một NPC ở nơi này. Ở công ty: bạn họp đầu ngày xong (sang cảnh khác) thì cả nhóm cũng tan họp, về bàn
 function songWantW(W, who){
+  const a = W.npcs.find(x => x.ai && x.who === who);
+  if (a && a.ai.forceOut) return { act:'out', i:'force' };                     // đã rủ nhau về cùng
   const w = songWant(who, W.song.kind, W.t);
   return W.song.kind === 'office' && w.act === 'meet' && W.ref.id !== 'standup' ? { ...w, act:'desk', i:'desk' + w.i } : w;
 }
@@ -70,7 +76,7 @@ function songSettle(W, api, a, def, p){
   if (def.lie) { a.rot = -90; a.s = .5; C.place(a, p.x, p.y); a.el.dataset.y = p.y - 30; C.act(a, 'act-sleep'); }
   else { a.rot = 0; api.put(a, p.x, p.y); C.face(a, !!p.face); C.act(a, def.act !== undefined ? def.act : (W.song.kind === 'office' ? VP_SIT[a.who] : '')); }
   if (def.hide) songHide(a, true);
-  a.home = { x:p.x, y:p.y, name:def.act || '', lie:!!def.lie }; a.ai.seat = def.hide ? null : { x:p.x, y:p.y };
+  a.home = { x:p.x, y:p.y, name:def.act || '', lie:!!def.lie }; a.ai.seat = def.hide ? null : { x:p.x, y:p.y }; a.ai.face = !!p.face;
   api.depthSort(); songSign(a, def.sign);
 }
 
@@ -78,6 +84,7 @@ function songSettle(W, api, a, def, p){
 async function songGo(W, api, a, now, snap){
   const ai = a.ai, def = songDef(W, now.act); ai.busy = true; ai.act = now.act; ai.with = null; ai.seat = null; a.rot = 0; if (a.home) a.home.lie = false;   // đứng dậy rồi thì chỗ cũ trống
   if (def.out) {
+    if (!a.gone && !snap && typeof songLeaveTogether === 'function') { await songLeaveTogether(W, api, a); if (!api.alive()) return; }   // hết giờ: rủ người thân cùng về
     if (!a.gone) { const door = songSpot(W, a, 'door') || (W.song.kind === 'home' ? null : { x:W.H.spawn.x, y:W.H.spawn.y });
       if (door && !snap && !await songWalk(W, api, a, door)) return; songHide(a, true); }
     ai.until = Infinity; ai.busy = false; return;
@@ -93,18 +100,23 @@ async function songGo(W, api, a, now, snap){
 async function songBeat(W, api, a){
   const ai = a.ai, r = songRng('b' + a.who + Math.round(W.t)), list = W.song.kind === 'office' ? (ai.act === 'desk' ? VP_BEATS[a.who] : []) : (songDef(W, ai.act).beats || []);
   if (!list.length || r() > SONG.BEAT_P || a.gone) { ai.until = W.t + SONG.IDLE[0] + r() * (SONG.IDLE[1] - SONG.IDLE[0]); return; }
-  const B = SONG_BEAT[list[Math.floor(r() * list.length)]]; ai.busy = true;
+  const B = SONG_BEAT[list[Math.floor(r() * list.length)]];
+  if ((B.spot === 'visit' || B.spot === 'partner') && typeof songVisit === 'function') return songVisit(W, api, a, B);   // sang chỗ người khác nói chuyện
+  return songForceBeat(W, api, a, B);
+}
+// Làm một việc xen (cũng dùng cho sự kiện: chị Mai gọi ra ăn bánh…)
+async function songForceBeat(W, api, a, B){
+  const ai = a.ai, r = songRng('fb' + a.who + Math.round(W.t)); ai.busy = true; ai.with = null;
   const keep = { act:ai.act }, back = { x:a.x, y:a.y };
   let p = B.spot ? seatFor(W, a, songSpot(W, a, B.spot)) : B.step ? { x:a.x + (r() < .5 ? -B.step : B.step), y:a.y } : null;
   if (p) { a.rot = 0; if (!await songWalk(W, api, a, p)) return; api.C.face(a, !!p.face); ai.seat = { x:p.x, y:p.y }; }
   api.C.act(a, B.act); songSign(a, B.sign);
-  if (ai.with) { const b = ai.with; songSign(b, '💬'); api.C.act(b, 'act-listen'); api.C.face(b, false);
-    const c = typeof pairChat === 'function' ? pairChat(a.who, b.who) : null; if (c && songInView(W, a.x)) c.lines.forEach((t, i) => api.C.later(() => api.say(i % 2 ? b : a, t, 1500), i * 1600)); }
   ai.beatEnd = W.t + B.dur[0] + r() * (B.dur[1] - B.dur[0]); ai.beatBack = p ? keep : null; ai.beatPos = back; ai.busy = false; ai.inBeat = true;
 }
 async function songEndBeat(W, api, a){
   const ai = a.ai; ai.inBeat = false;
-  if (ai.with) { const b = ai.with; if (!b.gone && b.ai && !b.ai.busy) { api.C.act(b, VP_SIT[b.who] || ''); api.C.face(b, true); songSign(b, songDef(W, b.ai.act).sign); } ai.with = null; }
+  if (ai.with) { const b = ai.with; if (!b.gone && b.ai && !b.ai.busy && !b.ai.inBeat) { const d = songDef(W, b.ai.act);   // người kia quay lại việc đang làm
+      if (!(b.home && b.home.lie)) api.C.act(b, d.act !== undefined ? d.act : (VP_SIT[b.who] || '')); api.C.face(b, !!b.ai.face); songSign(b, d.sign); } ai.with = null; }
   await songGo(W, api, a, { act:ai.act });
 }
 
@@ -124,13 +136,14 @@ function songFrame(W, dt, api){
   const G = W.song; if (!G) return;
   G.acc += dt; if (G.acc < SONG.TICK) return; G.acc = 0;
   for (const a of W.npcs) {
-    const ai = a.ai; if (!ai || ai.busy || a.lock || a.left_) continue;
+    const ai = a.ai; if (!ai || ai.busy || ai.held || a.lock || a.left_) continue;   // held: đang được người khác bắt chuyện
     if (W.menu && W.menu.n.npc === a) continue;                                 // đang nói chuyện với người chơi: đứng yên
     const now = songWantW(W, ai.who);                                         // có tính trước thời gian đi đường
     if (now.i !== ai.block) { ai.block = now.i; ai.inBeat = false; songGo(W, api, a, now); continue; }
     if (ai.inBeat) { if (W.t >= ai.beatEnd) songEndBeat(W, api, a); continue; }
     if (W.t >= ai.until && !a.gone) songBeat(W, api, a);
   }
+  if (typeof songSocialTick === 'function') songSocialTick(W, api);           // chào nhau, sự kiện nhỏ
 }
 const songHomeOn = () => (HOME_WHO[S.bg] || []).length > 0;
 // Dành cho kiểm thử: tóm tắt NPC đang làm gì
