@@ -102,5 +102,5 @@ ROAM_PLACES.push({ id:'office', match:officeMatch, map:officeMap, entries:office
     if (W.ref.id === 'standup') { officeArrow(W, 'meet'); api.C.later(() => { const b = W.npcs.find(n => n.who === 'boss'); if (b) api.say(b, 'Cả nhà ra họp nhé!', 1800); }, 900); }
     if (W.ref.id === 'task' && W.ref.arg && W.ref.arg.first) officeArrow(W, 'mydesk');
   },
-  frame(W, dt, api){ klFrame(W, dt, api); },
+  frame(W, dt, api){ klFrame(W, dt, api); if (typeof songFrame === 'function') songFrame(W, dt, api); },
 });

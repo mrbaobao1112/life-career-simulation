@@ -1,0 +1,8 @@
+/* ---------- Thế giới sống: dấu hiệu nhỏ trên đầu NPC ---------- */
+.world .npc-sign{pointer-events:none;animation:signIn .25s ease-out}
+.world .npc-sign text{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif}
+@keyframes signIn{from{opacity:0}}
+.world.no-signs .npc-sign{display:none}
+.world .actor.gone .npc-sign{display:none}
+@media (prefers-reduced-motion: reduce){ .world .npc-sign{animation:none} }
+html.rm .world .npc-sign{animation:none}

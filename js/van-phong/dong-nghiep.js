@@ -14,6 +14,7 @@ const VP_SIT = { boss:'act-read', dung:'act-type', mai:'act-type', phong:'act-th
 const vpRnd = (a, b) => a + Math.random() * (b - a);
 
 function officeCastMount(W, api){
+  if (typeof songMount === 'function') return songMount(W, api, 'office');   // thế giới sống: đồng nghiệp làm theo lịch theo giờ
   const M = W.H, C = api.C;
   W.npcs = [];
   DESK_ORDER.filter(k => k !== 'me' && !M.absent.includes(k)).forEach(who => {
@@ -53,12 +54,12 @@ async function npcTrip(W, api, a, to, act, ms){
 async function bossVisit(W, api, line){
   const b = W.npcs.find(n => n.who === 'boss'); if (!b) return;
   while (W.npcAway && W.npcAway !== b) { if (!await api.wait(400)) return; }
-  W.npcAway = b;
+  W.npcAway = b; b.lock = true;                              // bộ máy hành vi không điều khiển chị Hạnh trong lúc đi nhắc
   const side = W.me.x > b.x ? -28 : 28;
   if (await npcWalk(W, api, b, { x:W.me.x + side, y:Math.max(ROAM.Y0, Math.min(ROAM.Y1, W.me.y)) })) {
     api.C.face(b, W.me.x < b.x); api.C.face(W.me, b.x < W.me.x); api.C.act(b, 'act-talk');
     api.say(b, line, 2400); SFX.play('dun');
     if (await api.wait(api.C.still ? 0 : 2400)) { api.C.act(b, ''); if (await npcWalk(W, api, b, { x:b.home.x, y:b.home.y })) { api.C.face(b, true); api.C.act(b, b.home.name); } }
   }
-  W.npcAway = null;
+  W.npcAway = null; b.lock = false; if (b.ai) b.ai.until = 0;
 }

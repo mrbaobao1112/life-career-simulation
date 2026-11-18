@@ -14,7 +14,8 @@
     "hai-thang": "node mo-phong-hai-thang.js",
     "the-gioi": "node kiem-thu-the-gioi.js",
     "van-phong-di-lai": "node kiem-thu-van-phong-di-lai.js",
-    "ra-pho": "node kiem-thu-ra-pho.js"
+    "ra-pho": "node kiem-thu-ra-pho.js",
+    "the-gioi-song": "node kiem-thu-the-gioi-song.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3"
