@@ -124,7 +124,7 @@ function stageCore(root){
   const act = (a, name) => { cbOf(a).setAttribute('class', 'cb cb-idle' + (name ? ' ' + name : '')); a.act = name; };
   const add = (who, x, y, lay, name, expr, x2 = {}) => {
     const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'g'); tmp.innerHTML = actorSVG(who, expr, x2.look, x2.id);
-    const a = A[x2.id || who] = { who, id:x2.id || who, el:tmp.firstChild, busy:false, s:x2.s, rot:x2.rot, dy:x2.dy }; place(a, x, y, lay); act(a, name); return a;
+    const a = A[x2.id || who] = { who, id:x2.id || who, el:tmp.firstChild, busy:false, s:x2.s, rot:x2.rot, dy:x2.dy, look:x2.look, expr:expr || (who !== 'me' && NPC[who] ? defaultNpcExpr(who) : 'neutral') }; place(a, x, y, lay); act(a, name); return a;
   };
   const snap = (a, x, y, lay) => { a.el.classList.add('snap'); place(a, x, y, lay); void a.el.getBoundingClientRect(); };
   const face = (a, left) => { a.left = !!left; a.el.classList.toggle('left', !!left); };

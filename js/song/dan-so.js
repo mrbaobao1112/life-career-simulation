@@ -10,6 +10,7 @@ const DS = {
   TICK:.5,                   // nghĩ 2 lần mỗi giây
   SPAWN:.12,                 // mỗi nhịp, nếu còn thiếu khách so với mật độ thì xác suất có người bước vào
   SPEED:56,
+  QUEUE:[[0, 0], [-26, 0], [0, 16], [-26, 16], [-52, 0], [-52, 16]],   // chỗ đứng xếp hàng quanh quầy (lệch x, lệch y): không ai đứng chồng lên ai
 };
 const H24 = s => s.split(',').map(Number);   // mật độ 24 giờ, viết gọn
 const DS_PLACE = {
@@ -108,7 +109,9 @@ async function popStep(W, api, a, r, snap){
   let p;
   if (st[0] === 'seat') { const i = popSeat(P, a, v.buddy); if (i < 0) { v.i = v.steps.length - 1; v.busy = false; return; } v.seat = i; p = { ...P.cfg.seats[i] }; }
   else { const s = P.cfg.spots[st[st[0] === 'maybe' ? 2 : 1]]; p = Array.isArray(s) ? { ...s[Math.floor(r() * s.length)] } : { ...s }; p.x += Math.round(r() * 12 - 6);
-    for (let k = 0; k < 4 && P.pool.some(b => b !== a && b.vis && b.vis.spot && Math.abs(b.vis.spot.x - p.x) < 20 && Math.abs(b.vis.spot.y - p.y) < 12); k++) p.x -= 24;   // có người đứng đó rồi: xếp hàng phía sau
+    const taken = q => P.pool.some(b => b !== a && b.vis && b.vis.spot && Math.abs(b.vis.spot.x - q.x) < 20 && Math.abs(b.vis.spot.y - q.y) < 12);
+    const slot = DS.QUEUE.map(([dx, dy]) => ({ ...p, x:p.x + dx, y:p.y + dy })).find(q => !taken(q));   // có người đứng đó rồi: xếp hàng phía sau (hai hàng)
+    if (slot) p = slot; else { v.i = v.steps.length - 1; v.busy = false; return; }                     // quầy quá đông: thôi, ra về
   }
   v.spot = st[0] === 'seat' ? null : p;
   if (!await go(p)) return;
@@ -116,12 +119,12 @@ async function popStep(W, api, a, r, snap){
   api.C.face(a, !!p.face); api.C.act(a, st[k]); songSign(a, st[k + 2]);
   v.until = dur(st[k + 1]);
   if (st[0] === 'seat' && v.buddy && v.buddy.vis && v.buddy.vis.seat >= 0 && songInView(W, a.x) && !api.C.still) {   // ngồi cùng bạn: nói chuyện
-    const l = pick(typeof GENERIC_CHAT !== 'undefined' ? GENERIC_CHAT : [['Ngon nhỉ.', 'Ừ.']]); songSign(a, '💬'); songSign(v.buddy, '💬');
+    const l = pick(typeof GENERIC_CHAT !== 'undefined' ? GENERIC_CHAT : [['Ngon nhỉ.', 'Ừ.']]); songSign(a, '💬'); songSign(v.buddy, '💬'); npcFace(a, 'happy'); npcFace(v.buddy, 'happy');
     l.forEach((t, j) => api.C.later(() => api.say(j % 2 ? v.buddy : a, t, 1400), 600 + j * 1500));
   }
   v.i++; v.busy = false;
 }
-function popGone(W, a){ popRelease(W.pop, a); songHide(a, true); a.vis = null; a.speed = DS.SPEED; }
+function popGone(W, a){ popRelease(W.pop, a); songHide(a, true); a.vis = null; a.speed = DS.SPEED; npcFace(a, 'neutral'); }
 function popFrame(W, dt, api){
   const P = W.pop; if (!P) return;
   P.acc += dt; if (P.acc < DS.TICK) return; P.acc = 0;

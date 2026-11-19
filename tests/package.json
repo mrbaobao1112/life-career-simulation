@@ -8,7 +8,7 @@
     "van-phong": "node kiem-thu-van-phong.js",
     "mo-dau": "node kiem-thu-mo-dau.js",
     "he-thong": "node kiem-thu-he-thong.js",
-    "ngau-nhien": "node choi-ngau-nhien.js 40",
+    "ngau-nhien": "node --max-old-space-size=6144 choi-ngau-nhien.js 40",
     "can-bang": "node can-bang-chien-luoc.js",
     "tai-chinh": "node kiem-thu-tai-chinh.js",
     "hai-thang": "node mo-phong-hai-thang.js",
@@ -17,7 +17,8 @@
     "ra-pho": "node kiem-thu-ra-pho.js",
     "the-gioi-song": "node kiem-thu-the-gioi-song.js",
     "xa-giao": "node kiem-thu-xa-giao.js",
-    "thanh-pho": "node kiem-thu-thanh-pho.js"
+    "thanh-pho": "node kiem-thu-thanh-pho.js",
+    "tri-nho": "node kiem-thu-tri-nho.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3"

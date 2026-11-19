@@ -161,6 +161,7 @@ function settleChoice(ch){
   const { before, out } = applyChoice(ch);
   if (ref) {
     learnHabit(ref, ch);
+    if (typeof memNote === 'function') memNote(ref, before);     // NPC ghi nhớ chuyện đáng nhớ (thế giới sống phase 4)
     const daily = ['meal','bedtime','activity'].includes(ref.id);
     const quiet = ['wake','dayReport','ffReport','monthReport','hangout_pick','plan','cut'].includes(ref.id) || (out.silent && !daily && S.money === before.money);
     if (!out.go && !quiet)
