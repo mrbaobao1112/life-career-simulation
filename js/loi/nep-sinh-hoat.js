@@ -90,6 +90,7 @@ function feedTime(ref){
   if (typeof ROAM_NOW === 'number' && !(ref && ref.id === 'bedtime')) return clock(ROAM_NOW);   // việc làm trong thế giới tự do: ghi đúng giờ trên đồng hồ
   if (ref && ref.id === 'wake') return clock(S.am ? S.am.wake / 60 : alarmFor(S.day));
   if (ref && ref.id === 'bedtime') return clock(S.bedHour || 23);
+  if (typeof WORLD !== 'undefined' && WORLD && typeof WORLD.t === 'number') return clock(WORLD.t / 60);   // đang trong thế giới (chọn từ danh sách, xong trò chơi nhỏ…): vẫn ghi giờ trên đồng hồ
   return SLOT_INFO[S.slot][1];
 }
 function feedAdd(ref, icon, text, money){

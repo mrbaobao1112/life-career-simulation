@@ -53,7 +53,8 @@ function phoEntries(ref, sc, o){
     if (!want) return;
     const poor = ch.cost && S.money < ch.cost;
     if (o.kind === 'lap') { if (!WORLD || !WORLD.lap) out.push({ icon:'🏃', label:'Bắt đầu chạy một vòng hồ', run:hoStart }); return; }
-    out.push({ icon:ch.icon, label:ch.short || ch.label, cost:ch.cost, i, off:poor || ch.disabled, why:poor ? 'Không đủ tiền' : '' });
+    const solo = PHO_PARTNER[ch.actId] && phoSolo(PHO_PARTNER[ch.actId]);   // người đi cùng không có ở đây: làm một mình
+    out.push({ icon:ch.icon, label:solo ? PHO_SOLO_LABEL[ch.actId] : ch.short || ch.label, cost:ch.cost, i, off:poor || ch.disabled, why:poor ? 'Không đủ tiền' : '' });
   });
   if (o.kind === 'minor' && PHO_MINOR[u.minor]) out.push({ ...PHO_MINOR[u.minor](), minor:true });
   return out;
@@ -64,19 +65,30 @@ function phoIdle(ref, o){
   if (o.kind === 'lap') return '🏃 Buổi này không chạy được';
   return `${o.icon} ${o.name}`;
 }
+// Hết buổi khi đang ở ngoài: kết quả là đi dạo phố (không phải việc ở nhà như xem phim)
+const DAO_PHO = {
+  MOOD:2,                    // ra ngoài hít thở, ngắm phố: tinh thần nhích nhẹ
+  ENERGY:-2,                 // đi bộ lòng vòng: hơi mỏi chân
+};
 function phoTimeout(ref, sc){
-  const r = roamTimeoutChoice(ref, sc);
-  if (ref.id === 'activity') r.text = 'Lang thang ngoài phố, buổi này trôi qua lúc nào không hay.';
-  return r;
+  if (ref.id !== 'activity') return roamTimeoutChoice(ref, sc);
+  return { ch:{ icon:'🚶', label:'Dạo phố', fx:() => { S.mood += DAO_PHO.MOOD; S.energy += DAO_PHO.ENERGY;
+    return pick(['Bạn lang thang ngoài phố, ngắm người qua lại. Buổi này trôi qua lúc nào không hay.', 'Đi hết phố này sang phố khác, chẳng mua gì, chẳng gặp ai. Nhưng đầu óc nhẹ hơn hẳn.']); } }, text:'' };
 }
 // Người trong quán: người hẹn sẵn (Linh ở quán cà phê, Tùng ở trà đá) → đúng lựa chọn đi chơi; người hẹn qua “Rủ ai đó đi chơi” → cuộc trò chuyện cũ
+// Việc cần người này (cà phê với Linh, trà đá với Tùng): thực đơn khi đứng cạnh họ
+const phoNeedEntries = n => (ref, sc) => { const i = sc.choices.findIndex(c => c.actId === n.need); return i < 0 ? [] : [{ icon:sc.choices[i].icon, label:sc.choices[i].short || sc.choices[i].label, i, cost:sc.choices[i].cost, off:sc.choices[i].cost && S.money < sc.choices[i].cost, why:'Không đủ tiền', say:pick(['Đợi lâu chưa?', 'Xin lỗi, tắc đường quá!']), reply:pick(['Mới đến thôi.', 'Ngồi đi!']) }, { icon:'💬', label:'Bắt chuyện', talk:true }]; };
+// Người đi cùng của từng việc: vắng mặt thì vẫn làm được, một mình (xem phoSolo)
+const PHO_PARTNER = { cafe:'linh', trada:'tung' }, PHO_SOLO_LABEL = { cafe:'Ngồi cà phê một mình', trada:'Ngồi trà đá một mình' };
+const phoSolo = who => !!(typeof WORLD !== 'undefined' && WORLD && WORLD.cityId && !WORLD.dead && !WORLD.npcs.some(a => a.who === who && !a.gone));
 function roomNpcs(W, api, id){
   const R = PHO_ROOMS[id]; if (!R || !R.npcs) return;
   R.npcs().forEach((n, k) => {
     if (n.need && !W.sc.choices.some(c => c.actId === n.need)) return;
+    if (n.need && typeof CITY_DAY !== 'undefined' && CITY_DAY[n.who]) return;     // Tùng, Linh: có mặt theo lịch của họ (thanh-pho.js), không ngồi sẵn
     if (S.meet && S.meet.d === S.day && n.who === S.meet.who) return;
     const a = api.npc(n.who, n.x, n.y, n.act, n.left, { id:n.who + '_' + k, look:n.look, label:n.label });
-    if (n.need) a.entries = (ref, sc) => { const i = sc.choices.findIndex(c => c.actId === n.need); return i < 0 ? [] : [{ icon:sc.choices[i].icon, label:sc.choices[i].short || sc.choices[i].label, i, cost:sc.choices[i].cost, off:sc.choices[i].cost && S.money < sc.choices[i].cost, why:'Không đủ tiền', say:pick(['Đợi lâu chưa?', 'Xin lỗi, tắc đường quá!']), reply:pick(['Mới đến thôi.', 'Ngồi đi!']) }, { icon:'💬', label:'Bắt chuyện', talk:true }]; };
+    if (n.need) a.entries = phoNeedEntries(n);
     else if (n.who === 'p') a.entries = () => [{ icon:'👋', label:'Chào', minor:true, greet:true, min:0 }];
   });
   const m = S.meet;

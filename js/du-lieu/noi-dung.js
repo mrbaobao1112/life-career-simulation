@@ -68,12 +68,14 @@ const ACTS = [
       return 'Bạn lưu 6 tin tuyển dụng. Bốn tin yêu cầu “3 năm kinh nghiệm cho vị trí Fresher”. Hai tin còn lại có vẻ khả thi.'; } },
   { id:'cafe', icon:'☕', label:'Cà phê với Linh', slots:['afternoon','evening'], cost:45000,
     hints:['🙂 +8','🤝 +Linh'],
-    fx:()=>{ rel('linh',7); S.mood += 8; S.soft += 1; S.energy -= 4;
+    fx:()=>{ const solo = typeof phoSolo === 'function' && phoSolo('linh'); if (!solo) rel('linh',7); S.mood += 8; S.soft += 1; S.energy -= 4;
+      if (solo) return pick(['Linh không có ở đây. Bạn ngồi một mình bên cửa sổ tầng 3, nhìn xuống phố, ly cà phê trứng nguội dần.', 'Một mình một bàn, một ly cà phê trứng. Thỉnh thoảng yên tĩnh cũng là một kiểu nghỉ ngơi.']);
       return pick(['Linh kể về khóa học mới với ánh mắt rực lửa. Bạn được truyền cảm hứng, kèm một chút áp lực.',
                    'Hai đứa ngồi quán cà phê trứng trên tầng 3, nhìn xuống phố. Linh bảo: “Cứ từ từ, ai cũng mất phương hướng một thời gian.”']); } },
   { id:'trada', icon:'🧊', label:'Trà đá vỉa hè với Tùng', slots:['afternoon','evening'], cost:10000,
     hints:['🙂 +7','🤝 +Tùng'],
-    fx:()=>{ rel('tung',6); S.mood += 7; S.soft += 1;
+    fx:()=>{ const solo = typeof phoSolo === 'function' && phoSolo('tung'); if (!solo) rel('tung',6); S.mood += 7; S.soft += 1;
+      if (solo) return pick(['Tùng không ra. Bạn ngồi ghế nhựa một mình, nghe bác bán trà đá kể chuyện giá xăng.', 'Một cốc trà đá, một đĩa hướng dương, ngồi ngắm người qua lại. Cũng vui.']);
       return pick(['Hai đứa ngồi ghế nhựa xanh, bàn chuyện bóng đá, thế sự, và việc tại sao trà đá lên 5.000đ.',
                    'Tùng kể kế hoạch làm giàu thứ 17 của cậu ấy. Kế hoạch lần này liên quan đến nuôi ốc. Bạn cười đến đau bụng.']); } },
   { id:'game', icon:'🎮', label:'Chơi game', slots:['morning','afternoon','evening'],

@@ -126,7 +126,7 @@ Mỗi nơi quan sát 10 giờ game (5 phút thật).
 | Cơm bụi | 5 | 23/24 | 0 | có, ở cửa (cách đo cũ, chưa đo lại) | 0 |
 | Thư viện | 5 | 21/21 | **Linh hiện ra/biến mất tại chỗ ngồi** (4 lần) | ít | 0 |
 | Trung tâm thương mại | 7 | 37/39 | **Tùng hiện ra/biến mất tại quầy** | 5,2 giây ở cửa (đo lại) | 0 |
-| Bến xe | 3 | 26/27 | **27 lần biến mất giữa sân chờ** (lên xe nhưng không có xe) | ít | 0 |
+| Bến xe | 3 | 26/27 | Khách khuất ở cửa xe khách đang đỗ (x = 360), tức là lên xe: hợp lý (xem P2-09, đã rút lại) | ít | 0 |
 | Hồ | 9 | 23/23 | 0 | có, ở ghế đá (cách đo cũ, chưa đo lại) | 0 |
 | Phố ngày thường | 9 | 78/77 | **26 hiện ra, 6–28 biến mất** ngay giữa màn hình | 2,6 giây | 11–12 (11–12) |
 | Phố cuối tuần | 9 | 110/111 | **38 hiện ra, 41 biến mất** giữa màn hình | 2,6 giây | 16 (10) |
@@ -242,10 +242,8 @@ Không tìm thấy lỗi **P0** (mất dữ liệu, không chơi được) hay *
 - Ghi chú: một phần do lịch (bố đi làm, mẹ ở nhà một mình). Nhưng lúc hai người cùng ở nhà (ăn trưa, xem tin buổi tối) cũng gần như không nói gì, nên ngôi nhà có cảm giác im lặng.
 - Hướng sửa: cho bữa ăn chung có hội thoại; mẹ nói với người chơi khi người chơi ở gần.
 
-**P2-09. Bến xe: hành khách biến mất ở giữa sân chờ**
-- File: `js/song/dan-so.js:42` (bước `board`), `:100-102`
-- Thực tế: 27 lần biến mất tại x = 360 trong 10 giờ game; không có xe khách nào đến.
-- Hướng sửa: có xe khách đỗ hoặc chạy qua, hoặc cho khách đi ra mép cảnh.
+**P2-09. ~~Bến xe: hành khách biến mất ở giữa sân chờ~~ — RÚT LẠI (kiểm tra lại ngày 19/11)**
+- Cảnh bến xe có vẽ sẵn một chiếc xe khách đỗ ở x = 330 (`PFURN.bus(330)`). Khách đi đến cửa xe (x = 360) rồi khuất là đang lên xe, đúng như mong đợi. Nhận định ban đầu là sai.
 
 **P2-10. Xe máy chạy vào tận cuối ngõ nhà**
 - File: `js/song/pho-song.js:67` (`from`/`to` là 10 và `PHO.W - 10`, tức cả ngõ)
@@ -383,7 +381,7 @@ Không tìm thấy lỗi **P0** (mất dữ liệu, không chơi được) hay *
 
 ## 7. Những tính năng hoạt động nhưng chưa tự nhiên
 
-- **Người đi đường hiện ra và biến mất ngay giữa màn hình** ở chỗ giáp ngõ và phố (P2-02); Tùng và Linh bật hiện ngay tại chỗ ngồi hoặc quầy (P2-04); khách bến xe biến mất giữa sân (P2-09).
+- **Người đi đường hiện ra và biến mất ngay giữa màn hình** ở chỗ giáp ngõ và phố (P2-02); Tùng và Linh bật hiện ngay tại chỗ ngồi hoặc quầy (P2-04).
 - **Tùng và Linh ngồi ở quán trái lịch, bất động 10 tiếng** (P2-03).
 - **Nhân viên quán không phục vụ, đứng yên cả ngày** (P2-07).
 - **Hội thoại khách lặp và lệch ngữ cảnh** (P2-06). Câu chào chiếm hơn một nửa số câu ở văn phòng.
@@ -400,7 +398,6 @@ Không tìm thấy lỗi **P0** (mất dữ liệu, không chơi được) hay *
 Không có chức năng đã hứa nào bị hỏng hẳn. Những phần **chưa có** hoặc **chưa hiện cho người chơi**:
 - **Trí nhớ NPC trong “Bắt chuyện” và trong cảnh chữ:** chưa có (P2-05). Người chơi chế độ bấm nút không thấy trí nhớ.
 - **Nhân viên phục vụ khách:** chưa có (P2-07).
-- **Xe khách ở bến xe:** chưa có, khách “lên xe” bằng cách biến mất (P2-09).
 - **Tham gia vào cuộc sống của NPC** (ngồi cùng bàn khách, nghe chuyện, xen vào tranh luận): chưa có.
 - **Chưa kiểm tra được:** từng trò chơi nhỏ chơi bằng tay (bot chọn “Để nhân vật tự làm”, chỉ có kiểm thử tự động); thiết bị thật; mạng thật; trình đọc màn hình.
 
@@ -409,7 +406,7 @@ Không có chức năng đã hứa nào bị hỏng hẳn. Những phần **chư
 **Bắt buộc sửa trước v18** (nhỏ, ít rủi ro, ảnh hưởng lớn đến cảm giác “thế giới thật”):
 1. **P2-03** Tùng và Linh ở quán trái lịch: cho lịch phase 3 quyết định họ có mặt hay không.
 2. **P2-01** NPC đứng chồng ở pantry: giữ chỗ trước khi đi.
-3. **P2-02, P2-04, P2-09** hiện ra/biến mất giữa màn hình: đi vào từ cửa hoặc từ ngoài khung nhìn.
+3. **P2-02, P2-04** hiện ra/biến mất giữa màn hình: đi vào từ cửa hoặc từ ngoài khung nhìn.
 4. **P2-11** hết buổi ở ngoài phố: kết quả “đi dạo” riêng.
 5. **P3-01, P3-02** giờ trong nhật ký và hai đồng hồ: lấy đúng giờ thế giới.
 6. **P3-09** bài kiểm thử phụ thuộc thời gian chờ: chuyển sang chờ theo điều kiện, để kiểm thử đáng tin.
@@ -446,7 +443,7 @@ Không có chức năng đã hứa nào bị hỏng hẳn. Những phần **chư
 
 ## Phụ lục: công cụ dùng trong lần kiểm tra
 
-Các script quan sát, chơi thử, đo hiệu năng, bản lưu cũ **không nằm trong repo**: chúng chạy ngoài game và không thay đổi mã nguồn. Có thể đưa vào `tests/audit/` nếu muốn chạy lại định kỳ.
+Từ v17.4, các script quan sát, chơi thử, đo hiệu năng, bản lưu cũ nằm ở `tests/audit/` (xem `tests/audit/README.md`). Chúng chạy ngoài game và không thay đổi mã nguồn.
 
 ## Kết luận
 
@@ -459,9 +456,15 @@ Các script quan sát, chơi thử, đo hiệu năng, bản lưu cũ **không n�
 **Những vấn đề bắt buộc phải sửa trước v18:**
 1. P2-03 Tùng/Linh ở quán trái với lịch của họ.
 2. P2-01 NPC đứng chồng ở pantry.
-3. P2-02, P2-04, P2-09 người hiện ra/biến mất giữa màn hình.
+3. P2-02, P2-04 người hiện ra/biến mất giữa màn hình.
 4. P2-11 hết buổi ở ngoài phố cho kết quả “xem phim”.
 5. P3-01, P3-02 giờ trong nhật ký và hai đồng hồ lệch nhau.
 6. P3-09 bài kiểm thử phụ thuộc thời gian chờ.
 
 Chưa sửa bất kỳ dòng mã nguồn nào trong lần kiểm tra này. Chờ xác nhận trước khi sửa.
+
+---
+
+## Cập nhật sau kiểm tra: v17.4
+
+6 mục bắt buộc đã sửa trong v17.4 (xem `CHANGELOG.md`): P2-01, P2-02, P2-03, P2-04, P2-11, P3-01, P3-02, P3-09. P2-09 đã rút lại. Các mục còn lại giữ nguyên để làm sau.

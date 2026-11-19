@@ -18,9 +18,9 @@ async function open(browser, bg = 'tro', opts = {}){
   return page;
 }
 // Cảnh chiều rảnh ngày 6 (thứ Bảy), đứng ở nơi `at`
-const scene = (page, at = 'home', ref = { id:'activity', arg:'afternoon' }, slot = 'afternoon') => page.evaluate(([at, ref, slot]) => {
-  S.day = 6; S.slot = slot; S.roam = null; S.roamPos = {}; S.where = at === 'home' ? null : { d:6, slot, at, bike:null }; S.queue = [ref]; S.cur = null; advance();
-}, [at, ref, slot]).then(() => page.waitForTimeout(400));
+const scene = (page, at = 'home', ref = { id:'activity', arg:'afternoon' }, slot = 'afternoon', h) => page.evaluate(([at, ref, slot, h]) => {
+  S.day = 6; S.slot = slot; S.roam = h ? { d:6, t:h * 60 } : null; S.roamPos = {}; S.where = at === 'home' ? null : { d:6, slot, at, bike:null }; S.queue = [ref]; S.cur = null; advance();
+}, [at, ref, slot, h]).then(() => page.waitForTimeout(400));
 const W = page => page.evaluate(() => ({ ...ROAM_DEBUG(), place:document.querySelector('#world') && document.querySelector('#world').dataset.place, riding:!!(WORLD && WORLD.riding) }));
 const at = (page, fn) => page.evaluate(fn).then(() => page.waitForTimeout(350));
 const menu = page => page.keyboard.press('KeyE').then(() => page.waitForTimeout(300)).then(() => page.$$eval('.w-menu .w-act', b => b.map(x => x.textContent.trim())));
@@ -42,11 +42,12 @@ const menu = page => page.keyboard.press('KeyE').then(() => page.waitForTimeout(
   }
 
   // 2. Việc ở từng nơi cho chỉ số giống hệt bấm nút cũ
-  const SAME = [['in:cafe', 'cafe', 'linh'], ['in:trada', 'trada', 'tung'], ['in:mall', 'shop', 'cashier'], ['in:lib', 'study', 'desk'], ['in:lake', 'run', 'lap'], ['in:bus', 'trip_home', 'ticket', 'morning']];
-  for (const [place, act, where, slot = 'afternoon'] of SAME) {
+  const SAME = [['in:cafe', 'cafe', 'linh', 'afternoon', 15], ['in:trada', 'trada', 'tung', 'afternoon', 16],   // giờ Linh, Tùng có mặt theo lịch (thứ Bảy)
+                ['in:mall', 'shop', 'cashier'], ['in:lib', 'study', 'desk'], ['in:lake', 'run', 'lap'], ['in:bus', 'trip_home', 'ticket', 'morning']];
+  for (const [place, act, where, slot = 'afternoon', h] of SAME) {
     const run = async world => {
       const page = await open(browser, 'tro'); await page.evaluate(() => { Math.random = () => .4; });
-      await scene(page, world ? place : 'home', { id:'activity', arg:slot }, slot);
+      await scene(page, world ? place : 'home', { id:'activity', arg:slot }, slot, world ? h : undefined);
       if (world) {
         if (where === 'lap') {
           await at(page, () => { WORLD.me.x = 110; WORLD.me.y = 172; }); await menu(page); await page.keyboard.press('Digit1'); await page.waitForTimeout(200);
@@ -103,24 +104,35 @@ const menu = page => page.keyboard.press('KeyE').then(() => page.waitForTimeout(
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
   // 5. Chuyện bất ngờ: gặp người quen, hàng rong, mưa, tắc đường; mỗi loại một lần mỗi ngày
+  //    (chờ theo điều kiện thay vì chờ một số mili giây cố định, để máy bận vẫn kiểm đúng)
   { const page = await open(browser, 'tro'); await page.evaluate(() => { S.flags.pho = null; }); await scene(page, 'street');
-    const force = k => page.evaluate(k => { WORLD.gap = { kind:k, at:0, walked:0, lx:WORLD.me.x }; WORLD.me.x += 2; }, k).then(() => page.waitForTimeout(250));
+    const until = (fn, arg, ms = 15000) => page.waitForFunction(fn, arg, { timeout:ms }).then(() => true, () => false);
+    const force = k => page.evaluate(k => { WORLD.gap = { kind:k, at:0, walked:0, lx:WORLD.me.x }; WORLD.me.x += 2; }, k).then(() => until(k => gapToday()[k], k, 5000));
     await at(page, () => { WORLD.me.x = 900; WORLD.me.y = 190; });
-    const r0 = await page.evaluate(() => JSON.stringify(S.rel)); await force('met'); await page.waitForTimeout(4500);
+    const r0 = await page.evaluate(() => JSON.stringify(S.rel)); await force('met');
+    await until(() => { const a = WORLD.npcs.find(n => /^met_/.test(n.id)); return a && a.tx == null && !WORLD.busy; });
     const met = await page.evaluate(() => WORLD.npcs.find(a => /^met_/.test(a.id)));
     check('Gặp người quen: một người bạn đi tới chào', !!met);
     await page.evaluate(() => { const a = WORLD.npcs.find(n => /^met_/.test(n.id)); WORLD.me.x = a.x - 26; WORLD.me.y = a.y; }); await page.waitForTimeout(300);
-    await menu(page); await page.keyboard.press('Digit1'); await page.waitForTimeout(6000);
+    await menu(page); await page.keyboard.press('Digit1');
+    await until(r0 => JSON.stringify(S.rel) !== r0 && !WORLD.busy, r0, 20000);
     check('Bắt chuyện với người quen: quan hệ tăng (theo giới hạn mỗi ngày)', await page.evaluate(() => JSON.stringify(S.rel)) !== r0);
-    const m0 = await page.evaluate(() => ({ money:S.money, mood:S.mood })); await force('vendor'); await page.waitForTimeout(400);
+    await until(() => !WORLD.npcs.some(n => /^met_/.test(n.id) && !n.gone && Math.abs(n.x - WORLD.me.x) < 80), null, 20000);   // người quen đi khỏi rồi mới gọi hàng rong
+    const m0 = await page.evaluate(() => ({ money:S.money, mood:S.mood })); await force('vendor');
+    await until(() => WORLD.npcs.some(n => n.id === 'vendor'));
     await page.evaluate(() => { const a = WORLD.npcs.find(n => n.id === 'vendor'); WORLD.me.x = a.x - 26; WORLD.me.y = a.y; }); await page.waitForTimeout(300);
-    const vm = await menu(page); await page.keyboard.press('Digit1'); await page.waitForTimeout(1300);
+    const vm = await menu(page); await page.keyboard.press('Digit1');
+    await until(m0 => S.money !== m0, m0.money);
     const m1 = await page.evaluate(() => ({ money:S.money, mood:S.mood }));
     check('Hàng rong: mua bánh mì −15.000đ, tinh thần +2', m0.money - m1.money === 15000 && m1.mood === Math.min(100, m0.mood + 2), vm.join(' | '));
-    await at(page, () => { WORLD.me.x = 1235; WORLD.me.y = 200; }); await force('rain'); await page.evaluate(() => { WORLD.wetT = 9.95; }); await page.waitForTimeout(600);
+    await at(page, () => { WORLD.me.x = 1235; WORLD.me.y = 200; }); await force('rain');
+    await until(() => WORLD.wetT !== undefined && WORLD.wetT !== null && !!document.querySelector('.w-rain'));
+    await page.evaluate(() => { WORLD.wetT = 9.95; }); await until(mood => S.mood !== mood, m1.mood, 8000);
     const m2 = await page.evaluate(() => ({ mood:S.mood, rain:S.flags.rainDay === S.day, svg:!!document.querySelector('.w-rain') }));
     check('Mưa bất chợt: phố có mưa; không trú kịp thì tinh thần −2', m2.rain && m2.svg && m2.mood === m1.mood - 2, JSON.stringify(m2));
-    await page.evaluate(() => { S.flags.pho.jam = false; WORLD.riding = true; }); const t0 = (await W(page)).t; await force('jam'); await page.waitForTimeout(1800);
+    await until(() => !WORLD.busy, null, 8000);
+    await page.evaluate(() => { S.flags.pho.jam = false; WORLD.riding = true; }); const t0 = (await W(page)).t; await force('jam');
+    await until(t0 => WORLD.t - t0 >= 10, t0, 15000);
     check('Tắc đường khi đi xe: mất khoảng 10 phút', (await W(page)).t - t0 >= 10, `${((await W(page)).t - t0).toFixed(1)} phút`);
     check('Mỗi loại chuyện chỉ một lần mỗi ngày', await page.evaluate(() => { const g = gapToday(); return g.met && g.vendor && g.rain && g.jam; }));
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }

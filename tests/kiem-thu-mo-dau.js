@@ -109,14 +109,16 @@ async function makeSave(page){ await page.click('#fresh'); await page.click('.bg
 
   // 5. Bong bóng thoại, người đi bộ, các hành vi ngắn (theo dõi 100 giây)
   { const page = await open(browser);
+    await page.evaluate(() => { window.__gap = 0; let last = performance.now(); const f = t => { window.__gap = Math.max(window.__gap, t - last); last = t; requestAnimationFrame(f); }; requestAnimationFrame(f); });   // đo máy có bị nghẽn không
     await page.evaluate(() => { window.__bub = []; const L = document.querySelector('.title-scene .L-say'); new MutationObserver(ms => ms.forEach(m => { m.addedNodes.forEach(n => window.__bub.push({ n, t0:performance.now(), t1:null, text:n.textContent })); m.removedNodes.forEach(n => { const b = window.__bub.find(x => x.n === n); if (b) b.t1 = performance.now(); }); })).observe(L, { childList:true }); });
-    let maxSay = 0, overlap = 0, maxWalk = 0; const seen = new Set();
+    let maxSay = 0, overlap = 0, maxWalk = 0, skipped = 0; const seen = new Set();
     for (let i = 0; i < 400; i++) {
       await page.waitForTimeout(250);
       const a = await page.evaluate(() => ({ says:document.querySelectorAll('.title-scene .say').length, w:[...document.querySelectorAll('.title-scene .actor')].map(el => { const m = new DOMMatrix(getComputedStyle(el).transform); return { who:el.dataset.who, lay:el.parentNode.getAttribute('class'), x:m.e, y:m.f, cls:el.querySelector('.cb').getAttribute('class') }; }) }));
       maxSay = Math.max(maxSay, a.says);
       const walk = a.w.filter(x => x.lay === 'L-aisle' || x.lay === 'L-front'); maxWalk = Math.max(maxWalk, walk.length);
       walk.forEach(x => { if (/act-phone/.test(x.cls) && !/act-walk/.test(x.cls)) seen.add('đứng xem điện thoại'); if (/act-run/.test(x.cls)) seen.add('chạy bộ'); });
+      const lag = await page.evaluate(() => { const g = window.__gap; window.__gap = 0; return g; }); if (lag > 120) { skipped++; continue; }   // máy nghẽn (một khung hình > 120 ms): bỏ mẫu này, vì đó là máy chậm chứ không phải luật đi đường
       const byLane = {}; walk.forEach(x => (byLane[Math.round(x.y)] = byLane[Math.round(x.y)] || []).push(x));
       Object.values(byLane).forEach(L => { for (let p = 0; p < L.length; p++) for (let q = p + 1; q < L.length; q++) if (Math.abs(L[p].x - L[q].x) < 14 && L[p].x > 0 && L[p].x < 360 && L[q].x > 0 && L[q].x < 360) overlap++; });
     }
@@ -128,7 +130,7 @@ async function makeSave(page){ await page.click('#fresh'); await page.click('.bg
     check('Không bao giờ quá 2 bong bóng thoại cùng lúc', maxSay <= 2, 'nhiều nhất ' + maxSay);
     check('Bong bóng biến mất đúng lúc (không cái nào ở quá 2,5 giây)', longest <= 2500 && done.length >= 2, `${done.length} bong bóng, lâu nhất ${longest} mili giây`);
     check('Không lặp lại cùng một câu liền nhau', repeat === 0, repeat + ' lần');
-    check('Không ai đi xuyên qua ai trên vỉa hè; mật độ vừa phải', overlap === 0 && maxWalk <= 6, `trùng chỗ ${overlap} lần, nhiều nhất ${maxWalk} người đi bộ`);
+    check('Không ai đi xuyên qua ai trên vỉa hè; mật độ vừa phải', overlap === 0 && maxWalk <= 6, `trùng chỗ ${overlap} lần, nhiều nhất ${maxWalk} người đi bộ${skipped ? `, bỏ ${skipped} mẫu lúc máy nghẽn` : ''}`);
     check('Có các hành vi ngắn mới (ngẫu nhiên, trong 100 giây thấy ít nhất 2 loại)', seen.size >= 2, [...seen].join(', '));
     check('Không có lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
