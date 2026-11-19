@@ -9,7 +9,7 @@ const CITY_DAY = {
   tung:{ weekday:[[13.5, 21.5, 'in:mall', { x:250, y:160, act:'', sign:'🏷️', label:'Tùng (đang làm ca)' }]],
          weekend:[[15.2, 18.2, 'in:trada', { x:262, y:160, act:'act-talk', sign:'🧊', left:true }]] },
   linh:{ weekday:[[8.3, 11.5, 'in:lib', { x:180, y:164, act:'act-read', sign:'📚' }], [13.5, 17, 'in:lib', { x:180, y:164, act:'act-read', sign:'📚' }], [19, 21.5, 'in:cafe', { x:300, y:156, act:'act-sip', sign:'☕', left:true }]],
-         weekend:[[9, 11.5, 'in:cafe', { x:300, y:156, act:'act-sip', sign:'☕', left:true }]] },
+         weekend:[[9, 11.5, 'in:cafe', { x:300, y:156, act:'act-sip', sign:'☕', left:true }], [14.5, 17, 'in:cafe', { x:300, y:156, act:'act-sip', sign:'☕', left:true }]] },
 };
 const CITY_LINE = {
   tung:{ 'in:mall':['Ơ, mày đi mua gì đấy?', 'Đang ca, tí về nói chuyện nhé!'], 'in:trada':['Ngồi làm cốc trà đá không?', 'Cuối tuần sướng thật!'] },
@@ -26,14 +26,22 @@ function cityMount(W, api, id){
     if (W.npcs.some(a => a.who === who)) return;                               // đã có mặt (hẹn gặp / hoạt động cần người này)
     const p = CITY_DAY[who][songWeekend() ? 'weekend' : 'weekday'].find(s => s[2] === id); if (!p) return;
     const o = p[3], a = api.npc(who, o.x, o.y, o.act, !!o.left, { id:'city_' + who, label:o.label });
-    a.city = who; a.entries = () => [{ icon:'👋', label:'Chào', minor:true, greet:true, min:0 }];
+    a.city = who; a.post = { x:o.x, y:o.y, left:!!o.left };
+    const need = (PHO_ROOMS[id] && PHO_ROOMS[id].npcs ? PHO_ROOMS[id].npcs() : []).find(n => n.who === who && n.need);
+    a.entries = need && W.sc.choices.some(c => c.actId === need.need) ? phoNeedEntries(need) : () => [{ icon:'👋', label:'Chào', minor:true, greet:true, min:0 }];
     W.city.push(a); cityShow(W, api, a, true);
   });
 }
-function cityShow(W, api, a, first){
+// Đến giờ thì đi từ cửa vào chỗ; hết giờ thì đứng dậy đi ra cửa (lúc mới vào cảnh thì đã ở sẵn chỗ, hoặc đã đi rồi)
+async function cityShow(W, api, a, first){
   const at = cityAt(a.city, W.t), on = !!at && at.place === W.cityId;
-  if (!first && a.gone === !on) return;
-  songHide(a, !on); if (on) { api.C.act(a, at.act); songSign(a, at.sign); }
+  if (a.cityBusy || (!first && a.gone === !on)) return;
+  const exit = (W.H.objs.find(o => o.id === 'exit') || { spot:{ x:40, y:166 } }).spot;
+  if (first || api.C.still) { if (on) api.put(a, a.post.x, a.post.y); songHide(a, !on); if (on) { api.C.face(a, a.post.left); api.C.act(a, at.act); songSign(a, at.sign); } return; }
+  a.cityBusy = true;
+  if (on) { songAppear(api, a, exit.x, exit.y); api.C.act(a, ''); if (await songWalk(W, api, a, a.post)) { api.put(a, a.post.x, a.post.y); api.C.face(a, a.post.left); api.C.act(a, at.act); songSign(a, at.sign); } }
+  else { songSign(a, ''); api.C.act(a, ''); if (await songWalk(W, api, a, exit)) songHide(a, true); }
+  a.cityBusy = false;
 }
 function cityFrame(W, api){
   for (const a of W.city || []) {

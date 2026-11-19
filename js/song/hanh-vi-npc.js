@@ -70,6 +70,9 @@ async function songWalk(W, api, a, p){
   return api.alive();
 }
 function songHide(a, on){ a.gone = !!on; a.el.classList.toggle('gone', !!on); if (on) songSign(a, ''); }
+// Hiện ra ở (x, y) ngay lập tức rồi mới đi: đặt chỗ khi còn ẩn, ép trình duyệt cập nhật vị trí, rồi mới hiện
+// (nếu đặt chỗ và bắt đầu đi trong cùng một lượt, trình duyệt chỉ thấy điểm đích nên nhân vật trượt từ chỗ cũ hoặc bật hiện tại đích)
+function songAppear(api, a, x, y){ a.rot = 0; a.s = roamScale(y); api.put(a, x, y); a.el.classList.add('snap'); void a.el.getBoundingClientRect(); songHide(a, false); }
 // Vào chỗ và làm động tác của việc này
 function songSettle(W, api, a, def, p){
   const C = api.C;
@@ -89,8 +92,9 @@ async function songGo(W, api, a, now, snap){
       if (door && !snap && !await songWalk(W, api, a, door)) return; songHide(a, true); }
     ai.until = Infinity; ai.busy = false; return;
   }
-  if (a.gone) { songHide(a, false); const door = songSpot(W, a, 'door'); if (door && !snap) { a.s = roamScale(door.y); api.put(a, door.x, door.y); } }
+  if (a.gone) { const door = songSpot(W, a, 'door'); if (door && !snap) songAppear(api, a, door.x, door.y); else songHide(a, false); }
   const p = seatFor(W, a, songSpot(W, a, def.spot)) || { x:a.x, y:a.y };
+  if (!def.out && !def.hide) ai.seat = { x:p.x, y:p.y };                     // giữ chỗ trước khi đi
   if (snap) { a.s = roamScale(p.y); api.put(a, p.x, p.y); } else if (!await songWalk(W, api, a, p)) return;
   songSettle(W, api, a, def, p);
   const r = songRng('beat' + a.who + Math.round(W.t));
@@ -109,7 +113,7 @@ async function songForceBeat(W, api, a, B){
   const ai = a.ai, r = songRng('fb' + a.who + Math.round(W.t)); ai.busy = true; ai.with = null;
   const keep = { act:ai.act }, back = { x:a.x, y:a.y };
   let p = B.spot ? seatFor(W, a, songSpot(W, a, B.spot)) : B.step ? { x:a.x + (r() < .5 ? -B.step : B.step), y:a.y } : null;
-  if (p) { a.rot = 0; if (!await songWalk(W, api, a, p)) return; api.C.face(a, !!p.face); ai.seat = { x:p.x, y:p.y }; }
+  if (p) { a.rot = 0; ai.seat = { x:p.x, y:p.y }; if (!await songWalk(W, api, a, p)) return; api.C.face(a, !!p.face); }   // giữ chỗ ngay lúc chọn, để người được gọi cùng lúc không chọn trùng
   api.C.act(a, B.act); songSign(a, B.sign);
   ai.beatEnd = W.t + B.dur[0] + r() * (B.dur[1] - B.dur[0]); ai.beatBack = p ? keep : null; ai.beatPos = back; ai.busy = false; ai.inBeat = true;
 }

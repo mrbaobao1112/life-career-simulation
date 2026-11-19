@@ -1,6 +1,44 @@
 # Lịch sử phiên bản
 
-## v17.3: Thế giới sống – Phase 4: NPC có trí nhớ, nét mặt và hoàn thiện (hiện tại)
+## v17.4: Sửa các lỗi bắt buộc sau lần kiểm tra toàn diện (hiện tại)
+Sửa 6 nhóm lỗi trong `docs/AUDIT_REPORT_v17.3.md`. Không thêm tính năng lớn. Không đổi tài chính, sức khỏe, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu.
+
+**1. Tùng và Linh theo đúng lịch của họ (P2-03):**
+- Trước đây, cứ có hoạt động “Cà phê với Linh” hay “Trà đá với Tùng” là họ ngồi sẵn ở quán, bất động 10 tiếng, kể cả lúc lịch nói họ đang đi làm hay đi học.
+- Giờ họ chỉ có mặt khi lịch nói họ ở đó (hoặc khi đã hẹn qua “Rủ ai đó đi chơi”). Đứng cạnh họ vẫn rủ được như cũ.
+- Họ không có ở đó thì vẫn làm được **một mình**: thực đơn hiện “Ngồi cà phê một mình” / “Ngồi trà đá một mình”, vẫn trả tiền, tinh thần vẫn tăng như cũ, nhưng quan hệ với Linh/Tùng không đổi (vì họ không có ở đó). Câu kết quả riêng cho lúc ngồi một mình.
+- Lịch Linh thêm chiều thứ Bảy, Chủ nhật 14:30–17:00 ở quán cà phê, để vẫn có lúc gặp Linh ở quán vào buổi chiều.
+
+**2. NPC không còn đứng chồng lên nhau ở pantry (P2-01):** chỗ đứng được giữ ngay lúc chọn, trước khi đi; người được gọi cùng lúc (chị Mai mang bánh, cùng đi lấy nước, sang bàn nhau) mỗi người một chỗ.
+
+**3. Không còn người hiện ra hay biến mất giữa màn hình (P2-02, P2-04):**
+- Người đi bộ trên phố đi vào và đi ra ở mép bản đồ (qua ngõ, hoặc cuối phố), hoặc bước ra từ cửa một quán. Trước đây họ bật hiện ở chỗ giáp ngõ và phố.
+- Tùng và Linh đến giờ thì đi từ cửa vào chỗ; hết giờ thì đứng dậy đi ra cửa rồi mới khuất. Trước đây họ bật hiện/tắt ngay tại chỗ ngồi.
+- Sửa gốc: khi một nhân vật được đặt chỗ rồi bắt đầu đi ngay trong cùng một lượt, trình duyệt chỉ thấy điểm đích nên nhân vật “trượt” từ chỗ cũ hoặc bật hiện tại đích. Thêm `songAppear` (đặt chỗ khi còn ẩn, cập nhật vị trí, rồi mới hiện); dùng cho người đi bộ, xe máy, người dắt chó, khách vào quán, đồng nghiệp và người nhà đi vào cửa, Tùng và Linh.
+
+**4. Hết buổi khi đang ở ngoài phố (P2-11):** kết quả là “dạo phố” (tinh thần +2, năng lượng −2, theo bảng `DAO_PHO`), không còn tự chọn “xem phim” như đang ở nhà.
+
+**5. Giờ hiển thị đúng (P3-01, P3-02):**
+- Nhật ký trong ngày ghi đúng giờ trên đồng hồ của thế giới, kể cả khi chọn từ “Danh sách lựa chọn” hoặc sau trò chơi nhỏ (trước đây ghi giờ đầu buổi, ví dụ “Chuẩn bị CV” lúc 07:00 dù làm lúc 10:33).
+- Giờ trên đầu trang chạy theo đồng hồ trong cảnh (trước đây đứng ở giờ đầu buổi, ví dụ “Trưa, 12:00” khi đồng hồ cảnh đã 13:30). Dùng vòng lặp sẵn có của thế giới, chỉ cập nhật khi đổi phút.
+
+**6. Kiểm thử đáng tin hơn khi máy bận (P3-09):**
+- `ra-pho`: phần chuyện bất ngờ chờ theo điều kiện (người quen đến nơi, quan hệ đổi, tiền đổi, mưa đến, đồng hồ chạy đủ) thay vì chờ số mili giây cố định.
+- `mo-dau`: bỏ các mẫu lấy lúc máy nghẽn (một khung hình quá 120 ms) khi đếm người đi bộ trùng chỗ.
+- `ra-pho`: bài “cà phê/trà đá cho chỉ số giống hệt bấm nút” vào quán đúng giờ Linh, Tùng có mặt.
+
+**Công cụ kiểm tra:** các script của lần kiểm tra v17.3 nằm ở `tests/audit/` (xem `tests/audit/README.md`). Bot chơi thử không còn giữ tham chiếu phần tử, nên số đo bộ nhớ khi chơi lâu không còn tăng giả.
+
+**Báo cáo:** rút lại lỗi P2-09. Bến xe có xe khách đỗ sẵn, khách khuất ở cửa xe là đang lên xe.
+
+**Kiểm thử:** thêm `npm run sua-loi-17-4` (20 mục):
+- pantry không chồng;
+- người đi bộ chỉ xuất hiện ở mép hoặc cửa quán;
+- Tùng/Linh theo lịch, ngồi một mình, đi vào/ra bằng cửa;
+- dạo phố khi hết buổi;
+- giờ trong nhật ký và trên đầu trang.
+
+## v17.3: Thế giới sống – Phase 4: NPC có trí nhớ, nét mặt và hoàn thiện
 Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày, quan hệ của người chơi (`S.rel`). Bản lưu chỉ thêm một danh sách ngắn `S.npcMem` (tối đa 24 chuyện, dưới 1.500 ký tự). Bản lưu cũ chưa có thì tự tạo, không cần chuyển đổi.
 
 **NPC nhớ chuyện cũ** (`js/song/tri-nho-npc.js`, câu nói ở `js/du-lieu/tri-nho.js`):

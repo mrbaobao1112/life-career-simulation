@@ -16,6 +16,8 @@ const PS = {
   SHELTER:[10, 25],          // trú mưa chừng này phút game
   SPAWN:.18, TICK:.5,
   LANES:[152, 166], ROAD:[198, 208],
+  EDGE:14,                   // người đi bộ vào và ra ở mép bản đồ (đầu ngõ bên trái, cuối phố bên phải)
+  FROM_DOOR:.3,              // xác suất người đi bộ bước ra từ cửa một quán thay vì đi từ mép bản đồ
 };
 const psWant = (arr, cap, we, t) => Math.round(Math.min(1, arr[Math.floor((t / 60) % 24)] * (songWeekend() ? we : 1)) * cap);
 const psRain = () => S.flags.rainDay === S.day;
@@ -40,10 +42,13 @@ function streetMount(W, api){
 async function psWalker(W, api, r, mid){
   const a = W.street.walk.find(x => !x.vis); if (!a) return;
   const right = r() < .5, y = PS.LANES[right ? 0 : 1] + Math.round(r() * 6);
-  const x0 = mid ? PHO.LANE + 40 + r() * (PHO.W - PHO.LANE - 120) : right ? PHO.LANE + 10 : PHO.W - 20, end = right ? PHO.W - 20 : PHO.LANE + 10;
+  // xuất hiện ở mép bản đồ (đi qua ngõ ra phố) hoặc bước ra từ cửa một quán, không bao giờ hiện ra giữa đường
+  const out = !mid && r() < PS.FROM_DOOR ? PHO_DOORS[Math.floor(r() * PHO_DOORS.length)] : null;
+  const x0 = mid ? PHO.LANE + 40 + r() * (PHO.W - PHO.LANE - 120) : out ? out.x + out.w / 2 : right ? PS.EDGE : PHO.W - PS.EDGE, y0 = out ? 162 : y;
+  const end = right ? PHO.W - PS.EDGE : PS.EDGE;
   const door = r() < PS.ENTER ? PHO_DOORS.filter(d => (d.x + d.w / 2 - x0) * (right ? 1 : -1) > 80)[0] : null;
   const v = a.vis = { right, end:door ? door.x + door.w / 2 : end, y:door ? 162 : y, door:!!door, stop:null, met:false, shelter:false };
-  songHide(a, false); a.rot = 0; a.s = roamScale(y); api.put(a, x0, y); api.C.face(a, !right); api.depthSort();
+  songAppear(api, a, x0, y0); api.C.face(a, !right); api.depthSort();
   while (a.vis === v && api.alive()) {
     if (v.stop) { await v.stop; v.stop = null; continue; }                   // đang dừng nói chuyện
     if (psRain() && !v.shelter) {                                            // mưa: chạy vào mái hiên gần nhất, trú một lúc
@@ -65,7 +70,7 @@ function psDone(a){ songHide(a, true); a.vis = null; }
 async function psBike(W, api, r){
   const a = W.street.bike.find(x => !x.vis); if (!a) return;
   const right = r() < .5, y = PS.ROAD[right ? 0 : 1], from = right ? 10 : PHO.W - 10, to = right ? PHO.W - 10 : 10;
-  a.vis = { right }; songHide(a, false); a.s = roamScale(y); api.put(a, from, y); api.C.face(a, !right); api.C.act(a, 'act-ride'); api.depthSort();
+  a.vis = { right }; songAppear(api, a, from, y); api.C.face(a, !right); api.C.act(a, 'act-ride'); api.depthSort();
   const stop = r() < PS.STOP ? PHO_DOORS[Math.floor(r() * PHO_DOORS.length)] : null;
   if (stop) {
     if (!await songWalk(W, api, a, { x:stop.x + stop.w / 2, y })) return; api.C.act(a, 'act-ride'); songSign(a, '🛍️');
@@ -116,7 +121,7 @@ function laneFrame(W, api, r, first){
   if (first || k1.gone === kids) [k1, k2].forEach(a => { songHide(a, !kids); if (kids) npcFace(a, 'happy'); });
   if (kids && !first && !api.C.still && songInView(W, k1.x) && r() < .15) api.C.react(r() < .5 ? k1 : k2, 'jump');
   if (dog && !dw.vis && r() < (first ? .5 : LANE.DOG_P)) {                   // người dắt chó đi từ đầu ngõ ra phố rồi khuất
-    dw.vis = {}; songHide(dw, false); api.put(dw, 20, 190); api.C.face(dw, false); songSign(dw, '🐕');
+    dw.vis = {}; songAppear(api, dw, 20, 190); api.C.face(dw, false); songSign(dw, '🐕');
     songWalk(W, api, dw, { x:PHO.LANE + 360, y:190 }).then(ok => { if (ok) { songHide(dw, true); dw.vis = null; } });
   }
 }

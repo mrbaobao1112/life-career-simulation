@@ -38,9 +38,8 @@ function xgBusy(W, b, a){
 async function songVisit(W, api, a, B, target){
   const ai = a.ai, r = songRng('v' + a.who + Math.round(W.t)), p = target ? seatFor(W, a, { x:target.x + 30, y:target.y + 6, face:true }) : seatFor(W, a, songSpot(W, a, B.spot)), b = ai.with;
   if (!p || !b) { ai.until = W.t + SONG.IDLE[0]; return; }
-  ai.busy = true; a.rot = 0;
+  ai.busy = true; a.rot = 0; ai.seat = { x:p.x, y:p.y };                     // giữ chỗ trước khi đi
   if (!await songWalk(W, api, a, p)) return;
-  ai.seat = { x:p.x, y:p.y };
   if (xgBusy(W, b, a)) {                                                       // bận: từ chối khéo, người hỏi quay về
     api.C.face(a, b.x < a.x); songSign(b, '🙅');
     if (xgTalkOn(W, a) && !api.C.still) api.say(b, pickLine(XG.decline[b.who] || ['Lát nhé.'], 'dec' + b.who, r), XGK.LINE_MS);

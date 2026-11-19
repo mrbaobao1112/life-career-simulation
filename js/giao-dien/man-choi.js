@@ -27,12 +27,18 @@ function calHTML(extra=''){
     <div class="cal-dow">${di.dow}</div></div>`;
 }
 
+// Giờ hiện trên đầu trang: đang ở trong thế giới thì lấy đúng đồng hồ của thế giới (không lệch với đồng hồ trong cảnh)
+const hudTime = () => typeof WORLD !== 'undefined' && WORLD && typeof WORLD.t === 'number' ? clock(WORLD.t / 60) : null;
+function hudClockTick(){
+  const m = document.querySelector('#who .who-meta'), t = hudTime(); if (!m || !t) return;
+  const txt = m.textContent.replace(/\d{2}:\d{2}/, t); if (txt !== m.textContent) m.textContent = txt;
+}
 function updateHUD(enter){
   fpsMeter();
   $('#top').hidden = false; $('#bars').hidden = false; $('#foot').hidden = false; $('#phoneFab').hidden = false;
   $('#cal').innerHTML = calHTML(enter ? 'enter' : '');
   $('#avatar').innerHTML = chibiSVG(playerLook(), playerExpr(), { dark:darkCircles(), label:`${S.name}, tâm trạng hiện tại` });
-  const [sn, st] = SLOT_INFO[S.slot];
+  const [sn, st0] = SLOT_INFO[S.slot], st = hudTime() || st0;
   const job = S.job ? (S.day >= S.job.start ? COMPANIES[S.job.co].name : `Sắp vào ${COMPANIES[S.job.co].name}`) : 'Chưa có việc';
   $('#who').innerHTML = `<div class="who-name">${esc(S.name)}</div>
     <div class="who-meta">${sn}, ${st}. ${job}</div>

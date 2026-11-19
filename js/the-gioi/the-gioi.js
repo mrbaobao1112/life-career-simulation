@@ -212,6 +212,7 @@ function roamMount(root, ref){
     const r = P.timeout(ref, sc);
     C.say(me, ref.id === 'bedtime' ? 'Buồn ngủ quá…' : 'Ơ, hết giờ rồi à?', 1400); await C.wait(C.still ? 0 : 1300); if (!alive()) return;
     if (r.bed) { const o = H.objs.find(x => x.kind === 'bed'); pose(o, true); return commit(bedChoice({ h:r.bed, icon:'🦉', label:'Ngủ gục lúc 02:00' })); }
+    if (r.ch) return commit(r.ch, r.text);                                  // nơi đó tự có kết quả riêng khi hết giờ (đi dạo phố…)
     if (r.i < 0) { S.cur = null; return advance(); }
     const ch = sc.choices[r.i], o = H.objs.find(x => x.kind === P.choiceObj(ref, ch));
     if (o && !o.use.exit) pose(o, true);
@@ -374,6 +375,7 @@ function roamMount(root, ref){
       else if (best && moving) Object.assign($w('.w-prompt').style, scr(anchor(best).x, anchor(best).y));
       else if (best && Math.abs(cam - target) > .05) Object.assign($w('.w-prompt').style, scr(anchor(best).x, anchor(best).y));
     }
+    const hc = clock(W.t / 60); if (hc !== W.hudClock) { W.hudClock = hc; if (typeof hudClockTick === 'function') hudClockTick(); }   // giờ trên đầu trang chạy theo đồng hồ thế giới
     if (now - W.lastSave > 3000) { W.lastSave = now; saveRoam(); }
     W.raf = requestAnimationFrame(frame);
   }

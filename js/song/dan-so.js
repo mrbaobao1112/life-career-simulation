@@ -79,7 +79,7 @@ function popSpawn(W, api, r, seated, buddyOf){
   let script = P.cfg.script; if (script === 'lake') script = r() < .45 ? 'lake' : r() < .5 ? 'lakeSit' : 'lakeWalk';
   const steps = DS_SCRIPT[script];
   a.vis = { steps, i:0, until:0, busy:false, seat:-1, buddy:buddyOf || null };
-  songHide(a, false); a.rot = 0; a.s = roamScale(P.exit.y); api.put(a, P.exit.x, P.exit.y);
+  songAppear(api, a, P.exit.x, P.exit.y);
   if (seated) { const si = steps.findIndex(s => s[0] === 'seat'); if (si >= 0) { a.vis.i = si; popStep(W, api, a, r, true); return a; } }
   popStep(W, api, a, r);
   if (!buddyOf && !seated && P.cfg.group && r() < P.cfg.group) { const b = popSpawn(W, api, r, false, a); if (b) a.vis.buddy = b; }   // đi theo nhóm hai người
