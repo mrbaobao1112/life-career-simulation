@@ -75,7 +75,9 @@ function songGreetTick(W, api){
       const k = pairKey(a.who, b.who); if (W.t - (W.greetT[k] ?? -1e9) < NPCREL.GREET_CD) continue;
       W.greetT[k] = W.t; const tier = W.song.kind === 'home' ? 'than' : npcTier(a.who, b.who);
       if (tier === 'lanh') { api.C.react(b, 'nod'); continue; }
-      const l = pickLine(XG.greet[tier], 'greet' + tier, songRng('g' + k + Math.round(W.t)));
+      const mem = typeof memNpcLine === 'function' ? memNpcLine(a.who, b.who) : null;   // nhớ chuyện hôm trước (tranh luận, ăn bánh)
+      const l = mem ? mem.lines : pickLine(XG.greet[tier], 'greet' + tier, songRng('g' + k + Math.round(W.t)));
+      if (mem && typeof npcFeel === 'function') { npcFeel(a, mem.expr); npcFeel(b, mem.expr); }
       if (!api.C.still) { api.say(a, l[0], 1200); api.C.later(() => api.say(b, l[1], 1200), 900); api.C.react(b, 'nod'); }
       songSign(a, '👋'); api.C.later(() => songSign(a, ''), 1400);
     }
@@ -107,7 +109,7 @@ async function songSnackTick(W, api){
   if (!api.C.still && xgTalkOn(W, mai)) api.say(mai, pickLine(XG.snack.call, 'snc', r), 2000);
   for (const b of W.npcs.filter(x => x !== mai && x.ai && !x.gone && !x.ai.busy && !x.ai.inBeat && !x.lock)) {
     const join = npcRel('mai', b.who).c >= XGK.SNACK_JOIN && !(personaOf(b.who).focus > .9 && r() < .6);
-    if (join) { npcBond('mai', b.who, 1); songForceBeat(W, api, b, B).then(() => { if (!api.C.still && xgTalkOn(W, b)) api.say(b, pickLine(XG.snack.join, 'snj', r), 1500); }); }
+    if (join) { npcBond('mai', b.who, 1); if (typeof memAdd === 'function') memAdd({ w:b.who, o:'mai', k:'snack', v:1 }); songForceBeat(W, api, b, B).then(() => { if (!api.C.still && xgTalkOn(W, b)) api.say(b, pickLine(XG.snack.join, 'snj', r), 1500); }); }
     else { songSign(b, '🙅'); if (!api.C.still && xgTalkOn(W, b)) api.say(b, pickLine(XG.snack.skip, 'sns', r), 1600); }
   }
 }

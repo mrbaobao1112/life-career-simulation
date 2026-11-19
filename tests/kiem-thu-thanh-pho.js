@@ -49,20 +49,20 @@ const P = page => page.evaluate(() => POP_DEBUG());
     for (let k = 0; k < 14; k++) { await page.waitForTimeout(700);
       const s = await page.evaluate(() => { const P = WORLD.pop, ids = P.seats.filter(Boolean).map(a => a.id), sat = P.seats.filter(Boolean);
         return { a:P.pool.filter(a => a.vis).length, dup:new Set(ids).size !== ids.length,
-          ov:(still => still.some((a, i) => still.some((b, j) => j > i && Math.hypot(a.x - b.x, a.y - b.y) < 10)))(P.pool.filter(a => a.vis && !a.vis.busy && !a.gone)) }; });
+          ov:(still => { for (const a of still) for (const b of still) if (a !== b && Math.hypot(a.x - b.x, a.y - b.y) < 10) return `${a.id}@${Math.round(a.x)},${Math.round(a.y)} b${a.vis.i}/${a.vis.steps[a.vis.i - 1]} & ${b.id}@${Math.round(b.x)},${Math.round(b.y)} b${b.vis.i}/${b.vis.steps[b.vis.i - 1]}`; return ''; })(P.pool.filter(a => a.vis && !a.vis.busy && !a.gone)) }; });
       maxA = Math.max(maxA, s.a); dup = dup || s.dup; overlap = overlap || s.ov; }
     const r = await page.evaluate(() => ({ gone:window.__gone, n:WORLD.npcs.length, cap:WORLD.pop.cfg.cap, pool:WORLD.pop.pool.length }));
     check('Khách xong việc thì ra về (vòng đời: vào → gọi đồ → ngồi → về)', r.gone >= 1, `${r.gone} khách đã về`);
     check('Không bao giờ quá số chỗ của quán', maxA <= r.cap, `tối đa ${maxA}/${r.cap}`);
-    check('Hai khách không ngồi chung một ghế, không đè lên nhau', !dup && !overlap);
+    check('Hai khách không ngồi chung một ghế, không đè lên nhau', !dup && !overlap, overlap || '');
     check('Số nhân vật không tăng (dùng lại nhóm có sẵn)', r.n === n0 && r.pool <= 7, `${n0} → ${r.n}`);
     const m = await page.evaluate(() => { const a = WORLD.npcs.find(n => n.who === 'p' && n.label === 'Chị pha chế'); return !!a; });
     check('Nhân viên quán (chị pha chế) vẫn đứng quầy', m);
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
   // 3. Hồ Bán Nguyệt: nhóm tập dưỡng sinh sáng sớm, trưa thì không
-  { const page = await open(browser); await scene(page, 'in:lake', 8, 6);
-    const a = (await P(page)).ex; await scene(page, 'in:lake', 8, 13); const b = (await P(page)).ex;
+  { const page = await open(browser); const ex = () => page.waitForFunction(() => WORLD && WORLD.pop && WORLD.pop.id === 'in:lake', null, { timeout:8000 }).then(() => page.waitForTimeout(600)).then(() => P(page)).then(p => p.ex);
+    await scene(page, 'in:lake', 8, 6); const a = await ex(); await scene(page, 'in:lake', 8, 13); const b = await ex();
     check('Hồ: 6 giờ sáng có nhóm tập dưỡng sinh, 13 giờ thì không', a === 4 && b === 0, `${a} → ${b}`);
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
@@ -104,12 +104,13 @@ const P = page => page.evaluate(() => POP_DEBUG());
 
   // 6. Sự kiện thế giới ở văn phòng: có giãn cách, có giới hạn mỗi ngày, có người đến muộn
   { const page = await open(browser);
-    await page.evaluate(() => { S.job = { co:'hotay', salary:1e7, start:3 }; OFFICE_BAL.ABSENT = 0; S.day = 9; S.slot = 'morning'; S.roam = { d:9, t:600 }; S.queue = [{ id:'task', arg:{ tid:102 } }]; S.cur = null; advance(); WORLD.t = 600; WORLD.end = 1e9;
+    await page.evaluate(() => { WEV.ON = false; S.job = { co:'hotay', salary:1e7, start:3 }; OFFICE_BAL.ABSENT = 0; S.day = 9; S.slot = 'morning'; S.roam = { d:9, t:600 }; S.queue = [{ id:'task', arg:{ tid:102 } }]; S.cur = null; advance(); WORLD.t = 600; WORLD.end = 1e9;
       WORLD.npcs.forEach(a => { if (a.ai) a.ai.until = Infinity; }); });
     await page.waitForTimeout(2500);
-    const c0 = await page.evaluate(() => npcRel('dung', 'mai').t);
+    const c0 = await page.evaluate(() => [['dung', 'mai'], ['phong', 'dung'], ['mai', 'phong']].reduce((n, [x, y]) => n + npcRel(x, y).t, 0));   // tổng độ tin của ba cặp có thể tranh luận
     const ok = await page.evaluate(() => WEV_FORCE('argue')); await page.waitForTimeout(6500);
-    const c1 = await page.evaluate(() => npcRel('dung', 'mai').t);
+    const c1 = await page.evaluate(() => [['dung', 'mai'], ['phong', 'dung'], ['mai', 'phong']].reduce((n, [x, y]) => n + npcRel(x, y).t, 0));   // tổng độ tin của ba cặp có thể tranh luận
+    await page.evaluate(() => { WEV.ON = true; });
     check('Tranh luận kỹ thuật: hai đồng nghiệp cãi nhau (💢) rồi làm lành, độ tin giảm một chút', ok === true && c1 < c0, `${ok} ${c0} → ${c1}`);
     const g = await page.evaluate(() => { S.flags.wev = null; const W = WORLD, a = wevAllow(W, 'office'); wevMark(W, 'office', 'x'); const b = wevAllow(W, 'office'); W.t += WEV.GAP; const c = wevAllow(W, 'office');
       for (let k = 0; k < WEV.DAY_MAX; k++) wevMark(W, 'x' + k); W.t += 999; const d = wevAllow(W, 'office'); W.t -= 999 + WEV.GAP; return [a, b, c, d]; });

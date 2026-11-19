@@ -1,6 +1,42 @@
 # Lịch sử phiên bản
 
-## v17.2: Thế giới sống – Phase 3: thành phố sống (hiện tại)
+## v17.3: Thế giới sống – Phase 4: NPC có trí nhớ, nét mặt và hoàn thiện (hiện tại)
+Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày, quan hệ của người chơi (`S.rel`). Bản lưu chỉ thêm một danh sách ngắn `S.npcMem` (tối đa 24 chuyện, dưới 1.500 ký tự). Bản lưu cũ chưa có thì tự tạo, không cần chuyển đổi.
+
+**NPC nhớ chuyện cũ** (`js/song/tri-nho-npc.js`, câu nói ở `js/du-lieu/tri-nho.js`):
+- Khi một lựa chọn làm quan hệ với ai đó thay đổi đáng kể (tăng từ 4 hoặc giảm từ 3), người đó ghi nhớ chuyện gì và tốt hay không tốt. Ví dụ:
+  - cho Tùng mượn tiền hay từ chối; đi nhậu với Tùng hay bỏ về;
+  - đi cà phê với Linh; học nhóm với Linh hay hẹn mãi;
+  - mua nước cho anh Dũng; hỏi anh Dũng quá nhiều lần;
+  - quên sinh nhật chị Mai; cãi “trên máy em chạy bình thường” với chị Mai;
+  - ở lại OT hay xin lùi hạn với chị Hạnh; trả nợ đúng hẹn hay xin khất.
+- Chỉ những chuyện có câu nhắc lại trong bảng `MEM_LINES` mới được nhớ, nên câu luôn khớp chuyện. Thêm chuyện mới = thêm một mục.
+- Từ hôm sau, lần đầu gặp ngoài đời (đi ngang qua), người đó nhắc lại chuyện cũ. Nét mặt theo chuyện: vui khi nhắc chuyện tốt; buồn hoặc hơi khó chịu khi nhắc chuyện không vui.
+- Mỗi ngày nhắc một lần, mỗi chuyện tối đa hai lần. Sau 14 ngày thì quên. Mỗi người nhớ tối đa 4 chuyện.
+- Đi làm lại sau từ 2 ngày nghỉ trở lên trong tuần: đồng nghiệp hỏi thăm (“Mấy hôm nghỉ ổn chứ em?”), mỗi người một lần.
+- NPC cũng nhớ chuyện với nhau: hôm sau trận tranh luận, hai người gặp lại thì nhắc và làm lành; hôm sau chị Mai mang bánh, người đã ăn khen bánh.
+
+**Nét mặt theo tình huống** (dùng đúng các nét mặt chibi có sẵn, không ngẫu nhiên):
+- Ngủ thì nhắm mắt. Chơi game, ăn, uống trà thì vui. Khuya chưa ngủ thì ngáp. Chiều muộn ở công ty ai còn ngồi bàn thì mệt.
+- Nói chuyện với người thân thì vui. Phong hỏi nhiều quá thì anh Dũng mệt, Phong buồn.
+- Tranh luận thì khó chịu, làm lành thì vui. Người đến muộn thì hoảng.
+- Người trú mưa buồn. Trẻ con chơi, hàng xóm nói chuyện, khách đi cùng bạn thì vui.
+- Đổi nét mặt ngay trên nhân vật đang đứng, không dựng lại nhân vật.
+
+**Hiệu năng:**
+- Sửa lỗi xếp lớp nhân vật theo chiều sâu. Trước đây, khi lớp có thêm đồ vật (xe hàng rong, đồ trong quán…), mỗi khung hình đều xếp lại toàn bộ nhân vật dù không ai di chuyển. Giờ chỉ xếp khi thứ tự thật sự đổi. Đứng yên trong quán đông khách: 0 lần đụng vào trang.
+- Bài chơi ngẫu nhiên 40 lượt (`npm run ngau-nhien`) từng hết bộ nhớ, cả ở bản trước. Nguyên nhân là thư viện giả lập trình duyệt (jsdom) giữ lại khoảng 5MB cho mỗi ván, kể cả với một đoạn mã thử đơn giản, nên không phải lỗi của game. Script giờ chạy với bộ nhớ lớn hơn (tên script không đổi).
+
+**Sửa lỗi:** khi quầy quán đông, khách xếp hàng có thể đứng chồng lên nhau gần cửa. Giờ có sẵn 6 chỗ đứng xếp hàng (hai hàng) quanh quầy. Hết chỗ thì khách thôi không gọi đồ, ra về.
+
+**Kiểm thử ổn định hơn khi máy bận:** bài `thanh-pho` chờ cảnh hồ dựng xong mới đếm; bài tranh luận tính cả ba cặp đồng nghiệp có thể tranh luận (trước chỉ xem cặp Dũng–Mai, nên có lúc báo lỗi sai).
+
+**Kiểm thử:** thêm `npm run tri-nho` (32 mục):
+- ghi nhớ đúng người, đúng tốt hay xấu; chuyện nhỏ không ghi; giới hạn và tự quên; lưu và tải lại; bản lưu cũ;
+- nhắc lại từ hôm sau, mỗi ngày một lần, tối đa hai lần; nét mặt khi nhắc; đồng nghiệp hỏi thăm sau khi nghỉ; NPC nhớ chuyện với nhau;
+- nét mặt khi ngủ, chơi game, chiều muộn ở công ty; không xếp lại lớp nhân vật khi đứng yên; điện thoại và giảm chuyển động.
+
+## v17.2: Thế giới sống – Phase 3: thành phố sống
 Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu (chỉ thêm một mục nhỏ `S.flags.wev` ghi sự kiện trong ngày), nên không cần chuyển đổi bản lưu.
 
 **Dân số theo giờ trong các quán và địa điểm** (`js/song/dan-so.js`):

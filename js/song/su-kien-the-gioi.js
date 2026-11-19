@@ -34,9 +34,9 @@ const WORLD_EV = [
     const [x, y] = pairs[Math.floor(songRng('arg' + W.t)() * pairs.length)], a = officeNpc(W, x), b = officeNpc(W, y);
     a.ai.busy = true; b.ai.held = true;
     if (!await songWalk(W, api, a, seatFor(W, a, { x:b.x + 30, y:b.y + 6, face:true }))) return true;
-    songSign(a, '💢'); songSign(b, '💢'); npcBond(x, y, 0, -1);
+    songSign(a, '💢'); songSign(b, '💢'); npcBond(x, y, 0, -1); memAdd({ w:x, o:y, k:'argue', v:-1 }); npcFeel(a, 'annoyed', 60000); npcFeel(b, 'annoyed', 60000);
     await songTalk(W, api, a, b, pickLine(XG_EV.argue, 'arg', songRng('a' + W.t)));
-    if (!api.alive()) return true; songSign(a, '🤝'); songSign(b, '🤝'); b.ai.held = false; a.ai.busy = false; a.ai.until = 0; return true; } },
+    if (!api.alive()) return true; songSign(a, '🤝'); songSign(b, '🤝'); npcFeel(a, 'happy'); npcFeel(b, 'happy'); b.ai.held = false; a.ai.busy = false; a.ai.until = 0; return true; } },
   { id:'newtask', where:'office', h:[9.5, 16], p:.3, run:async (W, api) => {           // chị Hạnh giao task mới cho một người
     const boss = officeNpc(W, 'boss'), to = ['phong', 'mai', 'dung'].map(k => officeNpc(W, k)).find(Boolean); if (!boss || !to) return false;
     boss.ai.busy = true; to.ai.held = true;
@@ -66,7 +66,7 @@ function wevTick(W, api){
 function wevLateTick(W, api){
   const who = wevLateWho(), f = wevDay(); if (!who || f.lateSaid) return;
   const a = W.npcs.find(x => x.ai && x.who === who && !x.gone && x.ai.act === 'desk' && !x.ai.busy); if (!a) return;
-  f.lateSaid = true; songSign(a, '😅');
+  f.lateSaid = true; songSign(a, '😅'); npcFeel(a, 'panic', 3000);
   if (songInView(W, a.x) && !api.C.still) { api.say(a, pick(XG_EV.late), 1800); const b = W.npcs.find(x => x.who === 'boss' && !x.gone); if (b) api.C.later(() => api.C.react(b, 'nod'), 900); }
 }
 // Dành cho kiểm thử: chạy ngay một sự kiện

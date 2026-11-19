@@ -107,7 +107,7 @@ function chibi(L, expr = 'neutral', o = {}){
   return `${H.back ? `<path d="${H.back}" fill="${hc}"/>` : ''}${bodySVG(L)}${held}
     <g class="cb-head"><circle cx="19" cy="58" r="8" fill="${sk}"/><circle cx="101" cy="58" r="8" fill="${sk}"/>
     <circle cx="60" cy="52" r="40" fill="${sk}" stroke="${shade(sk, -.18)}" stroke-width="1.4"/>
-    ${faceSVG(expr, sk, { ...o, g:L.g, hc:L.hairColor })}${faceAcc}<path d="${H.front}" fill="${hc}" stroke="${shade(hc, -.3)}" stroke-width="1" stroke-opacity=".5"/>${top}</g><g class="cb-front">${armsSVG(L)}</g>${extras}`;
+    <g class="cb-face">${faceSVG(expr, sk, { ...o, g:L.g, hc:L.hairColor })}</g>${faceAcc}<path d="${H.front}" fill="${hc}" stroke="${shade(hc, -.3)}" stroke-width="1" stroke-opacity=".5"/>${top}</g><g class="cb-front">${armsSVG(L)}</g><g class="cb-extra">${extras}</g>`;
 }
 function chibiSVG(L, expr, o = {}){
   return `<svg viewBox="-14 -18 148 158" role="img" aria-label="${o.label || 'Nhân vật'}"><g class="cb cb-idle">${chibi(L, expr, o)}</g></svg>`;

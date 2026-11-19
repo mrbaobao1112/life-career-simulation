@@ -50,9 +50,9 @@ async function psWalker(W, api, r, mid){
       v.shelter = true; api.C.act(a, 'act-run'); a.speed *= 1.8;
       const d = PHO_DOORS.reduce((b, x) => Math.abs(x.x + x.w / 2 - a.x) < Math.abs(b.x + b.w / 2 - a.x) ? x : b);
       const ok = await songWalk(W, api, a, { x:d.x + d.w / 2 + Math.round(r() * 30 - 15), y:158 }); a.speed /= 1.8; api.C.act(a, ''); if (!ok) return;
-      songSign(a, '☔'); const until = W.t + PS.SHELTER[0] + r() * (PS.SHELTER[1] - PS.SHELTER[0]);
+      songSign(a, '☔'); npcFace(a, 'sad'); const until = W.t + PS.SHELTER[0] + r() * (PS.SHELTER[1] - PS.SHELTER[0]);
       while (W.t < until && api.alive()) if (!await api.wait(400)) return;
-      songSign(a, ''); continue;
+      songSign(a, ''); npcFace(a, 'neutral'); continue;
     }
     const dx = v.end - a.x; if (Math.abs(dx) < 4) break;
     const nx = Math.abs(dx) <= PS.STEP ? v.end : a.x + Math.sign(dx) * PS.STEP;
@@ -111,9 +111,9 @@ function laneMount(W, api){
 function laneFrame(W, api, r, first){
   const G = W.street, [h1, h2, k1, k2, dw] = G.lane; if (!h1) return;
   const t = W.t, rain = psRain(), chat = !rain && inH(LANE.CHAT, t), kids = !rain && inH(songWeekend() ? LANE.KIDS_WE : LANE.KIDS, t), dog = !rain && inH(LANE.DOG, t);
-  if (first || h1.gone === chat) { [h1, h2].forEach(a => songHide(a, !chat)); if (chat) { api.C.act(h1, 'act-talk'); api.C.act(h2, 'act-listen'); songSign(h1, '💬'); } }
+  if (first || h1.gone === chat) { [h1, h2].forEach(a => songHide(a, !chat)); if (chat) { api.C.act(h1, 'act-talk'); api.C.act(h2, 'act-listen'); songSign(h1, '💬'); npcFace(h1, 'happy'); npcFace(h2, 'happy'); } }
   if (chat && !first && !api.C.still && songInView(W, h1.x) && r() < .03) { const l = pickLine(XG.family, 'hx', r); api.say(h1, l[0], 1500); api.C.later(() => api.say(h2, l[1], 1500), 1600); }
-  if (first || k1.gone === kids) [k1, k2].forEach(a => songHide(a, !kids));
+  if (first || k1.gone === kids) [k1, k2].forEach(a => { songHide(a, !kids); if (kids) npcFace(a, 'happy'); });
   if (kids && !first && !api.C.still && songInView(W, k1.x) && r() < .15) api.C.react(r() < .5 ? k1 : k2, 'jump');
   if (dog && !dw.vis && r() < (first ? .5 : LANE.DOG_P)) {                   // người dắt chó đi từ đầu ngõ ra phố rồi khuất
     dw.vis = {}; songHide(dw, false); api.put(dw, 20, 190); api.C.face(dw, false); songSign(dw, '🐕');
