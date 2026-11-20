@@ -26,7 +26,7 @@ const isOpen = (to, t) => { const h = PHO_OPEN[to]; if (!h) return true; const x
 /* ----- Việc làm được ở từng đồ vật ngoài phố và trong quán ----- */
 const PHO_MINOR = {
   takeaway:() => ({ icon:'🥤', label:`Cà phê trứng mang về (${fmt(PHOK.TAKEAWAY)})`, min:5, off:S.money < PHOK.TAKEAWAY || S.flags.takeaway === S.day, why:S.flags.takeaway === S.day ? 'Hôm nay uống rồi' : 'Không đủ tiền',
-    fx:() => { S.flags.takeaway = S.day; S.money -= PHOK.TAKEAWAY; spendLog(PHOK.TAKEAWAY); S.mood += PHOK.TAKEAWAY_MOOD; clampAll(); feedAdd({ id:'pho' }, '🥤', 'Cà phê trứng mang về.', -PHOK.TAKEAWAY); return 'Béo ngậy, thơm lừng.'; } }),
+    fx:() => { if (typeof pvPlayerOrder === 'function') pvPlayerOrder(WORLD); S.flags.takeaway = S.day; S.money -= PHOK.TAKEAWAY; spendLog(PHOK.TAKEAWAY); S.mood += PHOK.TAKEAWAY_MOOD; clampAll(); feedAdd({ id:'pho' }, '🥤', 'Cà phê trứng mang về.', -PHOK.TAKEAWAY); return 'Béo ngậy, thơm lừng.'; } }),
   beer:() => ({ icon:'🍺', label:`Làm một cốc bia hơi (${fmt(PHOK.BEER)})`, min:15, off:S.money < PHOK.BEER || S.flags.beer === S.day, why:S.flags.beer === S.day ? 'Một cốc thôi' : 'Không đủ tiền',
     fx:() => { S.flags.beer = S.day; S.money -= PHOK.BEER; spendLog(PHOK.BEER); S.mood += PHOK.BEER_MOOD; S.energy += PHOK.BEER_ENERGY; clampAll(); feedAdd({ id:'pho' }, '🍺', 'Một cốc bia hơi.', -PHOK.BEER); return 'Mát lạnh. Một cốc thôi đấy.'; } }),
   view:    () => ({ icon:'🌆', label:'Ngắm phố từ ban công', min:PHOK.LOOK_MIN, fx:() => 'Từ tầng 3 nhìn xuống, dòng xe như một con sông.' }),
@@ -129,7 +129,7 @@ ROAM_PLACES.push(phoPlace('street', phoMap, {
   frame(W, dt, api){ if (W.riding) bikeFit(W); gapFrame(W, dt, api); streetFrame(W, dt, api); phoMiniFrame(W); },
 }));
 Object.keys(PHO_ROOMS).forEach(id => ROAM_PLACES.push(phoPlace(id, () => phoRoom(id), {
-  mount(W, api){ roomNpcs(W, api, id); popMount(W, api, id); cityMount(W, api, id); if (S.flags.rainDay === S.day && id === 'in:lake') { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = rainSVG(); W.svg.appendChild(g); } },
+  mount(W, api){ roomNpcs(W, api, id); popMount(W, api, id); cityMount(W, api, id); if (typeof pvMount === 'function') pvMount(W, api, id); if (S.flags.rainDay === S.day && id === 'in:lake') { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = rainSVG(); W.svg.appendChild(g); } },
   frame(W, dt, api){ if (id === 'in:lake') hoFrame(W, api); popFrame(W, dt, api); cityFrame(W, api); },
 })));
 

@@ -120,6 +120,18 @@
 .act-getoff{animation:getOff .42s ease-out 1}
 @keyframes getOff{0%{transform:translate(-14px,-6px)}45%{transform:translate(-5px,-12px)}100%{transform:none}}
 
+/* v17.5: Ngồi (ghế quán, ghế nhựa, ghế đá): gập chân như ngồi xe, hạ người một chút; ghép được với động tác tay (act-sip act-sit) */
+.act-sit .cb-legL,.act-sit .cb-legR{transform:rotate(-62deg)}
+.act-sit .cb-shin{transform:rotate(76deg)}
+.cb.act-sit{transform:translateY(9px)}
+/* v17.5: Tập dưỡng sinh: hai tay từ từ nâng lên, hạ xuống */
+.act-tap .cb-armL{animation:taiChiL 4.2s ease-in-out infinite}
+.act-tap .cb-armR{animation:taiChiR 4.2s ease-in-out infinite}
+.act-tap .cb-torso{animation:taiChiB 4.2s ease-in-out infinite}
+@keyframes taiChiL{0%,100%{transform:rotate(10deg)}50%{transform:rotate(150deg)}}
+@keyframes taiChiR{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(-150deg)}}
+@keyframes taiChiB{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+
 @media (prefers-reduced-motion: reduce){
   [class*="act-"],[class*="act-"] *{animation:none!important}
 }

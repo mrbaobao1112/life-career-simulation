@@ -46,7 +46,7 @@ const P = page => page.evaluate(() => POP_DEBUG());
     await page.evaluate(() => { DS.SPAWN = 1; window.__gone = 0; const g = popGone; popGone = (W, a) => { window.__gone++; return g(W, a); };
       WORLD.pop.pool.forEach(a => { if (a.vis) a.vis.until = Math.min(a.vis.until, WORLD.t + 3); }); });
     let maxA = 0, dup = false, overlap = false;
-    for (let k = 0; k < 14; k++) { await page.waitForTimeout(700);
+    for (let k = 0; k < 30; k++) { await page.waitForTimeout(700);   // v17.5: khách xếp hàng trả tiền, chờ nhân viên phục vụ nên lâu hơn
       const s = await page.evaluate(() => { const P = WORLD.pop, ids = P.seats.filter(Boolean).map(a => a.id), sat = P.seats.filter(Boolean);
         return { a:P.pool.filter(a => a.vis).length, dup:new Set(ids).size !== ids.length,
           ov:(still => { for (const a of still) for (const b of still) if (a !== b && Math.hypot(a.x - b.x, a.y - b.y) < 10) return `${a.id}@${Math.round(a.x)},${Math.round(a.y)} b${a.vis.i}/${a.vis.steps[a.vis.i - 1]} & ${b.id}@${Math.round(b.x)},${Math.round(b.y)} b${b.vis.i}/${b.vis.steps[b.vis.i - 1]}`; return ''; })(P.pool.filter(a => a.vis && !a.vis.busy && !a.gone)) }; });
