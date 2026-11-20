@@ -48,7 +48,11 @@ Dữ liệu: `js/du-lieu/phat-trien.js`. Cách chạy: `js/he-thong/phat-trien.j
 
 **Hồ sơ:** thêm phần Mục tiêu (thanh tiến độ), Cấp bậc (từng điều kiện lên cấp tiếp theo, đạt/chưa đạt), Kỹ năng nghề.
 
-**Kiểm thử:** thêm `npm run phat-trien` (31 kiểm tra). Phần cuối chạy trên trình duyệt thật.
+**Kiểm thử:** thêm `npm run phat-trien` (36 kiểm tra). Phần cuối chạy trên trình duyệt thật.
+- `npm test`: 21 bộ ĐẠT, 1 KHÔNG ĐẠT, 2 BÁO CÁO.
+  - Bộ không đạt là `hieu-nang`: phố giờ cao điểm trên điện thoại giả lập 35,8 FPS, dưới ngưỡng 40.
+  - Đo lại xen kẽ 6 lần trên main và 6 lần trên nhánh này: hai bên như nhau (trung bình 37,5 và 35,2), nên không phải do Phase 2.
+  - Đây là rủi ro H1 của Phase 1, để Phase 3 xử lý. Không hạ ngưỡng.
 - Lỗi đã bắt được khi viết bài: file mới bọc một hàm của `man-choi.js` nhưng lại nạp trước file đó.
   - Trên trình duyệt thật, việc này làm hỏng cả game.
   - Bài jsdom không thấy vì nó gộp mọi file làm một.
