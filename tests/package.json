@@ -21,7 +21,8 @@
     "tri-nho": "node kiem-thu-tri-nho.js",
     "sua-loi-17-4": "node kiem-thu-sua-loi-17-4.js",
     "hoi-thoai": "node kiem-thu-hoi-thoai.js",
-    "quan-song": "node kiem-thu-quan-song.js"
+    "quan-song": "node kiem-thu-quan-song.js",
+    "gia-dinh-cong-viec": "node kiem-thu-gia-dinh-cong-viec.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3"

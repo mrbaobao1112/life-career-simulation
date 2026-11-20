@@ -1,6 +1,56 @@
 # Lịch sử phiên bản
 
-## v17.5 – Phase 2: Quán có đời sống thật (hiện tại)
+## v17.5 – Phase 3: Gia đình và công việc (hiện tại)
+Không đổi công thức tài chính, sức khỏe, năng lượng, lương, nghỉ phép. Không đổi định dạng bản lưu (chỉ thêm vài cờ nhỏ trong `S.flags`).
+
+**Ngày làm việc không còn giống nhau (P2-12)** (dữ liệu `js/du-lieu/ngay-dac-biet.js`, điều khiển `js/song/ngay-dac-biet-vp.js`):
+- 6 loại ngày đặc biệt:
+  - **Hạn chót:** gánh thêm việc / hỗ trợ Phong / làm phần mình.
+  - **Review code:** anh Dũng nhờ xem code. Góp ý thẳng có thể được nhận, hoặc thành một trận tranh luận nhỏ nếu chưa thân; hoặc hỏi để học; hoặc khen cho qua.
+  - **Khách đến:** soạn tài liệu / đón khách / làm task.
+  - **Sự cố:** khách không đăng nhập được; đọc log cùng anh Dũng / trực điện thoại / làm nốt task.
+  - **Demo cho ban giám đốc:** xin trình bày (thành công tùy kỹ năng; nếu lỗi thì chị Hạnh đỡ lời, không bị phạt nặng) / chuẩn bị dữ liệu / ngồi dự.
+  - **Chiều thứ Sáu team building:** tham gia (góp 50.000đ) / ghé chút / làm nốt việc.
+- Cách xếp:
+  - khoảng 25–45% số ngày làm việc là ngày đặc biệt, còn lại là ngày bình thường;
+  - không có trong 3 ngày đầu đi làm, không hai ngày liền cùng một loại, không quá 2 ngày đặc biệt liền nhau;
+  - đúng thứ trong tuần (khách đến thứ Ba–Năm, demo thứ Tư–Sáu, team building thứ Sáu);
+  - mỗi công ty nghiêng về vài loại (Hồ Tây Soft hay có khách, Cú Đêm Lab hay chạy hạn chót, Lò Rèn hay có sự cố…);
+  - cố định theo ngày (tải lại game không đổi), không cần lưu.
+- Ngày có cảnh đặc biệt thì buổi đó **không thêm sự kiện ngẫu nhiên** (không dày đặc). Tua nhanh hoặc nghỉ phép thì là ngày bình thường.
+- Mỗi cảnh **luôn có một lựa chọn không làm giảm gì**. Hậu quả vừa phải: quan hệ đổi tối đa 5, năng lượng giảm tối đa 10.
+- **Đồng nghiệp phản ứng trong văn phòng:**
+  - hạn chót, sự cố: ai cũng ngồi lì ở bàn (⏰ 🔥), mặt mệt hoặc hoảng, không đi lại tán gẫu;
+  - review: anh Dũng sang bàn bạn (🔍);
+  - khách đến: một vị khách vào ngồi ở chỗ họp cùng chị Hạnh (🤝);
+  - demo: chị Hạnh, chị Mai, anh Dũng ra chỗ họp (📽️);
+  - team building: cả team ra pantry (🎉).
+- **Đồng nghiệp nhớ chuyện:** hôm sau nhắc lại khi bắt chuyện (“Hôm chạy hạn chót em gánh đỡ chị nhiều đấy.”). Trận tranh luận khi review thì anh Dũng hơi lạnh nhạt vài ngày. Ngay trong ngày, bắt chuyện cũng có câu về ngày hôm đó (“Tôi sắp khóc rồi ông ạ.” vào ngày hạn chót).
+- Tắt được: `NGAY.ON = false`.
+
+**Đời sống gia đình (P2-08)** (dữ liệu `js/du-lieu/gia-dinh.js`, điều khiển `js/song/gia-dinh.js`):
+- **Bố mẹ trò chuyện** khi cùng ăn cơm, cùng xem TV, cùng uống trà; câu theo việc đang làm (“Mai trời rét đấy ông ạ.” – “Ừ, nhớ lấy áo bông ra.”).
+- **Đi làm về, mẹ hỏi han** (ở ghép thì Tùng hỏi): “Hôm nay đi làm có mệt không con?”. Bấm vào mẹ để chọn:
+  - công việc khá ổn / hơi nhiều việc / công ty có chuyện không vui / con muốn nghỉ một chút;
+  - phần lớn chỉ để trò chuyện, không đổi chỉ số;
+  - riêng “chuyện không vui” thì mẹ an ủi, bố nói thêm “Có gì khó thì nói với bố.”, tinh thần +2 (mỗi ngày một lần), và hôm sau mẹ hỏi lại “Chuyện công ty hôm qua, nay ổn hơn chưa con?”;
+  - mỗi ngày làm việc hỏi một lần.
+- **Tùng đi ca chiều về kể chuyện chỗ làm** (bà khách thử ba mươi cái áo, ông khách trả bằng xu…).
+- **Lương vừa về:** bố, mẹ hỏi chuyện lương khi bắt chuyện.
+- Tắt được: `GD.ON = false`.
+
+**Kiểm thử:** thêm `npm run gia-dinh-cong-viec` (31 mục):
+- chọn loại ngày đúng luật, đủ 6 loại, cố định; xếp đúng buổi, không chồng sự kiện ngẫu nhiên, tua nhanh thì không có;
+- luôn có lựa chọn không làm giảm gì, hậu quả vừa phải; đồng nghiệp nhớ và nhắc lại; tranh luận làm lạnh nhạt; câu theo ngày;
+- phản ứng trong văn phòng (hạn chót, review, khách, team building);
+- bố mẹ trò chuyện; mẹ hỏi han và an ủi; hỏi một lần mỗi ngày; Tùng hỏi han và kể chuyện; bố hỏi lương; tắt được.
+
+`56-ngay` (phần sân khấu văn phòng) và `van-phong` tắt ngày đặc biệt (`NGAY.ON = false`), để kiểm riêng sân khấu như trước. Ngày đặc biệt được kiểm ở bài mới.
+
+**Bản lưu cũ:** bản lưu từ v17.5 Phase 2 (ngày 21) mở bằng bản mới, chơi tiếp đến hết ngày 56: 0 lỗi.
+
+
+## v17.5 – Phase 2: Quán có đời sống thật
 Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu (chỉ thêm hai mục nhỏ trong `S.flags` để giới hạn mỗi ngày).
 
 **Nhân viên phục vụ thật** (`js/song/phuc-vu.js`, bảng `PV_PLACE`):
