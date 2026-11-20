@@ -123,12 +123,18 @@ Các file dùng chung biến với nhau và được nạp lần lượt theo da
 
 ## Chạy kiểm thử
 
-Cần cài [Node.js](https://nodejs.org/) (bản 18 trở lên).
+Cần cài [Node.js](https://nodejs.org/) (bản 18 trở lên). `npm install` cài cả jsdom và Playwright (trình duyệt thật cho các bài đi lại, hình, hiệu năng).
+Nếu máy chưa có trình duyệt Chromium cho Playwright thì chạy thêm `npx playwright install chromium`.
 
 ```bash
 cd tests
 npm install
-npm test              # kiểm thử hệ thống, tài chính, các mốc 56 ngày + 20 lượt chơi ngẫu nhiên trọn 56 ngày
+npm test              # v17.6: chạy TẤT CẢ các bộ (3 luồng song song, khoảng 25 phút) và in bảng kết quả rõ ràng (xem dưới)
+npm run co-ban        # bộ nhanh như trước: hệ thống, tài chính, các mốc 56 ngày, 20 lượt chơi ngẫu nhiên
+node chay-tat-ca.js tri-nho luu-tai   # chỉ chạy vài bộ (các bộ khác ghi là CHƯA CHẠY); --luong=1 để chạy lần lượt
+npm run luu-tai       # v17.6: lưu/tải, bản lưu thật của các bản 16.1 → 17.5 (tests/du-lieu-mau/), bản lưu thiếu dữ liệu, lưu giữa lúc đang đi (khoảng 2 phút)
+npm run npc-on-dinh   # v17.6: lịch không trùng, NPC không trùng mặt, không kẹt, không bận mãi ở 10 nơi; ra vào địa điểm liên tục (cần Playwright, khoảng 6 phút)
+npm run hieu-nang     # v17.6: FPS trên điện thoại giả lập, NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)
 npm run the-gioi      # tự đi lại trong nhà: phím, va chạm, đồng hồ, dùng đồ, đi ngủ, joystick trên điện thoại (cần Playwright, khoảng 1 phút)
@@ -150,6 +156,13 @@ npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra 
 npm run tai-chinh     # kiểm thử sổ hóa đơn và mô phỏng tài chính cả tháng
 npm run hai-thang     # mô phỏng hai tháng, so sánh thu xếp sớm và phút chót
 ```
+
+**Đọc kết quả `npm test`** (bảng in ra màn hình và ghi vào `tests/ket-qua/tong-hop.md`):
+- ✅ **ĐẠT**: đã chạy, mọi kiểm tra trong bộ đều đúng.
+- ❌ **KHÔNG ĐẠT**: đã chạy nhưng có kiểm tra sai, bị lỗi, hoặc chạy quá 25 phút.
+- ⏭️ **SKIP**: không chạy được vì máy thiếu thứ cần thiết (ví dụ thiếu Playwright). **Không tính là đạt**; `npm test` báo lỗi.
+- ⬜ **CHƯA CHẠY**: không được chọn để chạy lần này.
+- 📊 **BÁO CÁO**: bộ chỉ in số liệu cân bằng để người đọc (`can-bang`, `hai-thang`), không có tiêu chí đạt/không đạt; chỉ cho biết đã chạy xong không lỗi.
 
 ## Hướng phát triển
 

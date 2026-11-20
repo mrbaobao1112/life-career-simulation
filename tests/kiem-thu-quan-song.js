@@ -1,7 +1,7 @@
 // Kiểm thử v17.5 – Phase 2: quán có đời sống thật (nhân viên phục vụ, vòng đời khách, người chơi tham gia). Cần Playwright.
 // Chạy: npm run quan-song
 let chromium, devices;
-try { ({ chromium, devices } = require('playwright')); } catch (e) { console.log('Bỏ qua: máy này chưa có Playwright (npm i -D playwright).'); process.exit(0); }
+try { ({ chromium, devices } = require('playwright')); } catch (e) { console.log('⏭️ SKIP: máy này chưa có Playwright (chạy: cd tests && npm install). Bài này CHƯA CHẠY, không tính là đạt.'); process.exit(3); }
 const path = require('path');
 const URL = 'file://' + path.join(__dirname, '..', 'index.html');
 let fail = 0;

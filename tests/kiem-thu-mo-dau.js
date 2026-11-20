@@ -1,7 +1,7 @@
 // Kiểm thử màn hình mở đầu trong trình duyệt thật (cần Playwright): vòng đời hoạt cảnh và âm thanh, bản lưu, giảm chuyển động, hiệu năng.
 // Chạy: npm run mo-dau        Chạy thêm bài để yên 5 phút: DAI=1 npm run mo-dau
 let chromium;
-try { ({ chromium } = require('playwright')); } catch (e) { console.log('Bỏ qua: máy này chưa có Playwright (npm i -D playwright).'); process.exit(0); }
+try { ({ chromium } = require('playwright')); } catch (e) { console.log('⏭️ SKIP: máy này chưa có Playwright (chạy: cd tests && npm install). Bài này CHƯA CHẠY, không tính là đạt.'); process.exit(3); }
 const path = require('path');
 const URL = 'file://' + path.join(__dirname, '..', 'index.html'), KEY = 'lcs-tuan-dau-tien-v6';
 let fail = 0;

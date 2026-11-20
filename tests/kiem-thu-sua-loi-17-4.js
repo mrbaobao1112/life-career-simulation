@@ -1,7 +1,7 @@
 // Kiểm thử v17.4: các lỗi bắt buộc sửa sau lần kiểm tra toàn diện v17.3 (docs/AUDIT_REPORT_v17.3.md). Cần Playwright.
 // Chạy: npm run sua-loi-17-4
 let chromium;
-try { ({ chromium } = require('playwright')); } catch (e) { console.log('Bỏ qua: máy này chưa có Playwright (npm i -D playwright).'); process.exit(0); }
+try { ({ chromium } = require('playwright')); } catch (e) { console.log('⏭️ SKIP: máy này chưa có Playwright (chạy: cd tests && npm install). Bài này CHƯA CHẠY, không tính là đạt.'); process.exit(3); }
 const path = require('path');
 const URL = 'file://' + path.join(__dirname, '..', 'index.html');
 let fail = 0;

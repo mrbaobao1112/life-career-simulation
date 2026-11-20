@@ -51,4 +51,6 @@ for (let run=0; run<N; run++){
 }
 const avg=a=>Math.round(a.reduce((x,y)=>x+y,0)/a.length);
 console.log(JSON.stringify({runs:st.runs, errors:st.errors, ngayKetThuc:st.lastDay, jobs:st.jobs, noJob:st.noJob, replies:st.replies, hang:st.hang, avgMsgsPerRun:Math.round(st.msgs/st.runs), avgSteps:avg(st.steps), fail:st.fail, scenes:st.scenes},null,1));
+// v17.6: in kết quả dạng đạt/không đạt để bộ chạy tổng đếm được
+console.log((st.errors ? '❌' : '✅') + ` Chơi ngẫu nhiên ${st.runs} lượt (bấm bừa, mở điện thoại, tua): không kẹt, không lỗi, kết thúc đúng ngày 56, không hiện undefined/NaN` + (st.errors ? ` → ${st.errors} lượt lỗi` : ''));
 if (st.errors) process.exit(1);
