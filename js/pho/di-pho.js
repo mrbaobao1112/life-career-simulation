@@ -95,8 +95,8 @@ function roomNpcs(W, api, id){
   if (m && m.d === S.day && m.slot === S.slot && m.at === id) {
     const sp = PHO_ROOMS[id].objs().find(o => o.kind === 'act');
     const a = api.npc(m.who, sp ? sp.spot.x + 40 : 200, 158, 'act-talk', true, { id:'meet_' + m.who });
-    a.entries = () => [{ icon:'💬', label:`Ngồi nói chuyện với ${PEOPLE[m.who].name}`, run:() => meetStart(m.who) }];
-    api.C.later(() => api.say(a, 'Đây rồi! Ngồi đi.', 1800), 600);
+    a.entries = () => [{ icon:m.sc === 'cc_hoc' ? '📚' : '💬', label:m.sc === 'cc_hoc' ? `Ngồi học cùng ${PEOPLE[m.who].name}` : `Ngồi nói chuyện với ${PEOPLE[m.who].name}`, run:() => meetStart(m.who, m.sc) }];   // sc: cảnh riêng của lần hẹn (chuyện tự nảy sinh)
+    api.C.later(() => api.say(a, m.sc === 'cc_hoc' && typeof CC_LOI !== 'undefined' ? CC_LOI.linh.gap : 'Đây rồi! Ngồi đi.', 1800), 600);
   }
 }
 // “Rủ ai đó đi chơi”: ở chế độ đi lại, người được rủ đợi ở nơi hẹn thay vì gặp ngay
@@ -106,7 +106,7 @@ function meetLater(k, slot){
   S.meet = { d:S.day, slot, who:k, at }; S.queue.unshift({ id:'activity', arg:slot });
   note(`Hẹn ${PEOPLE[k].name} ở ${PHO_ROOMS[at].name}.`); return true;
 }
-function meetStart(k){ S.meet = null; S.where = null; S.queue.unshift({ id:'hangout', arg:k }); S.cur = null; save(); advance(); }
+function meetStart(k, sc){ S.meet = null; S.where = null; S.queue.unshift({ id:sc || 'hangout', arg:k }); S.cur = null; save(); advance(); }
 
 /* ----- Cửa nhà ở chế độ đi lại: dẫn ra phố (rủ ai đó đi chơi vẫn ở đây) ----- */
 (() => {

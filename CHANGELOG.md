@@ -1,6 +1,36 @@
 # Lịch sử phiên bản
 
-## v17.5 – Phase 3: Gia đình và công việc (hiện tại)
+## v17.5 – Phase 4: Chuyện tự nảy sinh và hoàn thiện (hiện tại)
+Không đổi công thức tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Bản lưu cũ vẫn chơi tiếp được: chỉ thêm `S.cc` (trạng thái chuyện, tự tạo khi chưa có) và vài cờ nhỏ trong `S.flags`.
+
+**Chuyện tự nảy sinh** (dữ liệu `js/du-lieu/cau-chuyen.js`, điều khiển `js/song/cau-chuyen.js`). Không phải kịch bản cố định: chuyện chỉ bắt đầu khi các hệ thống sẵn có (trí nhớ NPC, quan hệ, sự kiện thế giới, lịch sinh hoạt) đủ điều kiện, và đi tiếp theo lựa chọn của bạn.
+- **Linh rủ đi thư viện:**
+  - điều kiện: Linh thân từ 58 trở lên, và 5 ngày gần đây có lần gặp vui (Linh nhớ chuyện đi cà phê, hoặc bạn vừa bắt chuyện với Linh);
+  - 1–2 ngày sau Linh mới nhắn, có lý do (“Hôm trước đi cà phê với mày vui ghê.”) rồi rủ đi Thư viện quận; đang đi làm thì hẹn ngày nghỉ;
+  - nhận lời: chiều hôm hẹn Linh đợi ở thư viện (“Ngồi học cùng Linh”) → cảnh học cùng (học nghiêm túc, hoặc học một lúc rồi ra hồ) → Linh nhớ và nhắc lại khi gặp, khi bắt chuyện;
+  - từ chối: Linh bảo không sao; lờ tin: Linh nhắn lặng lẽ, hơi phật lòng; hẹn mà không đến: tối Linh nhắn buồn và nhớ chuyện bị “cho leo cây”;
+  - xong một lần thì 12 ngày sau mới có thể rủ lại.
+- **Đồng nghiệp giận rồi làm lành:**
+  - sau trận tranh luận ở văn phòng, họ không bắt tay ngay nữa; hôm sau còn giận: quan hệ giữa hai người giảm thêm, không sang bàn nhau, đi ngang không chào; bắt chuyện thì họ nhắc chuyện hôm qua;
+  - từ hôm sau có thể có việc chung ở chỗ họp (chị Hạnh gọi ra): hai người cùng làm, nói chuyện lại, bắt tay làm lành (🤝), thân lại, và lần chào sau nhắc “Hôm trước làm chung ăn ý đấy nhỉ.”;
+  - lâu không có dịp gặp (nghỉ, cuối tuần) thì tự nguôi.
+- Thêm chuyện mới: thêm số liệu, câu chữ vào `CC`, `CC_LOI` và một mục vào bảng `CC_STORIES`. Tắt được: `CC.ON = false` (khi tắt, tranh luận lại bắt tay ngay như cũ).
+
+**Điện thoại gọn hơn (P3-08)** (`js/he-thong/dien-thoai.js`, bảng `PHONE`):
+- Số đỏ trên nút điện thoại là **số cuộc trò chuyện có tin mới**, không đếm từng tin (trước đây dồn lên khoảng 35 sau hai tuần).
+- **Chỉ đổ chuông khi tin quan trọng** (cần trả lời, chị Hạnh nhắc). Tin nhắc lại khi bạn lờ đi đến lặng lẽ.
+- Tin nhắn vu vơ **tối đa 2 lần mỗi ngày**; NPC chỉ nhắn khi có lý do (điều kiện riêng của từng tin, chuyện đang diễn ra).
+- Danh sách: cuộc **chờ trả lời lên đầu**, rồi cuộc có tin mới, rồi theo tin gần nhất. Nút điện thoại có viền vàng khi có tin chờ trả lời.
+- Trong cuộc trò chuyện có **vạch “Tin mới”** ngăn tin cũ và tin chưa đọc. Lịch sử vẫn xem lại được (giữ 80 tin gần nhất mỗi cuộc).
+
+**Sửa lỗi và hiệu năng:**
+- **P2-10:** xe máy chỉ chạy trên phố chính, không chạy vào ngõ nhà.
+- **P3-11 (hiệu năng trên điện thoại):** người ngoài khung nhìn hoặc đã đi khỏi thì dừng hoạt ảnh (chân bước, tay, dấu hiệu) và không vẽ; kiểm tra vài lần mỗi giây trong vòng lặp sẵn có, không thêm vòng lặp. Lối chơi trên máy tính và điện thoại giữ nguyên. Đo trên giả lập iPhone 13 (CPU chậm 6 lần), phố giờ cao điểm, 2 lần mỗi bản: bản cũ 51,7 và 59,3 FPS, CPU 96% và 76%; bản mới 58,7 và 57,7 FPS, CPU 66% và 81%. Số đo dao động nhiều giữa các lần, nhưng thời gian tính kiểu dáng (style) giảm khoảng một phần ba (trung bình 14,5% → 10,5%). Văn phòng, quán cà phê vẫn khoảng 60 FPS.
+- Kiểm thử mở đầu ổn định hơn: “ít nhất 2 hành vi ngắn” được xem thêm tối đa 60 giây nếu 100 giây đầu chưa đủ (hành vi là ngẫu nhiên); “mở/đóng Cài đặt giữa lúc nói” đợi lâu hơn khi máy bận.
+
+**Kiểm thử:** thêm `npm run cau-chuyen` (Linh rủ đi thư viện và đủ các nhánh, đồng nghiệp giận rồi làm lành, thông báo điện thoại, xe máy, dừng hoạt ảnh ngoài màn hình).
+
+## v17.5 – Phase 3: Gia đình và công việc
 Không đổi công thức tài chính, sức khỏe, năng lượng, lương, nghỉ phép. Không đổi định dạng bản lưu (chỉ thêm vài cờ nhỏ trong `S.flags`).
 
 **Ngày làm việc không còn giống nhau (P2-12)** (dữ liệu `js/du-lieu/ngay-dac-biet.js`, điều khiển `js/song/ngay-dac-biet-vp.js`):

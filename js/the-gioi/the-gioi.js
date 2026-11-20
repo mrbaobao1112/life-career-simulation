@@ -359,6 +359,9 @@ function roamMount(root, ref){
     const target = Math.max(0, Math.min(H.W - ROAM.VIEW_W, me.x - ROAM.VIEW_W / 2));
     const cam = C.still ? target : W.cam + (target - W.cam) * Math.min(1, dt * 7);
     if (Math.abs(cam - W.cam) > .05 || W.cam === 0 && cam !== 0) { W.cam = Math.abs(target - cam) < .05 ? target : cam; $w('.w-cam').setAttribute('transform', `translate(${-W.cam.toFixed(2)} 0)`); placeMenu(); }
+    // v17.5: người ngoài khung nhìn hoặc đã đi khỏi thì dừng hoạt ảnh (đỡ nặng máy, nhất là điện thoại); vài lần mỗi giây là đủ
+    if (now - (W.offT || 0) > ROAM.OFF_MS) { W.offT = now; const x0 = W.cam - ROAM.OFF_PAD, x1 = W.cam + ROAM.VIEW_W + ROAM.OFF_PAD;
+      for (const a of W.npcs) { if (!a.el) continue; const off = !!a.gone || a.x < x0 || a.x > x1; if (off !== !!a.off) { a.off = off; a.el.classList.toggle('off', off); } } }
     // phòng đang đứng
     const room = (H.rooms.find(r => me.x >= r[1] && me.x < r[2]) || [''])[0];
     if (room !== W.room) { W.room = room; const rr = $w('.w-room'); rr.textContent = room; rr.classList.remove('pop'); void rr.offsetWidth; rr.classList.add('pop'); }

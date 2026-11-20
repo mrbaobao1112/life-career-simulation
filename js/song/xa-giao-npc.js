@@ -72,6 +72,7 @@ function songGreetTick(W, api){
     for (const b of list) {
       if (b === a || a.ai.with === b || b.ai.with === a || Math.abs(a.x - b.x) > XGK.GREET_R || Math.abs(a.y - b.y) > 30) continue;   // đang đến để nói chuyện thì không chào kiểu đi ngang
       const k = pairKey(a.who, b.who); if (W.t - (W.greetT[k] ?? -1e9) < NPCREL.GREET_CD) continue;
+      if (typeof ccGian === 'function' && ccGian(a.who, b.who)) { W.greetT[k] = W.t; continue; }   // đang giận nhau: đi ngang không chào
       W.greetT[k] = W.t; const tier = W.song.kind === 'home' ? 'than' : npcTier(a.who, b.who);
       if (tier === 'lanh') { api.C.react(b, 'nod'); continue; }
       const mem = typeof memNpcLine === 'function' ? memNpcLine(a.who, b.who) : null;   // nhớ chuyện hôm trước (tranh luận, ăn bánh)

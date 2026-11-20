@@ -12,7 +12,9 @@
 @keyframes waterRun{to{stroke-dashoffset:-9}}
 .world .w-smoke path{animation:smokeUp 4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
 @keyframes smokeUp{50%{transform:translateX(2px) scaleY(1.08);opacity:.35}}
-.world .actor.gone{opacity:0}
+.world .actor.gone{opacity:0;visibility:hidden}
+/* v17.5: người ngoài khung nhìn hoặc đã đi khỏi: dừng hoạt ảnh (chân bước, tay, dấu hiệu), không vẽ lại liên tục */
+.world .actor.off,.world .actor.off *{animation-play-state:paused!important}
 
 /* đồng hồ, tên phòng */
 .w-hud{position:absolute;left:8px;top:8px;right:8px;display:flex;align-items:center;gap:8px;pointer-events:none}

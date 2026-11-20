@@ -69,7 +69,7 @@ async function songWalk(W, api, a, p){
   for (const q of path) { a.s = roamScale(q.y); if (!await api.C.walk(a, q.x, q.y)) return false; a.el.dataset.y = q.y; api.depthSort(); }
   return api.alive();
 }
-function songHide(a, on){ a.gone = !!on; a.el.classList.toggle('gone', !!on); if (on) songSign(a, ''); }
+function songHide(a, on){ a.gone = !!on; a.el.classList.toggle('gone', !!on); if (on) { songSign(a, ''); a.off = true; a.el.classList.add('off'); } }   // off: dừng hoạt ảnh (khung hình sau tự cập nhật khi hiện lại)
 // Hiện ra ở (x, y) ngay lập tức rồi mới đi: đặt chỗ khi còn ẩn, ép trình duyệt cập nhật vị trí, rồi mới hiện
 // (nếu đặt chỗ và bắt đầu đi trong cùng một lượt, trình duyệt chỉ thấy điểm đích nên nhân vật trượt từ chỗ cũ hoặc bật hiện tại đích)
 function songAppear(api, a, x, y){ a.rot = 0; a.s = roamScale(y); api.put(a, x, y); a.el.classList.add('snap'); void a.el.getBoundingClientRect(); songHide(a, false); }

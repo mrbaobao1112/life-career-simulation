@@ -69,7 +69,7 @@ function psDone(a){ songHide(a, true); a.vis = null; }
 // Một xe máy chạy qua (có khi dừng trước quán một lát rồi đi tiếp)
 async function psBike(W, api, r){
   const a = W.street.bike.find(x => !x.vis); if (!a) return;
-  const right = r() < .5, y = PS.ROAD[right ? 0 : 1], from = right ? 10 : PHO.W - 10, to = right ? PHO.W - 10 : 10;
+  const L = PHO.LANE + 12, right = r() < .5, y = PS.ROAD[right ? 0 : 1], from = right ? L : PHO.W - 10, to = right ? PHO.W - 10 : L;   // v17.5: chỉ trên phố chính, từ đầu ngõ trở ra (không chạy vào ngõ)
   a.vis = { right }; songAppear(api, a, from, y); api.C.face(a, !right); api.C.act(a, 'act-ride'); api.depthSort();
   const stop = r() < PS.STOP ? PHO_DOORS[Math.floor(r() * PHO_DOORS.length)] : null;
   if (stop) {

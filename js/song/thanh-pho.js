@@ -23,7 +23,7 @@ function cityAt(who, t){
 function cityMount(W, api, id){
   W.city = []; W.cityId = id;
   Object.keys(CITY_DAY).forEach(who => {
-    if (W.npcs.some(a => a.who === who)) return;                               // đã có mặt (hẹn gặp / hoạt động cần người này)
+    if (W.npcs.some(a => a.who === who) || (S.meet && S.meet.d === S.day && S.meet.slot === S.slot && S.meet.who === who)) return;   // đã có mặt, hoặc đang có hẹn với bạn ở chỗ khác
     const p = CITY_DAY[who][songWeekend() ? 'weekend' : 'weekday'].find(s => s[2] === id); if (!p) return;
     const o = p[3], a = api.npc(who, o.x, o.y, o.act, !!o.left, { id:'city_' + who, label:o.label });
     a.city = who; a.post = { x:o.x, y:o.y, left:!!o.left };
