@@ -15,7 +15,8 @@ async function open(browser, opts = {}){
   page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load/.test(m.text())) page.errs.push(m.text().slice(0, 200)); });
   await page.addInitScript(() => window.addEventListener('unhandledrejection', e => console.error('REJ ' + (e.reason && e.reason.stack || e.reason))));
   await page.goto(URL); await page.click('#fresh'); await page.click('.bgopt[data-f] >> nth=1'); await page.click('.bgopt[data-b] >> nth=1'); await page.click('#go');
-  await page.evaluate(() => { S.opt.roam = false;   // bài này chỉ kiểm tra văn phòng: buổi sáng ở nhà dùng danh sách như trước
+  await page.evaluate(() => { NGAY.ON = false; S.opt.roam = false;   // v17.5: ngày đặc biệt kiểm riêng ở gia-dinh-cong-viec
+    // bài này chỉ kiểm tra văn phòng: buổi sáng ở nhà dùng danh sách như trước
     S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 9; S.slot = 'morning'; S.stat.workDays = 5; S.deck = shuffle(TASKS.map(t => t.id)); OFFICE_BAL.ABSENT = 0; STAGE_DEBUG.conflicts = 0; STAGE_DEBUG.log.length = 0; });
   return page;
 }

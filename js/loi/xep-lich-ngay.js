@@ -37,7 +37,7 @@ function buildSlot(){
       pushCommute(q);
       q.push({ id:'cut', arg:'arrive' });                    // phân cảnh đến công ty (tự bỏ qua khi tua hoặc khi tắt sân khấu)
       if (first) q.push({ id:'ob_arrive' }, { id:'ob_env' }, { id:'ob_team' });
-      else { q.push({ id:'standup' }, { id:'task', arg:{} }); maybeEvent(q, 'workmorning'); }
+      else { q.push({ id:'standup' }); const nd = typeof ngayQueue === 'function' && ngayQueue(q, 'morning'); q.push({ id:'task', arg:{} }); if (!nd) maybeEvent(q, 'workmorning'); }   // ngày đặc biệt (v17.5)
     } else {
       if (!S.job && di.wd === 1 && d > 1 && reapplyList().length) q.push({ id:'reapply' });   // thứ Hai: tìm việc tiếp
       if (di.wd === 6 && S.job && S.bugs.length) q.push({ id:'bug_weekend' });
@@ -52,7 +52,7 @@ function buildSlot(){
     else if (work) {
       if (S.bugs.some(b => b.due <= d)) q.push({ id:'bug_back' });
       q.push({ id:'task', arg:{ first, auto:!first } });       // task buổi chiều tự làm theo cách quen tay
-      if (!first) maybeEvent(q, 'workafternoon');
+      if (!first && !(typeof ngayQueue === 'function' && ngayQueue(q, 'afternoon'))) maybeEvent(q, 'workafternoon');
       if (reviewDue()) q.push({ id:'review' });
       q.push({ id:'endwork', arg:{} }, { id:'cut', arg:'leave' });
     } else { maybeEvent(q, 'freeafternoon'); q.push({ id:'activity', arg:'afternoon' }); }
