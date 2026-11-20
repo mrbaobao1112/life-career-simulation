@@ -162,7 +162,7 @@ function roamMount(root, ref){
     if (e.greet) {
       const a = n.npc; C.face(me, a.x < me.x); if (!a.home.lie) C.face(a, me.x < a.x);
       C.say(me, P.greet(a.who), 1200); SFX.play('talk'); await C.wait(C.still ? 0 : 1000); if (!alive()) return;
-      if (a.home.lie) C.say(a, 'Khò… khò…', 1400); else { C.react(a, 'nod'); C.say(a, pick(NPC_QUIP[a.who] || ['Ừ.']), 1500); }
+      if (a.home.lie) C.say(a, 'Khò… khò…', 1400); else { C.react(a, 'nod'); C.say(a, (typeof htGreetReply === 'function' && htGreetReply(W, a)) || pick(NPC_QUIP[a.who] || ['Ừ.']), 1500); }
       await C.wait(C.still ? 0 : 1200); if (!alive()) return; W.busy = false; showPrompt(); return;
     }
     if (e.go) {                                                // đi sang nơi khác (ra phố, vào quán, về nhà): đồng hồ chạy tiếp

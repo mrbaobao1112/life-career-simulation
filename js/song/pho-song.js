@@ -93,7 +93,7 @@ function psMeetTick(W, api, r){
     const a = list[i], b = list[j]; if (a.vis.met || b.vis.met || a.vis.right === b.vis.right || Math.abs(a.x - b.x) > 60) continue;
     a.vis.met = b.vis.met = true; if (r() > PS.MEET || !wevAllow(W, 'street')) continue;
     wevMark(W, 'street');
-    const l = pickLine(XG.greet.than.concat(GENERIC_CHAT), 'psmeet', r);
+    const l = pickLine(XG.greet.than.concat(typeof xgNoiList === 'function' ? xgNoiList('street', W.t / 60) : []), 'psmeet', r);
     const talk = (async () => {
       api.C.face(a, b.x < a.x); api.C.face(b, a.x < b.x); songSign(a, '💬'); songSign(b, '💬'); api.C.act(a, 'act-talk'); api.C.act(b, 'act-listen');
       for (let k = 0; k < l.length; k++) { if (!api.C.still) api.say(k % 2 ? b : a, l[k], 1400); if (!await api.wait(api.C.still ? 0 : 1500)) return; }

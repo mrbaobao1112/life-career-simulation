@@ -61,6 +61,7 @@ function officeNpcEntries(ref, sc, who){
 }
 // Bắt chuyện: dùng câu nói theo tính cách (tinh-cach.js), cộng quan hệ trong giới hạn mỗi ngày (chatBond)
 async function officeTalk(a, api){
+  if (typeof htTalk === 'function' && HTC.ON && XUNG[a.who]) return htTalk(WORLD, api, a);   // v17.5: hội thoại có trí nhớ, theo nơi, giờ, mức thân
   const t = pickTalk(a.who), lines = t ? t.lines : [pick(NPC_QUIP[a.who] || ['Ừ.']), 'Dạ.'];
   api.say(api.me, VP_GREET[a.who] || 'Chào!', 1100); SFX.play('talk'); if (!await api.wait(api.C.still ? 0 : 1000)) return;
   for (let i = 0; i < lines.length; i++) {
