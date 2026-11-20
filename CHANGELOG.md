@@ -1,6 +1,39 @@
 # Lịch sử phiên bản
 
-## v17.5 – Phase 4: Chuyện tự nảy sinh và hoàn thiện (hiện tại)
+## v17.6 – Phase 1: Kiểm tra toàn bộ và kiểm thử (hiện tại)
+**Không đổi mã game.** Chỉ sửa môi trường kiểm thử, thêm bài kiểm thử và công cụ đo. Báo cáo đầy đủ: `docs/AUDIT_REPORT_v17.6.md`.
+
+**Môi trường kiểm thử:**
+- Playwright (trình duyệt dùng cho kiểm thử) nằm trong `tests/package.json`: `npm install` là đủ, không phụ thuộc bản cài sẵn trên máy.
+- Thiếu Playwright thì bài báo **⏭️ SKIP** (mã thoát 3), không còn báo "Bỏ qua" rồi tính là đạt như trước.
+- `npm test` giờ chạy **tất cả** các bộ (trước chỉ chạy 4 bộ), qua bộ chạy tổng `tests/chay-tat-ca.js`.
+  - Mỗi bộ ghi rõ: ✅ ĐẠT / ❌ KHÔNG ĐẠT / ⏭️ SKIP / ⬜ CHƯA CHẠY / 📊 BÁO CÁO.
+  - Bảng kết quả ghi vào `tests/ket-qua/tong-hop.md`.
+  - Bộ đo hiệu năng chạy riêng sau cùng.
+  - Bộ nhanh cũ: `npm run co-ban`.
+- `he-thong`, `tai-chinh`, `ngau-nhien` có kiểm tra đạt/không đạt thật (trước chỉ in số liệu). `can-bang`, `hai-thang` ghi rõ là bảng báo cáo.
+
+**Bài kiểm thử mới:**
+- `npm run luu-tai`:
+  - bản lưu thật của 16.1, 17.0, 17.3, 17.4, 17.5 (ngày 12, ngày 30, và lúc đang đi ngoài phố) mở bằng bản hiện tại và chơi tiếp đến hết;
+  - bản lưu thiếu dữ liệu mới;
+  - lưu rồi tải lại giữ nguyên mọi thứ;
+  - đang hẹn Linh, tải lại trang vẫn còn hẹn.
+  - Bản lưu mẫu ở `tests/du-lieu-mau/`, tạo thêm bằng `tao-ban-luu.js`.
+- `npm run npc-on-dinh`:
+  - lịch không trùng trong 56 ngày;
+  - ở 10 nơi không ai trùng mặt, kẹt, ra ngoài bản đồ hay bận mãi;
+  - ra vào địa điểm 24 lần không lỗi, không nhân đôi vòng lặp hình.
+- `npm run hieu-nang`:
+  - FPS trên điện thoại giả lập ở phố, văn phòng, quán;
+  - NPC ngoài màn hình không chạy hoạt ảnh;
+  - tìm đường nhanh;
+  - ra vào 20 lần không rò nút trang, trình nghe sự kiện, bộ nhớ.
+- Công cụ `tests/audit/trai-nghiem.js`: bot chơi nhiều ván, đếm ngày nhạt, sự kiện lặp, hoạt động được chọn, hậu quả về sau.
+
+**Kết quả:** 21 bộ ĐẠT, 0 KHÔNG ĐẠT, 0 SKIP, 2 BÁO CÁO; 669 kiểm tra đạt.
+
+## v17.5 – Phase 4: Chuyện tự nảy sinh và hoàn thiện
 Không đổi công thức tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Bản lưu cũ vẫn chơi tiếp được: chỉ thêm `S.cc` (trạng thái chuyện, tự tạo khi chưa có) và vài cờ nhỏ trong `S.flags`.
 
 **Chuyện tự nảy sinh** (dữ liệu `js/du-lieu/cau-chuyen.js`, điều khiển `js/song/cau-chuyen.js`). Không phải kịch bản cố định: chuyện chỉ bắt đầu khi các hệ thống sẵn có (trí nhớ NPC, quan hệ, sự kiện thế giới, lịch sinh hoạt) đủ điều kiện, và đi tiếp theo lựa chọn của bạn.

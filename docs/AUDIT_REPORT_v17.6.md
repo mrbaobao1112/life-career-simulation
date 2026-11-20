@@ -93,7 +93,41 @@ Bảng kết quả ghi vào `tests/ket-qua/tong-hop.md`. Bộ đo hiệu năng c
 
 ## 4. Kết quả kiểm thử (chạy thật bằng `npm test`)
 
-KET_QUA_BANG
+Chạy ngày 20/11/2026, `npm test`, 3 luồng song song, bộ hiệu năng chạy riêng sau cùng. Tổng thời gian khoảng 25 phút.
+
+**Tổng: ✅ ĐẠT 21 bộ · ❌ KHÔNG ĐẠT 0 · ⏭️ SKIP 0 · ⬜ CHƯA CHẠY 0 · 📊 BÁO CÁO 2. Có 669 kiểm tra đạt, 0 kiểm tra hỏng.**
+
+| Bộ | Kết quả | Kiểm tra đạt | Giây |
+|---|---|---|---|
+| he-thong | ✅ ĐẠT | 5 (mới thêm) | 5 |
+| tai-chinh | ✅ ĐẠT | 4 (mới thêm) | 16 |
+| 56-ngay | ✅ ĐẠT | 96 | 23 |
+| ngau-nhien (40 ván) | ✅ ĐẠT | 1 (mới thêm) | 583 |
+| **luu-tai** (mới) | ✅ ĐẠT | 19 | 101 |
+| van-phong | ✅ ĐẠT | 18 | 188 |
+| mo-dau | ✅ ĐẠT | 40 | 202 |
+| the-gioi | ✅ ĐẠT | 66 | 79 |
+| van-phong-di-lai | ✅ ĐẠT | 62 | 82 |
+| ra-pho | ✅ ĐẠT | 45 | 99 |
+| the-gioi-song | ✅ ĐẠT | 27 | 62 |
+| xa-giao | ✅ ĐẠT | 24 | 117 |
+| thanh-pho | ✅ ĐẠT | 38 | 66 |
+| tri-nho | ✅ ĐẠT | 32 | 26 |
+| sua-loi-17-4 | ✅ ĐẠT | 20 | 56 |
+| hoi-thoai | ✅ ĐẠT | 34 | 66 |
+| quan-song | ✅ ĐẠT | 35 | 120 |
+| gia-dinh-cong-viec | ✅ ĐẠT | 31 | 61 |
+| cau-chuyen | ✅ ĐẠT | 46 | 26 |
+| **npc-on-dinh** (mới) | ✅ ĐẠT | 14 | 341 |
+| **hieu-nang** (mới, chạy riêng) | ✅ ĐẠT | 12 | 55 |
+| can-bang | 📊 BÁO CÁO (chạy xong, không lỗi) | – | 673 |
+| hai-thang | 📊 BÁO CÁO (chạy xong, không lỗi) | – | 32 |
+
+**Chưa kiểm tra được:**
+- máy thật (điện thoại thật, Safari);
+- mạng chậm;
+- trình đọc màn hình;
+- chơi tay từng trò chơi nhỏ.
 
 ## 5. Bài kiểm thử theo từng hệ thống được yêu cầu
 
@@ -151,7 +185,23 @@ Bot chọn ngẫu nhiên, 12 ván, chế độ bấm thẻ (`tests/audit/trai-ng
 
 ## 7. Hiệu năng
 
-PERF_BANG
+Bài `hieu-nang` trong lần chạy `npm test` (điện thoại giả lập iPhone 13, CPU chậm 6 lần, nhân vật đi qua lại để camera chạy):
+
+| Cảnh | FPS | 95% khung hình vẽ xong trong | Số người |
+|---|---|---|---|
+| Phố giờ cao điểm | **47,4** (lần chạy riêng trước đó: 45,1) | 33,4 ms | 9–10 |
+| Văn phòng | 59,4 | 16,7 ms | 4 |
+| Quán cà phê đông | 55,5 | 33,3 ms | 6 |
+
+| Mục | Kết quả |
+|---|---|
+| Tìm đường trên phố (dài 2080) | 0,02 ms mỗi lần, tìm được 300/300 |
+| Ra vào thế giới 20 lần: số nút trang | 2724 → 1989 (không tăng) |
+| Ra vào thế giới 20 lần: số trình nghe sự kiện | 63 → 54 (không tăng) |
+| Ra vào thế giới 20 lần: bộ nhớ JavaScript | 2,9 MB → 3,2 MB (+10%, dưới ngưỡng 12%) |
+| NPC ngoài khung nhìn | 7 người, 0 hoạt ảnh còn chạy; 7 người trong khung nhìn vẫn có 49 hoạt ảnh |
+
+- Bộ nhớ tăng 10% sau 20 lần ra vào: chưa đủ để kết luận là rò (số nút và trình nghe đều giảm), nhưng nằm gần ngưỡng. Phase 3 nên đo dài hơn bằng `tests/audit/chay-lau.js`.
 
 - Không thấy rò bộ nhớ, rò trình nghe sự kiện hay nhân đôi vòng lặp hình khi ra vào địa điểm nhiều lần.
 - NPC ngoài màn hình đã dừng hoạt ảnh (v17.5). NPC ngoài màn hình vẫn được cập nhật vị trí theo lịch (cố ý, để mô phỏng đúng), nhưng đi thẳng tới đích, không tính từng bước.
@@ -168,7 +218,20 @@ PERF_BANG
 
 ## 9. Lỗi còn tồn tại sau Phase 1
 
-LOI_CON
+Không có lỗi P0/P1 (làm hỏng game, mất dữ liệu). Không có bài kiểm thử nào hỏng.
+
+| Mức | Mã | Vấn đề | Đề xuất |
+|---|---|---|---|
+| P2 (gameplay) | G1 | Cảnh "Thiếu ngủ" lặp mỗi sáng khi nợ ngủ cao (khoảng 11 lần mỗi ván với bot) | Phase 3 |
+| P2 (gameplay) | G2 | 21% số ngày không có gì ngoài việc thường ngày | Phase 3, nối với mục tiêu (Phase 2) |
+| P2 (gameplay) | G3 | Ít lý do để ra ngoài ngày nghỉ (16,5% ngày nghỉ có gặp người, chế độ thẻ) | Phase 2–3 |
+| P2 (gameplay) | G4 | Ít quyết định có hậu quả nhiều ngày sau | Phase 2–3 |
+| P3 (hiệu năng) | H1 | Phố giờ cao điểm trên điện thoại khoảng 45–47 FPS khi camera chạy (sát ngưỡng 40) | Phase 3 |
+| P3 (hiệu năng) | H2 | Bộ nhớ tăng 10% sau 20 lần ra vào (chưa chắc là rò) | Phase 3 đo dài |
+| P3 | P3-06 | Anh Dũng đi xuyên mép bàn khi rời ghế | Phase 3 |
+| P3 | P3-07 | Biển tên công ty đè lên gợi ý "Bàn của bạn" | Phase 3 |
+| P3 | P3-10 | Bài chơi ngẫu nhiên cần 6 GB bộ nhớ | Phase 4 |
+| P3 | P3-12 | 78 file JS riêng lẻ (tải chậm qua mạng chậm) | Để sau |
 
 ## 10. Phase 1 đã thay đổi gì
 
