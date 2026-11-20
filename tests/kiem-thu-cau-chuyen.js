@@ -2,7 +2,7 @@
 // thông báo điện thoại gọn hơn, xe máy chỉ chạy trên phố chính, hiệu năng (NPC ngoài màn hình không chạy hoạt ảnh).
 // Cần Playwright. Chạy: npm run cau-chuyen
 let chromium;
-try { ({ chromium } = require('playwright')); } catch (e) { console.log('Bỏ qua: máy này chưa có Playwright (npm i -D playwright).'); process.exit(0); }
+try { ({ chromium } = require('playwright')); } catch (e) { console.log('⏭️ SKIP: máy này chưa có Playwright (chạy: cd tests && npm install). Bài này CHƯA CHẠY, không tính là đạt.'); process.exit(3); }
 const path = require('path');
 const URL = 'file://' + path.join(__dirname, '..', 'index.html');
 let fail = 0;

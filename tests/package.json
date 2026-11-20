@@ -3,7 +3,7 @@
   "private": true,
   "description": "Kiểm thử tự động cho bản chơi thử Life & Career Simulation",
   "scripts": {
-    "test": "node kiem-thu-he-thong.js && node kiem-thu-tai-chinh.js && node kiem-thu-56-ngay.js && node choi-ngau-nhien.js 20",
+    "test": "node chay-tat-ca.js",
     "56-ngay": "node kiem-thu-56-ngay.js",
     "van-phong": "node kiem-thu-van-phong.js",
     "mo-dau": "node kiem-thu-mo-dau.js",
@@ -23,9 +23,14 @@
     "hoi-thoai": "node kiem-thu-hoi-thoai.js",
     "quan-song": "node kiem-thu-quan-song.js",
     "gia-dinh-cong-viec": "node kiem-thu-gia-dinh-cong-viec.js",
-    "cau-chuyen": "node kiem-thu-cau-chuyen.js"
+    "cau-chuyen": "node kiem-thu-cau-chuyen.js",
+    "co-ban": "node kiem-thu-he-thong.js && node kiem-thu-tai-chinh.js && node kiem-thu-56-ngay.js && node choi-ngau-nhien.js 20",
+    "luu-tai": "node --max-old-space-size=4096 kiem-thu-luu-tai.js",
+    "npc-on-dinh": "node kiem-thu-npc-on-dinh.js",
+    "hieu-nang": "node kiem-thu-hieu-nang.js"
   },
   "devDependencies": {
-    "jsdom": "24.1.3"
+    "jsdom": "24.1.3",
+    "playwright": "1.63.0"
   }
 }

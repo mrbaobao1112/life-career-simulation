@@ -1,7 +1,7 @@
 // Kiểm thử văn phòng đi lại được (v15): bốn kiểu văn phòng, họp, task với trò chơi nhỏ, kỷ luật, tan làm. Cần Playwright.
 // Chạy: npm run van-phong-di-lai
 let chromium, devices;
-try { ({ chromium, devices } = require('playwright')); } catch (e) { console.log('Bỏ qua: máy này chưa có Playwright (npm i -D playwright).'); process.exit(0); }
+try { ({ chromium, devices } = require('playwright')); } catch (e) { console.log('⏭️ SKIP: máy này chưa có Playwright (chạy: cd tests && npm install). Bài này CHƯA CHẠY, không tính là đạt.'); process.exit(3); }
 const path = require('path');
 const URL = 'file://' + path.join(__dirname, '..', 'index.html');
 let fail = 0;

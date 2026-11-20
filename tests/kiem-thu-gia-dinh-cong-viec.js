@@ -1,7 +1,7 @@
 // Kiểm thử v17.5 – Phase 3: ngày làm việc đặc biệt (hạn chót, review, khách, sự cố, demo, team building) và đời sống gia đình.
 // Cần Playwright. Chạy: npm run gia-dinh-cong-viec
 let chromium;
-try { ({ chromium } = require('playwright')); } catch (e) { console.log('Bỏ qua: máy này chưa có Playwright (npm i -D playwright).'); process.exit(0); }
+try { ({ chromium } = require('playwright')); } catch (e) { console.log('⏭️ SKIP: máy này chưa có Playwright (chạy: cd tests && npm install). Bài này CHƯA CHẠY, không tính là đạt.'); process.exit(3); }
 const path = require('path');
 const URL = 'file://' + path.join(__dirname, '..', 'index.html');
 let fail = 0;
