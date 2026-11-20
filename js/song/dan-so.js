@@ -10,7 +10,7 @@ const DS = {
   TICK:.5,                   // nghĩ 2 lần mỗi giây
   SPAWN:.12,                 // mỗi nhịp, nếu còn thiếu khách so với mật độ thì xác suất có người bước vào
   SPEED:56,
-  QUEUE:[[0, 0], [-26, 0], [0, 16], [-26, 16], [-52, 0], [-52, 16]],   // chỗ đứng xếp hàng quanh quầy (lệch x, lệch y): không ai đứng chồng lên ai
+  QUEUE:[[0, 0], [-36, 0], [0, 18], [-36, 18], [-72, 0], [-72, 18]],   // chỗ đứng xếp hàng quanh quầy (lệch x, lệch y): không ai đứng chồng lên ai
 };
 const H24 = s => s.split(',').map(Number);   // mật độ 24 giờ, viết gọn
 const DS_PLACE = {
@@ -40,7 +40,7 @@ const DS_SCRIPT = {
   lib:[['go', 'shelf', 'act-read', [3, 8], '📚'], ['seat', null, 'act-read', [25, 60], '📖'], ['leave']],
   mall:[['go', 'browse', 'act-think', [3, 8], '👀'], ['go', 'browse', 'act-think', [3, 6], ''], ['maybe', .55, 'cashier', 'act-talk', [2, 3], '🛍️'], ['leave']],
   bus:[['go', 'ticket', 'act-talk', [2, 3], '🎫'], ['seat', null, 'act-phone', [10, 30], '🕒'], ['board']],
-  lake:[['jog']], lakeSit:[['seat', null, '', [15, 35], '🌳'], ['leave']], lakeWalk:[['stroll']],
+  lake:[['jog']], lakeSit:[['seat', null, 'act-think', [15, 35], '🌳'], ['leave']], lakeWalk:[['stroll']],
 };
 // Dáng người qua đường đa dạng (ghép từ tóc, màu da, áo có sẵn), cố định theo nơi và số thứ tự
 const DS_HAIR = { nam:['hair_short', 'hair_spiky', 'hair_side'], nu:['hair_long', 'hair_bob', 'hair_bun', 'hair_pixie'] };
@@ -63,7 +63,7 @@ function popMount(W, api, id){
   const P = W.pop = { id, cfg, acc:0, pool:[], seats:cfg.seats.map(() => null), exit:{ x:40, y:170 } };
   for (let k = 0; k < Math.min(DS.POOL, cfg.cap + 2); k++) {
     const a = api.npc('p', P.exit.x, P.exit.y, '', false, { id:`v${k}`, look:dsLook(id + k), speed:DS.SPEED, label:'Khách' });
-    a.entries = () => [{ icon:'👋', label:'Chào', minor:true, greet:true, min:0 }];
+    a.entries = typeof pvVisitorEntries === 'function' ? pvVisitorEntries(a) : () => [{ icon:'👋', label:'Chào', minor:true, greet:true, min:0 }];
     a.crowd = true; songHide(a, true); a.vis = null; P.pool.push(a);
   }
   // vào cảnh: một số khách đã ngồi sẵn giữa chừng (quán không trống trơn), nhóm tập dưỡng sinh ở hồ
@@ -78,11 +78,13 @@ function popSpawn(W, api, r, seated, buddyOf){
   const P = W.pop, a = popFree(P); if (!a) return null;
   let script = P.cfg.script; if (script === 'lake') script = r() < .45 ? 'lake' : r() < .5 ? 'lakeSit' : 'lakeWalk';
   const steps = DS_SCRIPT[script];
+  const free = P.seats.filter(x => !x).length - P.pool.filter(b => b.vis && b.vis.seat < 0 && b.vis.steps.some((s, i) => i >= b.vis.i && s[0] === 'seat')).length;   // chỗ còn trống, trừ người đang đến
+  if (!seated && steps.some(s => s[0] === 'seat') && free < 1) return null;   // hết chỗ thì không vào (trước đây vào rồi ra ngay ở cửa)
   a.vis = { steps, i:0, until:0, busy:false, seat:-1, buddy:buddyOf || null };
   songAppear(api, a, P.exit.x, P.exit.y);
   if (seated) { const si = steps.findIndex(s => s[0] === 'seat'); if (si >= 0) { a.vis.i = si; popStep(W, api, a, r, true); return a; } }
   popStep(W, api, a, r);
-  if (!buddyOf && !seated && P.cfg.group && r() < P.cfg.group) { const b = popSpawn(W, api, r, false, a); if (b) a.vis.buddy = b; }   // đi theo nhóm hai người
+  if (!buddyOf && !seated && P.cfg.group && r() < P.cfg.group && free >= 2) { const b = popSpawn(W, api, r, false, a); if (b) a.vis.buddy = b; }   // đi theo nhóm hai người
   return a;
 }
 function popSeat(P, a, near){
@@ -91,7 +93,7 @@ function popSeat(P, a, near){
   else i = free[Math.floor(Math.random() * free.length)];
   P.seats[i] = a; return i;
 }
-function popRelease(P, a){ if (a.vis && a.vis.seat >= 0) P.seats[a.vis.seat] = null; }
+function popRelease(P, a){ if (a.vis && a.vis.seat >= 0) { P.seats[a.vis.seat] = null; if (typeof pvLeft === 'function' && WORLD) pvLeft(WORLD, P.cfg.seats[a.vis.seat]); } }
 // Thực hiện bước hiện tại của khách
 async function popStep(W, api, a, r, snap){
   const P = W.pop, v = a.vis, st = v.steps[v.i]; if (!st) return popGone(W, a);
@@ -116,15 +118,18 @@ async function popStep(W, api, a, r, snap){
   v.spot = st[0] === 'seat' ? null : p;
   if (!await go(p)) return;
   const k = st[0] === 'maybe' ? 3 : 2;
-  api.C.face(a, !!p.face); api.C.act(a, st[k]); songSign(a, st[k + 2]);
+  api.C.face(a, !!p.face); api.C.act(a, st[0] === 'seat' ? ((st[k] || '') + ' act-sit').trim() : st[k]); songSign(a, st[k + 2]);
   v.until = dur(st[k + 1]);
+  if (!snap && typeof pvArrive === 'function') pvArrive(W, api, a, st);
+  if (snap && st[0] === 'seat' && typeof PV_PLACE !== 'undefined' && PV.ON && PV_PLACE[P.id] && PV_PLACE[P.id].order && PV_PLACE[P.id].prop) api.C.hold(a, PV_PLACE[P.id].prop);   // khách ngồi sẵn thì đã có cốc       // gọi đồ, trả tiền, chờ mang trà: nhân viên phục vụ
   if (st[0] === 'seat' && v.buddy && v.buddy.vis && v.buddy.vis.seat >= 0 && songInView(W, a.x) && !api.C.still) {   // ngồi cùng bạn: nói chuyện
-    const l = pickLine(typeof xgNoiList === 'function' ? xgNoiList(P.id, W.t / 60) : [['Ngon nhỉ.', 'Ừ.']], 'noi' + P.id, r);   // câu theo nơi và buổi songSign(a, '💬'); songSign(v.buddy, '💬'); npcFace(a, 'happy'); npcFace(v.buddy, 'happy');
+    const l = pickLine(typeof xgNoiList === 'function' ? xgNoiList(P.id, W.t / 60) : [['Ngon nhỉ.', 'Ừ.']], 'noi' + P.id, r);
+    songSign(a, '💬'); songSign(v.buddy, '💬'); npcFace(a, 'happy'); npcFace(v.buddy, 'happy');
     l.forEach((t, j) => api.C.later(() => api.say(j % 2 ? v.buddy : a, t, 1400), 600 + j * 1500));
   }
   v.i++; v.busy = false;
 }
-function popGone(W, a){ popRelease(W.pop, a); songHide(a, true); a.vis = null; a.speed = DS.SPEED; npcFace(a, 'neutral'); }
+function popGone(W, a){ popRelease(W.pop, a); if (a.holding && W.api) W.api.C.hold(a); songHide(a, true); a.vis = null; a.speed = DS.SPEED; npcFace(a, 'neutral'); }
 function popFrame(W, dt, api){
   const P = W.pop; if (!P) return;
   P.acc += dt; if (P.acc < DS.TICK) return; P.acc = 0;
@@ -132,16 +137,17 @@ function popFrame(W, dt, api){
   if (popActive(P) < want && r() < DS.SPAWN) popSpawn(W, api, r);
   for (const a of P.pool) { const v = a.vis; if (!v || v.busy || W.t < v.until) continue; if (W.menu && W.menu.n.npc === a) continue; popStep(W, api, a, r); }
   if (P.id === 'in:lake') popExerciseTick(W, api);
+  if (typeof pvTick === 'function') pvTick(W, api);
 }
 // Hồ Bán Nguyệt: nhóm tập dưỡng sinh sáng sớm và chiều muộn
 function popExercise(W, api){
-  W.pop.ex = [0, 1, 2, 3].map(k => { const a = api.npc('p', 470 + k * 30, 180 + (k % 2) * 8, '', k % 2 === 1, { id:'ex' + k, look:dsLook('ex' + k), label:'Người tập dưỡng sinh' }); a.fixed = true; a.crowd = true;
+  W.pop.ex = [0, 1, 2, 3].map(k => { const a = api.npc('p', 450 + k * 48, 176 + (k % 2) * 16, '', k % 2 === 1, { id:'ex' + k, look:dsLook('ex' + k), label:'Người tập dưỡng sinh' }); a.fixed = true; a.crowd = true;
     a.entries = () => [{ icon:'👋', label:'Chào', minor:true, greet:true, min:0 }]; return a; });
   popExerciseTick(W, api, true);
 }
 function popExerciseTick(W, api, first){
   const h = (W.t / 60) % 24, on = (h >= 5.5 && h < 7.2) || (h >= 17 && h < 18.6);
-  (W.pop.ex || []).forEach((a, k) => { if (a.gone === !on && !first) return; songHide(a, !on); if (on) { songSign(a, k === 0 ? '🤸' : ''); if (!api.C.still && songInView(W, a.x)) api.C.react(a, pick(['nod', 'jump'])); } });
+  (W.pop.ex || []).forEach((a, k) => { if (a.gone === !on && !first) return; songHide(a, !on); if (on) { api.C.act(a, 'act-tap'); songSign(a, k === 0 ? '🤸' : ''); } });
 }
 const POP_DEBUG = () => WORLD && WORLD.pop && { id:WORLD.pop.id, active:popActive(WORLD.pop), want:dsTarget(WORLD.pop.cfg, WORLD.pop.id, WORLD.t), pool:WORLD.pop.pool.length,
   seats:WORLD.pop.seats.map(a => a ? a.id : null), steps:WORLD.pop.pool.filter(a => a.vis).map(a => a.id + ':' + a.vis.i), ex:(WORLD.pop.ex || []).filter(a => !a.gone).length };

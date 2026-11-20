@@ -1,6 +1,55 @@
 # Lịch sử phiên bản
 
-## v17.5 – Phase 1: Hội thoại và trí nhớ khi chủ động bắt chuyện (hiện tại)
+## v17.5 – Phase 2: Quán có đời sống thật (hiện tại)
+Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu (chỉ thêm hai mục nhỏ trong `S.flags` để giới hạn mỗi ngày).
+
+**Nhân viên phục vụ thật** (`js/song/phuc-vu.js`, bảng `PV_PLACE`):
+- **Cà phê:** chị pha chế đứng **sau quầy**. Thêm mặt trước quầy che nửa người, và nâng người như đứng trên bục, nên thấy được từ vai trở lên. Trước đây chị đứng trước quầy, bất động cả ngày.
+- Khách đến quầy gọi đồ (“Cho chị một cốc nâu nóng.”), khách chờ (⏳). Chị nhận lời (“Có ngay ạ!”), ra máy pha có động tác pha chế, mang lại đưa cốc (“Cà phê nóng đây ạ.”). Khách cảm ơn, cầm cốc về chỗ ngồi uống.
+- Khách ra quầy trả tiền: chị báo giá, cảm ơn.
+- Khách về: chị vòng ra khỏi quầy, ra **dọn bàn** (🧽), rồi quay lại sau quầy.
+- Lúc rảnh: lau quầy (🧽) hoặc nghỉ ngắn xem điện thoại (📱).
+- **Cơm bụi:** cô bán cơm đứng sau tủ kính, khách gọi suất cơm, cô xới rồi đưa.
+- **Trà đá:** bác bán trà mang cốc trà ra tận ghế cho khách.
+- **Trung tâm thương mại:** khách ra quầy, thu ngân tính tiền.
+- **Thư viện:** cô thủ thư lúc rảnh đi xếp sách.
+- Bia hơi chưa có nhân viên. Thêm nơi mới = thêm một mục vào `PV_PLACE`.
+
+**Khách có vòng đời đầy đủ:** vào quán → (xếp hàng) gọi đồ → chờ → nhận đồ, cầm cốc → ngồi uống (dáng ngồi) → trả tiền → về. Khách ngồi sẵn lúc bạn vào quán đã có cốc trên tay.
+
+**Bạn tham gia được:**
+- **Gọi cà phê ở quầy** (“Cà phê trứng mang về”): chị pha chế pha và đưa cốc cho bạn thật; bạn cầm cốc một lúc. Giá và tinh thần như cũ.
+- **Ngồi cùng bàn, nói chuyện với khách** (bấm vào khách đang ngồi):
+  - bạn đi tới ngồi cạnh, nói vài câu hợp quán; khách đi cùng bạn cũng nói;
+  - mất 15 phút, tinh thần +1 (mỗi ngày tính tối đa 2 lần), ghi vào nhật ký.
+- **Mời người quen một cốc:**
+  - mời Linh ở cà phê (25.000đ) hoặc Tùng ở trà đá (10.000đ);
+  - họ thân hơn 3 (mỗi người mỗi ngày một lần), vui ra mặt, nhận cốc (ở trà đá thì bác mang ra tận chỗ);
+  - họ nhớ chuyện này và hôm sau nhắc lại khi bắt chuyện (“Lần này đến lượt tao mời nhé.”).
+- Các con số nằm trong bảng `PV`. Tắt được (`PV.ON = false`).
+
+**Sửa lỗi:**
+- **P3-05:** quán hết chỗ thì khách không vào nữa. Trước đây khách vào rồi ra ngay ở cửa. Đi theo cặp thì cần hai chỗ trống.
+- **P3-04:**
+  - thêm **dáng ngồi** (`act-sit`, gập chân, hạ người) cho khách ngồi ghế ở mọi quán, ghế chờ bến xe, ghế đá ở hồ; người ngồi ghế đá ngắm hồ (`act-think`);
+  - thêm **động tác dưỡng sinh** (`act-tap`, hai tay từ từ nâng lên hạ xuống); nhóm tập đứng giãn ra, hai hàng so le.
+- **Xếp hàng ở quầy:** các chỗ đứng cách nhau rộng hơn (36 đơn vị), hai người không đứng sát vào nhau.
+- **Sửa lỗi của Phase 1:** một chú thích `//` làm mất lệnh hiện dấu 💬 và nét mặt vui khi hai khách ngồi cùng bàn nói chuyện.
+
+**Kiểm thử:** thêm `npm run quan-song` (35 mục):
+- nhân viên sau quầy; khách ngồi sẵn có cốc; gọi đồ, pha chế, đưa đồ, trả tiền, dọn bàn, lúc rảnh;
+- bạn gọi cà phê; ngồi cùng bàn (giới hạn mỗi ngày); mời Linh (tiền, quan hệ, nhớ, nhắc lại hôm sau), mời Tùng (bác mang trà ra);
+- cơm bụi, thu ngân, thủ thư;
+- hết chỗ không vào; dáng ngồi, dưỡng sinh;
+- tắt được; điện thoại và giảm chuyển động.
+
+`thanh-pho`: bài “khách xong việc thì ra về” chờ lâu hơn (21 giây), vì giờ khách xếp hàng trả tiền và chờ nhân viên.
+
+**Bản lưu cũ:** bản lưu từ v17.5 Phase 1 (ngày 21) mở bằng bản mới, chơi tiếp đến hết ngày 56: 0 lỗi.
+
+**Ghi chú:** `mo-dau` có một mục dựa vào may rủi (“trong 100 giây thấy ít nhất 2 loại hành vi ngắn”). Thỉnh thoảng mục này không đạt, kể cả khi chạy riêng (2/3 lần đạt). Phase này không sửa màn hình mở đầu. Sẽ làm cho ổn định ở Phase 4.
+
+## v17.5 – Phase 1: Hội thoại và trí nhớ khi chủ động bắt chuyện
 Mục tiêu v17.5: người chơi chủ động tham gia thế giới sống, không chỉ đứng xem. Phase 1 tập trung vào nói chuyện.
 Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu.
 

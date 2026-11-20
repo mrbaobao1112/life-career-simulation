@@ -17,6 +17,7 @@ const MEM_LINES = {
   'ev:linh_check':{ pos:{ linh:['Dạo này mày đỡ hơn chưa? Tao vẫn lo đấy.'] } },
   'ev:tung_borrow':{ pos:{ tung:['Khoản hôm trước tao nhớ đấy, có lương tao trả ngay!', 'Mày đúng là bạn tốt nhất của tao.'] },
                      neg:{ tung:['Không sao đâu… tao tự xoay được.', 'Hôm trước tao hơi kẹt thật mà.'] } },
+  'moi_nuoc':     { pos:{ linh:['Cốc cà phê hôm trước mày mời, tao vẫn nhớ đấy.', 'Lần này đến lượt tao mời nhé.'], tung:['Cốc trà đá hôm trước ngon hơn hẳn vì mày trả tiền.', 'Hôm nay tao mời lại!'], '*':['Cảm ơn hôm trước đã mời nhé.'] } },
   'tung_repay':   { pos:{ tung:['Trả xong rồi nhé, sòng phẳng!'] }, neg:{ tung:['Khoản kia tao nhớ mà, đừng nhắc nữa…'] } },
   'repay':        { pos:{ linh:['Mày trả đúng hẹn, tao quý mày ở điểm đó.'], tung:['Sòng phẳng thế, tao phục.'], mom:['Con trả mẹ đúng hẹn, mẹ vui lắm.'] },
                     neg:{ linh:['Khoản kia… mày nhớ nhé.'], tung:['Ê, khoản kia đến hẹn rồi đấy.'], mom:['Tiêu pha cẩn thận con nhé.'] } },
