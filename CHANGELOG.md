@@ -1,6 +1,60 @@
 # Lịch sử phiên bản
 
-## v17.6 – Phase 1: Kiểm tra toàn bộ và kiểm thử (hiện tại)
+## v17.6 – Phase 2: Nền tảng phát triển (hiện tại)
+Chạy **song song** với chỉ số cũ (Chuyên môn, Kỹ năng mềm, điểm làm việc). **Không đổi** lương, tài chính, năng lượng, sức khỏe, hệ thống 56 ngày.
+Bản lưu cũ vẫn chơi tiếp được: chỉ thêm `S.pt`, tự tạo khi chưa có.
+Dữ liệu: `js/du-lieu/phat-trien.js`. Cách chạy: `js/he-thong/phat-trien.js`. Tắt được: `PT.ON = false`.
+
+**Kỹ năng nghề (5 loại):** Lập trình, Giao tiếp, Quản lý, Sáng tạo, Giải quyết vấn đề.
+- Mỗi kỹ năng có 6 mức: Mới bắt đầu → Cơ bản → Khá → Vững → Giỏi → Chuyên gia.
+- Mức ban đầu lấy từ chỉ số cũ: Lập trình từ Chuyên môn, Giao tiếp từ Kỹ năng mềm.
+- **Chỉ tăng khi làm việc có ích** (bảng `KN_NGUON`):
+  - làm xong task (làm tốt thì rèn thêm giải quyết vấn đề);
+  - sửa lỗi, xử lý sự cố;
+  - học thêm, làm dự án cá nhân;
+  - họp đầu ngày, trình bày demo, tiếp khách;
+  - lập kế hoạch chi tiêu, chạy hạn chót;
+  - đi chơi nói chuyện thật lòng;
+  - mọi việc làm tăng Chuyên môn hay Kỹ năng mềm.
+- Nằm nghỉ, xem phim không tăng gì. Cùng một việc lặp lại trong ngày chỉ được nửa điểm; mỗi kỹ năng mỗi ngày tăng tối đa 8 điểm.
+- Lên mức thì có thông báo.
+
+**Cấp bậc:** Junior → Middle → Senior → Team Leader → Manager (bảng `CAP_BAC`).
+- Đi làm thì là Junior.
+- Lên cấp cần cả ba điều:
+  - **năng lực:** mức kỹ năng;
+  - **kinh nghiệm:** ngày công, số task;
+  - **kết quả công việc:** điểm làm việc trung bình, nhận xét của trưởng nhóm không bị nhắc nhở.
+- Đủ điều kiện thì chiều thứ Sáu chị Hạnh gọi vào báo lên **Middle Developer**. **Lương chưa đổi** (để dành cho kỳ đánh giá ở bản sau).
+- Trong 56 ngày chỉ lên được Middle. Các cấp sau cần nhiều năm kinh nghiệm, đã có sẵn trong dữ liệu.
+- Bot chơi bừa không tự lên Middle được.
+
+**Mục tiêu sống:**
+- Tối ngày 2, game **gợi ý 3 mục tiêu theo hoàn cảnh** (nơi ở, gia cảnh, đã có việc chưa…):
+  - có việc đầu tiên;
+  - để dành tiền;
+  - đổi xe máy mới;
+  - tích lũy tiền đặt cọc nhà (mục tiêu nhiều năm);
+  - lên Middle;
+  - lên mức Khá ở kỹ năng yếu nhất;
+  - thân với bố mẹ hơn;
+  - có bạn thân ở công ty;
+  - tham gia 6 hoạt động cùng mọi người.
+- Chọn một mục tiêu ưu tiên, theo đuổi cả ba, hoặc để sau.
+- Mỗi mục tiêu có trạng thái (gợi ý / đang theo đuổi / đã xong / hết hạn), tiến độ (%) và điều kiện hoàn thành.
+  - Có việc rồi thì tự mở mục tiêu "Lên Middle".
+  - Hết 56 ngày, mục tiêu ngắn hạn chưa xong thành "hết hạn"; mục tiêu nhiều năm thì vẫn tiếp tục.
+- Hoàn thành thì có thông báo và ghi nhật ký. Không thưởng chỉ số.
+
+**Hồ sơ:** thêm phần Mục tiêu (thanh tiến độ), Cấp bậc (từng điều kiện lên cấp tiếp theo, đạt/chưa đạt), Kỹ năng nghề.
+
+**Kiểm thử:** thêm `npm run phat-trien` (31 kiểm tra). Phần cuối chạy trên trình duyệt thật.
+- Lỗi đã bắt được khi viết bài: file mới bọc một hàm của `man-choi.js` nhưng lại nạp trước file đó.
+  - Trên trình duyệt thật, việc này làm hỏng cả game.
+  - Bài jsdom không thấy vì nó gộp mọi file làm một.
+  - Đã sửa thứ tự nạp và thêm kiểm tra trên trình duyệt.
+
+## v17.6 – Phase 1: Kiểm tra toàn bộ và kiểm thử
 **Không đổi mã game.** Chỉ sửa môi trường kiểm thử, thêm bài kiểm thử và công cụ đo. Báo cáo đầy đủ: `docs/AUDIT_REPORT_v17.6.md`.
 
 **Môi trường kiểm thử:**

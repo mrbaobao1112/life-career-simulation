@@ -162,7 +162,8 @@ function openProfile(){
     ${met.map(k => `<div class="rel-row" style="grid-template-columns:26px 1fr 90px 34px"><span aria-hidden="true">${PEOPLE[k].icon}</span>
       <span>${PEOPLE[k].name}<br><small style="color:var(--muted)">${PEOPLE[k].note}. ${personaOf(k).trait}.</small></span>
       <div class="bar"><i class="${S.rel[k] < 30 ? 'low' : S.rel[k] < 55 ? 'mid' : ''}" style="width:${S.rel[k]}%"></i></div><span class="dv">${S.rel[k]}</span></div>`).join('')}
-    <button class="btn alt" type="button" id="closeDlg">Đóng</button>`;
+    ${typeof ptHTML === 'function' ? ptHTML() : ''}
+    <button class="btn alt" type="button" id="closeDlg">Đóng</button>`;   // v17.6: mục tiêu, cấp bậc, kỹ năng nghề (he-thong/phat-trien.js)
   const dlg = $('#dlg'); dlg.classList.remove('phone-dlg');
   $('#closeDlg').addEventListener('click', closeDlg);
   if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
