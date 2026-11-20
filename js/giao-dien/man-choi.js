@@ -59,7 +59,8 @@ function updateHUD(enter){
   updateHUD.last = { money:S.money, energy:S.energy, health:S.health, mood:S.mood };
   const n = unreadCount(), b = $('#phoneBadge'), fab = $('#phoneFab');
   b.hidden = !n; b.textContent = n;
-  fab.setAttribute('aria-label', n ? `Điện thoại, ${n} tin nhắn chưa đọc` : 'Điện thoại');
+  fab.setAttribute('aria-label', n ? `Điện thoại, ${n} cuộc trò chuyện có tin mới` : 'Điện thoại');
+  fab.classList.toggle('wait', Object.keys(ph().pending).length > 0);        // có tin đang chờ bạn trả lời
   if (S.flags.ring) { SFX.play('notify'); S.flags.ring = false; fab.classList.remove('ring'); void fab.offsetWidth; fab.classList.add('ring'); }
 }
 
@@ -220,7 +221,9 @@ function openPhone(){
   if (!dlg.open) { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); }
 }
 function renderPhoneList(){
-  const p = ph(), keys = Object.keys(THREADS).filter(k => p.threads[k] && p.threads[k].length);
+  const p = ph(), lastOf = k => { const L = p.threads[k], m = L[L.length - 1]; return m.d * 1e4 + (parseInt(String(m.time || '').replace(/\D/g, ''), 10) || 0); };
+  const rank = k => (p.pending[k] ? 2 : 0) + ((p.unread[k] || 0) > 0 ? 1 : 0);   // chờ trả lời lên đầu, rồi tin mới, rồi tin gần nhất
+  const keys = Object.keys(THREADS).filter(k => p.threads[k] && p.threads[k].length).sort((a, b) => rank(b) - rank(a) || lastOf(b) - lastOf(a));
   $('#dlgBody').innerHTML = `<div class="ph-head"><h2>Tin nhắn</h2><button class="ghost sm" type="button" id="phClose">Đóng</button></div>
     ${keys.length ? keys.map(k => { const last = p.threads[k][p.threads[k].length - 1], u = p.unread[k] || 0;
       return `<button class="ph-item" type="button" data-th="${k}"><span class="ph-av">${headSVG(NPC[avKey(k)].look, defaultNpcExpr(k))}</span>
@@ -233,11 +236,11 @@ function renderPhoneList(){
   $('#dlgBody').querySelectorAll('.ph-item').forEach(b => b.addEventListener('click', () => openThread(b.dataset.th)));
 }
 function openThread(th, chips){
-  const p = ph(), T_ = THREADS[th], msgs = p.threads[th] || [], pd = p.pending[th];
+  const p = ph(), T_ = THREADS[th], msgs = p.threads[th] || [], pd = p.pending[th], neu = msgs.length - Math.min(msgs.length, p.unread[th] || 0);
   p.unread[th] = 0; save(); updateHUD();
   let lastDay = 0;
-  const body = msgs.map(m => {
-    const day = m.d !== lastDay ? `<div class="ph-day">${dayInfo(m.d).dow}, ${fmtD(m.d)}</div>` : ''; lastDay = m.d;
+  const body = msgs.map((m, i) => {
+    const day = (i === neu && i > 0 ? '<div class="ph-new">Tin mới</div>' : '') + (m.d !== lastDay ? `<div class="ph-day">${dayInfo(m.d).dow}, ${fmtD(m.d)}</div>` : ''); lastDay = m.d;
     if (m.who === 'me') return `${day}<div class="msg out">${esc(m.t)}</div>`;
     return `${day}<div class="msg in">${T_.group ? `<span class="au">${esc(speakerName(m.who))}</span>` : ''}${esc(m.t)}</div>`;
   }).join('');
