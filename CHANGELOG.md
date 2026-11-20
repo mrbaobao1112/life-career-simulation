@@ -1,6 +1,40 @@
 # Lịch sử phiên bản
 
-## v17.4: Sửa các lỗi bắt buộc sau lần kiểm tra toàn diện (hiện tại)
+## v17.5 – Phase 1: Hội thoại và trí nhớ khi chủ động bắt chuyện (hiện tại)
+Mục tiêu v17.5: người chơi chủ động tham gia thế giới sống, không chỉ đứng xem. Phase 1 tập trung vào nói chuyện.
+Không đổi tài chính, sức khỏe, năng lượng, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu.
+
+**“Bắt chuyện” thành một cuộc nói chuyện thật** (`js/song/hoi-thoai-npc.js`, dữ liệu `js/du-lieu/hoi-thoai.js`):
+- Bạn mở lời theo buổi và đúng cách xưng hô: “Em chào chị ạ, sáng nay chị thế nào ạ?”, “Ê Tùng, ăn gì chưa?”, “Mẹ ơi, chiều nay mẹ có đi đâu không ạ?”. Người kia đáp theo mức thân: thân thì vui vẻ, bình thường thì ngắn, lạnh nhạt thì hờ hững.
+- Nếu họ còn nhớ chuyện cũ với bạn, họ nhắc lại và nét mặt theo chuyện. Ví dụ hôm trước mua cà phê giúp anh Dũng, hôm sau anh Dũng nói: “Hôm nào anh mời lại em cốc nước.” Bạn đáp lại một câu phù hợp.
+- Nếu không có chuyện cũ: nói chuyện vừa xảy ra (đi muộn, ở lại OT, lương về…), hoặc một chủ đề hợp nơi, giờ, mức thân, tính cách và việc người đó đang làm. Ví dụ: mẹ đang nấu ăn thì “Mẹ đang nấu canh cua, con đói chưa?”; Linh ở thư viện thì nói nhỏ “Suỵt…”; thân với chị Mai thì được rủ đi ăn bún chả.
+- 8 nhóm hội thoại: chào hỏi, công việc, cuộc sống, sở thích, tâm trạng, quan hệ, hẹn gặp, chuyện đã xảy ra. Hơn 100 đoạn mới cho 8 người, cộng các câu cũ trong `TALKS`.
+- Chống lặp: không kể lại 5 chuyện vừa kể với cùng một người; mỗi “chuyện vừa xảy ra” chỉ nói một lần mỗi ngày; mỗi ký ức được nhắc khi bắt chuyện tối đa một lần mỗi ngày.
+- Nếu hôm đó đã nhắc ký ức trong câu chào khi đi ngang, khi bắt chuyện sẽ nhắc bằng một câu khác. Tính chung vẫn chỉ một lần trong giới hạn hai lần của ký ức.
+- Chuyện không vui trong 3 ngày gần đây (nếu chưa thân lắm) làm người đó hơi lạnh nhạt, không gay gắt. Nói chuyện tiếp vẫn làm thân hơn một chút như trước (`chatBond`, tối đa 3 lần mỗi ngày), nên có thể cải thiện dần.
+- **Ở nhà giờ bắt chuyện được** với bố mẹ và Tùng (trước đây chỉ có “Chào”), trừ khi họ đang ngủ.
+- Có thể tắt (`HTC.ON = false`) để quay về cách cũ. Các mức ưu tiên chủ đề nằm trong bảng `HTC`.
+
+**Câu đáp khi “Chào”:** người quen đáp theo mức thân; khách lạ ở quán đáp câu hợp nơi đó.
+
+**Sửa lỗi:**
+- **P2-06 – khách lạ nói chuyện lệch ngữ cảnh:** khách lạ giờ nói chuyện theo nơi và buổi (`XG_NOI`, 9 nơi): bia hơi nói chuyện bóng đá, bạn bè, “cốc cuối”; thư viện thì thì thầm chuyện ôn thi, phỏng vấn; bến xe thì về quê, đi chơi… Trước đây khách lạ ở bia hơi hỏi nhau “Deploy chưa?”.
+- **P3-03 – họp đột xuất:** chị Hạnh gọi đúng tên hai người được gọi vào họp (trước đây luôn gọi “Dũng, Mai”).
+
+**Kiểm thử:** thêm `npm run hoi-thoai` (34 mục):
+- dữ liệu hợp lệ;
+- trí nhớ khi bắt chuyện, không nhắc lại trong ngày, tính một lần;
+- lạnh nhạt rồi bình thường lại, cải thiện quan hệ;
+- theo nơi, giờ, việc đang làm, mức thân, xưng hô;
+- không lặp;
+- bắt chuyện ở nhà, khách lạ ở quán, bia hơi buổi tối;
+- tên trong họp đột xuất; tắt được.
+
+**Bản lưu cũ:** bản lưu từ v17.4 và v16.1 (ngày 20) mở bằng v17.5 và chơi tiếp đến hết ngày 56: 0 lỗi.
+
+**Ghi chú:** khi chạy 3 luồng song song (máy bận), `mo-dau` có lần báo lỗi 2 mục: hành vi ngẫu nhiên trong 100 giây, và mở Cài đặt giữa lúc nhân vật nói. Chạy riêng thì đạt. Phần này không bị Phase 1 sửa; sẽ làm cho ổn định hơn ở Phase 4.
+
+## v17.4: Sửa các lỗi bắt buộc sau lần kiểm tra toàn diện
 Sửa 6 nhóm lỗi trong `docs/AUDIT_REPORT_v17.3.md`. Không thêm tính năng lớn. Không đổi tài chính, sức khỏe, lương, nghỉ phép, mô phỏng 56 ngày. Không đổi định dạng bản lưu.
 
 **1. Tùng và Linh theo đúng lịch của họ (P2-03):**

@@ -45,7 +45,8 @@ const WORLD_EV = [
     if (!api.alive()) return true; to.ai.held = false; to.ai.until = W.t + 60; songSign(to, '💻'); boss.ai.busy = false; boss.ai.until = 0; return true; } },
   { id:'meeting', where:'office', h:[10, 16], p:.25, run:async (W, api) => {          // họp đột xuất: chị Hạnh gọi hai người vào chỗ họp
     const boss = officeNpc(W, 'boss'), others = ['dung', 'mai', 'phong'].map(k => officeNpc(W, k)).filter(Boolean).slice(0, 2); if (!boss || others.length < 2) return false;
-    if (songInView(W, boss.x) && !api.C.still) api.say(boss, 'Dũng, Mai vào họp nhanh nhé!', 1800);
+    const TEN = { dung:'Dũng', mai:'Mai', phong:'Phong' };                  // gọi đúng tên hai người được gọi họp
+    if (songInView(W, boss.x) && !api.C.still) api.say(boss, `${others.map(a => TEN[a.who]).join(', ')} vào họp nhanh nhé!`, 1800);
     const B = { spot:'meet', act:'act-listen', sign:'👥', dur:[15, 25] };
     [boss, ...others].forEach(a => songForceBeat(W, api, a, B)); return true; } },
 ];

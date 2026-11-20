@@ -26,7 +26,7 @@ function memAdd(m){
   if (L.length > MEM.MAX) L.splice(0, L.length - MEM.MAX);
   return x;
 }
-function memForget(){ const L = memAll(); for (let i = L.length - 1; i >= 0; i--) if (S.day - L[i].d > MEM.KEEP || L[i].n >= MEM.SAY) L.splice(i, 1); }
+function memForget(){ const L = memAll(); for (let i = L.length - 1; i >= 0; i--) if (S.day - L[i].d > MEM.KEEP || (L[i].n >= MEM.SAY && L[i].said !== S.day && L[i].tk !== S.day)) L.splice(i, 1); }   // đã nhắc đủ lần thì quên (nhưng không quên giữa ngày đang nhắc)
 // Gọi sau mỗi lựa chọn (settleChoice): ai thay đổi quan hệ đáng kể trong cảnh có câu nhắc thì người đó ghi nhớ
 function memNote(ref, before){
   if (!ref || !before || !before.rel) return;
@@ -38,12 +38,15 @@ function memNote(ref, before){
   });
 }
 // Câu nhắc chuyện cũ của người này với mình (null nếu không có). Đánh dấu đã nhắc.
-function memRecall(who){
+// kind: 'chao' (câu chào khi đi ngang) hoặc 'talk' (khi bạn chủ động bắt chuyện). Mỗi kiểu nhắc tối đa một lần mỗi ngày;
+// cùng một ngày dù nhắc ở cả hai kiểu cũng chỉ tính là một lần (MEM.SAY đếm theo ngày), và chọn câu khác nhau.
+function memRecall(who, kind = 'chao'){
   memForget();
-  const m = memAll().filter(x => x.w === who && x.o === 'me' && x.d < S.day && x.said !== S.day).sort((a, b) => b.d - a.d)[0];
+  const key = kind === 'talk' ? 'tk' : 'said';
+  const m = memAll().filter(x => x.w === who && x.o === 'me' && x.d < S.day && x[key] !== S.day).sort((a, b) => b.d - a.d)[0];
   if (m) {
     const side = MEM_LINES[m.k] && MEM_LINES[m.k][m.v > 0 ? 'pos' : 'neg'], list = side && (side[who] || side['*']); if (!list) return null;
-    m.n++; m.said = S.day;
+    if (m.said !== S.day && m.tk !== S.day) m.n++; m[key] = S.day;
     return { text:pickLine(list, 'mem' + who + m.k), expr:m.v > 0 ? 'happy' : (who === 'mom' || m.k === 'ev:tung_borrow' ? 'sad' : 'annoyed'), m };
   }
   const L = MEM_LEAVE[who], f = S.flags.memLeave || (S.flags.memLeave = {});     // vừa nghỉ mấy hôm: hỏi thăm một lần

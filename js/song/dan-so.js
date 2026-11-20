@@ -119,7 +119,7 @@ async function popStep(W, api, a, r, snap){
   api.C.face(a, !!p.face); api.C.act(a, st[k]); songSign(a, st[k + 2]);
   v.until = dur(st[k + 1]);
   if (st[0] === 'seat' && v.buddy && v.buddy.vis && v.buddy.vis.seat >= 0 && songInView(W, a.x) && !api.C.still) {   // ngồi cùng bạn: nói chuyện
-    const l = pick(typeof GENERIC_CHAT !== 'undefined' ? GENERIC_CHAT : [['Ngon nhỉ.', 'Ừ.']]); songSign(a, '💬'); songSign(v.buddy, '💬'); npcFace(a, 'happy'); npcFace(v.buddy, 'happy');
+    const l = pickLine(typeof xgNoiList === 'function' ? xgNoiList(P.id, W.t / 60) : [['Ngon nhỉ.', 'Ừ.']], 'noi' + P.id, r);   // câu theo nơi và buổi songSign(a, '💬'); songSign(v.buddy, '💬'); npcFace(a, 'happy'); npcFace(v.buddy, 'happy');
     l.forEach((t, j) => api.C.later(() => api.say(j % 2 ? v.buddy : a, t, 1400), 600 + j * 1500));
   }
   v.i++; v.busy = false;
