@@ -25,7 +25,7 @@ Không đổi công thức tài chính, sức khỏe, năng lượng, lương, n
 
 **Sửa lỗi và hiệu năng:**
 - **P2-10:** xe máy chỉ chạy trên phố chính, không chạy vào ngõ nhà.
-- **P3-11 (hiệu năng trên điện thoại):** người ngoài khung nhìn hoặc đã đi khỏi thì dừng hoạt ảnh (chân bước, tay, dấu hiệu) và không vẽ; kiểm tra vài lần mỗi giây trong vòng lặp sẵn có, không thêm vòng lặp. Lối chơi trên máy tính và điện thoại giữ nguyên. PERF_LINE
+- **P3-11 (hiệu năng trên điện thoại):** người ngoài khung nhìn hoặc đã đi khỏi thì dừng hoạt ảnh (chân bước, tay, dấu hiệu) và không vẽ; kiểm tra vài lần mỗi giây trong vòng lặp sẵn có, không thêm vòng lặp. Lối chơi trên máy tính và điện thoại giữ nguyên. Đo trên giả lập iPhone 13 (CPU chậm 6 lần), phố giờ cao điểm, 2 lần mỗi bản: bản cũ 51,7 và 59,3 FPS, CPU 96% và 76%; bản mới 58,7 và 57,7 FPS, CPU 66% và 81%. Số đo dao động nhiều giữa các lần, nhưng thời gian tính kiểu dáng (style) giảm khoảng một phần ba (trung bình 14,5% → 10,5%). Văn phòng, quán cà phê vẫn khoảng 60 FPS.
 - Kiểm thử mở đầu ổn định hơn: “ít nhất 2 hành vi ngắn” được xem thêm tối đa 60 giây nếu 100 giây đầu chưa đủ (hành vi là ngẫu nhiên); “mở/đóng Cài đặt giữa lúc nói” đợi lâu hơn khi máy bận.
 
 **Kiểm thử:** thêm `npm run cau-chuyen` (Linh rủ đi thư viện và đủ các nhánh, đồng nghiệp giận rồi làm lành, thông báo điện thoại, xe máy, dừng hoạt ảnh ngoài màn hình).
