@@ -1,6 +1,30 @@
 # Lịch sử phiên bản
 
-## v17.6 – Phase 2: Nền tảng phát triển (hiện tại)
+## v17.7 – Phase 1: Đo thực tế để game dễ chơi hơn (hiện tại)
+**Không đổi mã game.** Chỉ đo, lập kế hoạch và phác thảo. Báo cáo: `docs/AUDIT_REPORT_v17.7.md`.
+
+**Vấn đề:** trò chơi nhỏ khó với người không biết code; quá nhiều chữ.
+**Quyết định:** giữ nghề lập trình nhưng đơn giản hóa cho mọi người chơi; rút gọn câu chữ (giữ ý, bỏ câu đùa phụ); 4 trò chơi nhỏ đổi sang kiểu game phổ thông.
+
+**Số liệu chính:**
+- Mỗi ván người chơi đọc khoảng **20.500 từ** (khoảng 100 phút chỉ để đọc): ngày đầu 775 từ, tuần đầu 4.032 từ.
+- **Cảnh tốn chữ nhất:** thức dậy (82 từ, gần như mỗi sáng), tổng kết tuần (khoảng 356 từ mỗi tuần), giờ rảnh, nhật ký cuối ngày, task. 10 cảnh hàng đầu chiếm 76,5% tổng chữ.
+- **Trên điện thoại,** nút lựa chọn nằm dưới màn hình đầu; nút điện thoại che chữ của thẻ task.
+- **Cả 4 trò chơi nhỏ** là câu đố kiến thức lập trình: đọc code thật, gõ lệnh git, nối thuật ngữ.
+
+**Kế hoạch (chờ duyệt):**
+- **Phase 2:** cài đặt "Đọc nhanh", ngân sách chữ, viết lại 10 cảnh ưu tiên, bày lại màn hình điện thoại, bảng thuật ngữ đơn giản.
+- **Phase 3:** 4 trò mới (phác thảo ở `docs/phac-thao/`):
+  - Ghép code (ghép 3);
+  - Né bug (chạy và nhảy tránh);
+  - Hứng dữ liệu (hứng đồ rơi);
+  - Gõ theo nhịp (chạm theo nhịp).
+
+**Thêm:**
+- Công cụ `tests/audit/dem-chu.js` (đếm chữ người chơi phải đọc, theo ngày, theo loại, theo cảnh; dùng để so sánh trước/sau).
+- 4 phác thảo SVG.
+
+## v17.6 – Phase 2: Nền tảng phát triển
 Chạy **song song** với chỉ số cũ (Chuyên môn, Kỹ năng mềm, điểm làm việc). **Không đổi** lương, tài chính, năng lượng, sức khỏe, hệ thống 56 ngày.
 Bản lưu cũ vẫn chơi tiếp được: chỉ thêm `S.pt`, tự tạo khi chưa có.
 Dữ liệu: `js/du-lieu/phat-trien.js`. Cách chạy: `js/he-thong/phat-trien.js`. Tắt được: `PT.ON = false`.
