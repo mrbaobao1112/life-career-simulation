@@ -41,7 +41,7 @@ const BO = [
   ['tro-choi-moi', 'kiem-thu-tro-choi-moi.js', [], 1, 'kt'],
   ['hieu-nang', 'kiem-thu-hieu-nang.js', [], 1, 'kt'],
 ];
-const RIENG = ['hieu-nang'];           // đo hiệu năng: chạy một mình sau cùng, khi các bộ khác đã xong (máy rảnh thì số đo mới đúng)
+const RIENG = ['mo-dau', 'hieu-nang'];   // chạy một mình sau cùng, khi các bộ khác đã xong: đo hiệu năng, và mo-dau (kiểm tra người đi bộ không chồng nhau theo thời gian thật, dễ sai khi máy bận)
 const QUA_GIO = 25 * 60 * 1000;           // một bộ chạy quá chừng này thì dừng và tính là KHÔNG ĐẠT
 
 const args = process.argv.slice(2), luong = +((args.find(a => a.startsWith('--luong=')) || '--luong=3').split('=')[1]) || 3;

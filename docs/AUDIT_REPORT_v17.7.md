@@ -312,3 +312,51 @@ Chưa chạy lại toàn bộ `npm test` sau khi sửa (chỉ sửa bài `tro-ch
 - Độ khó với người thật chưa được thử (xem trên).
 - Mục tiêu giảm 50% chữ của Phase 2 vẫn chưa đạt (42%). Đang chờ quyết định có cho ngày bình thường tự chạy hay không.
 - Phố giờ cao điểm trên điện thoại sát ngưỡng khung hình (H1, từ v17.6).
+
+---
+
+## Phase 4: Kiểm thử toàn bộ và tổng kết v17.7
+
+### Trước và sau (đo lại ở Phase 4, cùng công cụ, cùng cách chơi)
+
+| Mục | Trước v17.7 | Sau v17.7 | Thay đổi |
+|---|---|---|---|
+| Chữ phải đọc, ngày đầu | 775 từ | 555 từ | −28% |
+| Chữ phải đọc, tuần đầu | 4.032 từ | 2.543 từ | −37% |
+| Chữ phải đọc, cả 56 ngày | 20.485 từ (khoảng 100 phút đọc) | 11.978 từ (khoảng 60 phút) | **−42%** (mục tiêu −50%: chưa đạt) |
+| 15 phút đầu trên điện thoại: chữ mỗi màn (kể cả lịch, chỉ số, nút) | 97 từ | 70 từ | −28% |
+| Màn tạo nhân vật | 283 từ | 169 từ | −40% |
+| Tổng kết tuần (phần hiện sẵn) | khoảng 356 từ | khoảng 87 từ | −76% |
+| Nút lựa chọn trên điện thoại | dưới màn hình đầu (phải cuộn) | ngay màn hình đầu | đạt |
+| Thuật ngữ khó trên màn hình (task, bug, OT, standup, review, senior, #LCS…) | khoảng 130 lần trong câu chữ (ước lượng bằng quét mã nguồn ở Phase 1) | 0 khi bật Đọc nhanh (bài `doc-nhanh` quét 2 ván, 3 tuần) | đạt |
+| Trò chơi nhỏ: chữ, code phải đọc mỗi lượt | 25–30 từ, 6 dòng code hoặc lệnh `git` | 0 | đạt |
+| Trò chơi nhỏ: cần biết code | có (cả 4 trò) | không | đạt |
+| Trò chơi nhỏ: thời gian | 20–40 giây | 20 giây (+2 giây hướng dẫn) | đạt |
+| Trò chơi nhỏ: cách chơi | đọc, kéo dòng, gõ phím | chạm, vuốt, kéo; hướng dẫn bằng hình | đạt |
+
+Số chữ đo bằng `tests/audit/dem-chu.js` (6 ván, cùng hạt giống, chạy lại ở Phase 4 ra đúng số của Phase 2). 15 phút đầu đo bằng bot chơi trên điện thoại giả lập, bật và tắt Đọc nhanh.
+
+### Không đổi (đã kiểm tra)
+
+- **Lựa chọn, hiệu ứng, con số, xác suất, lương, tài chính, năng lượng, sức khỏe, 56 ngày.** Bài `doc-nhanh` so bật/tắt trên 7 cảnh giống hệt; cùng một lượt chơi đi cùng đường, cùng số tiền.
+- **Cách tính điểm trò chơi nhỏ:** bài `tro-choi-moi` kiểm cộng trừ đúng công thức cũ; tự làm cho cộng trừ 0.
+- **Bản lưu:** thêm bản lưu mẫu của **17.6 và 17.7**. Bài `luu-tai` giờ thử bản lưu thật của 7 phiên bản (16.1 → 17.7), mở bằng bản hiện tại và chơi tiếp đến hết.
+- **Điều khiển nhân vật, thế giới đi lại:** các bài `the-gioi`, `van-phong-di-lai`, `ra-pho`, `npc-on-dinh` vẫn đạt.
+
+### Sửa thêm ở Phase 4
+
+- **Số phiên bản trong Cài đặt** vẫn ghi v17.5 từ hồi v17.5 (quên đổi ở v17.6 và các phase trước của v17.7). Đã đổi thành **v17.7**.
+
+### Kết quả `npm test` ở Phase 4
+
+KET_QUA_P4
+
+### Việc còn lại và đề xuất
+
+| # | Việc | Ghi chú |
+|---|---|---|
+| 1 | **Mục tiêu −50% chữ chưa đạt (−42%)** | Phần còn lại là tên lựa chọn ở các màn lặp mỗi ngày. Giảm thêm cần bớt số lần dừng lại (ngày bình thường tự dậy, tự sang ngày). Đây là thay đổi lối chơi, **chờ người làm game quyết định**. |
+| 2 | **Chơi thử 4 trò mới với người thật** | Bot đọc thẳng vị trí trong trò nên chơi giỏi hơn người. Chỉnh độ khó trong bảng `MGM` theo cảm nhận thật. |
+| 3 | **Phố giờ cao điểm trên điện thoại sát ngưỡng khung hình (H1)** | Có từ v17.6, đo được 27–55 FPS tùy độ bận của máy (ngưỡng 40). Cần một phase hiệu năng riêng. |
+| 4 | Câu NPC tự nói trong thế giới đi lại chưa đổi thuật ngữ | Ít gặp thuật ngữ (chủ yếu câu chào). |
+| 5 | Lỗi nhỏ cũ: P3-06, P3-07, P3-10, P3-12 | Để sau. |

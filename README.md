@@ -136,7 +136,7 @@ npm install
 npm test              # v17.6: chạy TẤT CẢ các bộ (3 luồng song song, khoảng 25 phút) và in bảng kết quả rõ ràng (xem dưới)
 npm run co-ban        # bộ nhanh như trước: hệ thống, tài chính, các mốc 56 ngày, 20 lượt chơi ngẫu nhiên
 node chay-tat-ca.js tri-nho luu-tai   # chỉ chạy vài bộ (các bộ khác ghi là CHƯA CHẠY); --luong=1 để chạy lần lượt
-npm run luu-tai       # v17.6: lưu/tải, bản lưu thật của các bản 16.1 → 17.5 (tests/du-lieu-mau/), bản lưu thiếu dữ liệu, lưu giữa lúc đang đi (khoảng 2 phút)
+npm run luu-tai       # v17.6: lưu/tải, bản lưu thật của các bản 16.1 → 17.7 (tests/du-lieu-mau/), bản lưu thiếu dữ liệu, lưu giữa lúc đang đi (khoảng 2 phút)
 npm run npc-on-dinh   # v17.6: lịch không trùng, NPC không trùng mặt, không kẹt, không bận mãi ở 10 nơi; ra vào địa điểm liên tục (cần Playwright, khoảng 6 phút)
 npm run phat-trien    # v17.6 phase 2: kỹ năng nghề, cấp bậc, mục tiêu sống, lưu/tải; phần cuối chạy trên trình duyệt thật (khoảng 1 phút)
 npm run doc-nhanh     # v17.7 phase 2: Đọc nhanh: ngân sách chữ, thuật ngữ, bật/tắt cho cùng kết quả, nút hiện ngay màn đầu trên điện thoại (khoảng 1 phút)
