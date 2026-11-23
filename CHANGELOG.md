@@ -15,7 +15,13 @@ Tổng kết cả v17.7 ("game dễ chơi hơn cho mọi người"): xem `docs/A
 - Thêm bản lưu mẫu của 17.6 và 17.7. Bài `luu-tai` thử bản lưu thật của 7 phiên bản (16.1 → 17.7).
 - Chạy lại toàn bộ `npm test` (kết quả ở dưới).
 
-KQ_CHANGELOG
+**Kết quả `npm test` lần cuối:** 22 ĐẠT, 2 KHÔNG ĐẠT, 0 SKIP, 2 BÁO CÁO; 742 kiểm tra đạt, 3 hỏng.
+- **`56-ngay`:** kiểm tra "Phong nhắc chuyện vừa nghỉ" dùng số ngẫu nhiên không cố định nên thỉnh thoảng trượt. Đã dùng hạt giống cố định; chạy lại đạt.
+- **`mo-dau`:** trượt ở lần chạy trước do máy bận, chạy riêng thì đạt. Bộ chạy tổng giờ cho `mo-dau` chạy một mình sau cùng; lần cuối đạt.
+- **`hieu-nang` (chưa sửa):** phố trên điện thoại 36,4 FPS, quán cà phê 37,8 FPS, dưới ngưỡng 40.
+  - Đo xen kẽ với v17.6: khi bật Đọc nhanh, v17.7 chậm hơn khoảng 15–20% ở phố, dù thời gian chạy mã như nhau.
+  - Chưa tìm ra nguyên nhân. Chi tiết điều tra trong báo cáo. Cần một phase hiệu năng riêng. Không hạ ngưỡng.
+- Chưa chạy lại toàn bộ lần thứ 3 sau các sửa.
 
 ## v17.7 – Phase 3: 4 trò chơi nhỏ kiểu mới
 Thay 4 trò đọc code bằng 4 trò kiểu game phổ thông. **Không cần đọc chữ, không cần biết code**, mỗi lượt 20 giây.

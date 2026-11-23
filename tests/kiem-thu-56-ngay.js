@@ -223,7 +223,7 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   // đi làm lại
   r = J(`S.unfinished = 'Sửa nút Đặt hàng'; S.leaves = [{ id:'t', type:'unpaid', from:10, to:12, paid:false, status:'approved' }]; leaveHandover(S.leaves[0], 'phong'); const keep = Math.random; Math.random = () => 0;
     S.day = 14; S.slot = 'night'; S.queue = []; S.cur = null; S.energy = 60; S.fast = { from:15, until:15 }; startDay(); Math.random = keep; S.fast = null;
-    return JSON.stringify({ day:S.day, flag:S.flags.backFromLeave, talk:(() => { let n = 0; for (let i = 0; i < 20; i++) { lastTalk = {}; if (/nghỉ/.test(pickTalk('phong').lines[0])) n++; } return n; })(), notes:S.notes.join(' | ') });`);
+    return JSON.stringify({ day:S.day, flag:S.flags.backFromLeave, talk:(() => { let n = 0, h = 12345; const keep2 = Math.random; Math.random = () => (h = (h * 16807) % 2147483647) / 2147483647;   /* v17.7: hạt giống cố định, kết quả lặp lại được (trước đây thỉnh thoảng trượt do may rủi) */ for (let i = 0; i < 20; i++) { lastTalk = {}; if (/nghỉ/.test(pickTalk('phong').lines[0])) n++; } Math.random = keep2; return n; })(), notes:S.notes.join(' | ') });`);
   check('Đi làm lại sau kỳ nghỉ dài: việc bàn giao bị sót thành lỗi, phải bắt nhịp lại, đồng nghiệp nhắc chuyện vừa nghỉ', r.day === 15 && /để sót lỗi/.test(r.notes) && /bắt nhịp/.test(r.notes) && r.flag === 15 && r.talk >= 8, `Phong nhắc ${r.talk}/20 lần`);
   // hoạt động cả ngày
   w.eval(`${reset} S.leaves = [{ id:'t2', type:'unpaid', from:10, to:10, paid:false, status:'approved' }]; S.money = 2e6; S.day = 9; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);

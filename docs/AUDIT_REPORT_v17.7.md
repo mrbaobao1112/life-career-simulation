@@ -349,7 +349,44 @@ Số chữ đo bằng `tests/audit/dem-chu.js` (6 ván, cùng hạt giống, ch�
 
 ### Kết quả `npm test` ở Phase 4
 
-KET_QUA_P4
+Chạy toàn bộ 2 lần (3 luồng; `mo-dau` và `hieu-nang` chạy một mình sau cùng ở lần 2):
+
+| Lần | ✅ ĐẠT | ❌ KHÔNG ĐẠT | ⏭️ SKIP | ⬜ CHƯA CHẠY | 📊 BÁO CÁO | Kiểm tra |
+|---|---|---|---|---|---|---|
+| 1 | 23 | 1 (`mo-dau`) | 0 | 0 | 2 | 744 đạt, 1 hỏng |
+| 2 (cuối) | 22 | 2 (`56-ngay`, `hieu-nang`) | 0 | 0 | 2 | 742 đạt, 3 hỏng |
+
+Các bộ không đạt và đã làm gì:
+
+| Bộ | Kiểm tra hỏng | Nguyên nhân | Đã làm | Kết quả sau |
+|---|---|---|---|---|
+| `mo-dau` (lần 1) | Người đi bộ ở màn hình mở đầu "trùng chỗ 28 lần" | Kiểm tra theo thời gian thật, sai khi máy bận (v17.7 không đổi phần này). Chạy riêng 2 lần: 0 lần trùng | Bộ chạy tổng cho `mo-dau` chạy một mình sau cùng | Lần 2: ✅ 40/40 |
+| `56-ngay` (lần 2) | "Phong nhắc chuyện vừa nghỉ" 6/20 (cần 8) | Kiểm tra dùng số ngẫu nhiên không cố định. Chạy lại 6 lần: 10–16/20 | Dùng hạt giống cố định cho phần này (mục đích kiểm tra giữ nguyên) | ✅ chạy riêng 3 lần: 13/20 |
+| `hieu-nang` (lần 2) | Điện thoại: phố 36,4 FPS, quán cà phê 37,8 FPS (ngưỡng 40) | Xem điều tra bên dưới. **Chưa tìm ra nguyên nhân, chưa sửa** | Không hạ ngưỡng | ❌ còn |
+
+Sau các sửa trên, **chưa chạy lại toàn bộ lần thứ 3**: chỉ chạy lại riêng `56-ngay` và `mo-dau`.
+
+### Điều tra hiệu năng điện thoại (H1): v17.7 có làm chậm không?
+
+Đo phố giờ cao điểm, điện thoại giả lập, CPU chậm 6 lần; xen kẽ bản cuối v17.6 (`71e4c5d`) và bản hiện tại, cùng máy:
+
+| Thử nghiệm | v17.6 (FPS) | v17.7 (FPS) | Ghi chú |
+|---|---|---|---|
+| 4 cặp, v17.6 chạy trước | 39,2 · 37 · 46 · 36,6 (TB 39,7) | 33,4 · 34,8 · 26,9 · 31,3 (TB 31,6) | |
+| 3 cặp, v17.7 chạy trước | 40,7 · 40 · 38,5 (TB 39,7) | 33,3 · 35,2 · 32,4 (TB 33,6) | Không phải do thứ tự |
+| 3 cặp, v17.7 **tắt** Đọc nhanh | 31,9 · 38,8 · 34,3 (TB 35,0) | 36,4 · 29,8 · 37,6 (TB 34,6) | Ngang nhau |
+| 3 cặp, v17.7 bật, bỏ CSS điện thoại của Đọc nhanh | 32,5 · 35,6 · 45,6 (TB 37,9) | 35,3 · 29,1 · 37,5 (TB 34,0) | Không rõ |
+| Thời gian máy (Chrome đo) khi đi trên phố | mã 8,3–8,7% · kiểu dáng 20–22% · bố cục 8,1–8,4% | mã 8,0–8,7% · kiểu dáng 19–21% · bố cục 8,3–9,1% | Như nhau. Hàm đổi thuật ngữ chỉ chạy khoảng 1 lần/giây |
+
+**Kết luận:**
+- Khi bật Đọc nhanh, v17.7 có vẻ chậm hơn v17.6 khoảng 15–20% ở phố trên điện thoại giả lập (7/7 cặp).
+- Nhưng thời gian chạy mã, kiểu dáng, bố cục đo được là như nhau. Tắt Đọc nhanh thì ngang nhau. Bỏ CSS điện thoại thì không rõ.
+- Với cách đo hiện có (mỗi lần dao động ±8 FPS), **chưa xác định được nguyên nhân**. Có thể nằm ở bước vẽ hình mà các số đo này không bao quát.
+- Ở Phase 2 và 3 tôi đã cho rằng FPS thấp "chỉ là máy dao động". Điều đó **không đúng hoàn toàn**: ít nhất một phần là do v17.7.
+
+**Đề xuất:** một phase hiệu năng riêng, đo chi tiết từng khung hình (Chrome tracing: vẽ, ghép lớp) và thử trên điện thoại thật.
+
+Tạm thời, người chơi thấy giật ở phố có thể tắt Đọc nhanh; đổi lại sẽ đọc chữ đầy đủ.
 
 ### Việc còn lại và đề xuất
 
@@ -357,6 +394,6 @@ KET_QUA_P4
 |---|---|---|
 | 1 | **Mục tiêu −50% chữ chưa đạt (−42%)** | Phần còn lại là tên lựa chọn ở các màn lặp mỗi ngày. Giảm thêm cần bớt số lần dừng lại (ngày bình thường tự dậy, tự sang ngày). Đây là thay đổi lối chơi, **chờ người làm game quyết định**. |
 | 2 | **Chơi thử 4 trò mới với người thật** | Bot đọc thẳng vị trí trong trò nên chơi giỏi hơn người. Chỉnh độ khó trong bảng `MGM` theo cảm nhận thật. |
-| 3 | **Phố giờ cao điểm trên điện thoại sát ngưỡng khung hình (H1)** | Có từ v17.6, đo được 27–55 FPS tùy độ bận của máy (ngưỡng 40). Cần một phase hiệu năng riêng. |
+| 3 | **Phố giờ cao điểm trên điện thoại dưới ngưỡng khung hình (H1)** | Có từ v17.6. Bật Đọc nhanh thì chậm thêm khoảng 15–20%, chưa rõ nguyên nhân (xem điều tra ở trên). Bài `hieu-nang` đang KHÔNG ĐẠT. Cần một phase hiệu năng riêng. |
 | 4 | Câu NPC tự nói trong thế giới đi lại chưa đổi thuật ngữ | Ít gặp thuật ngữ (chủ yếu câu chào). |
 | 5 | Lỗi nhỏ cũ: P3-06, P3-07, P3-10, P3-12 | Để sau. |
