@@ -38,6 +38,7 @@ const BO = [
   ['gia-dinh-cong-viec', 'kiem-thu-gia-dinh-cong-viec.js', [], 1, 'kt'],
   ['cau-chuyen', 'kiem-thu-cau-chuyen.js', [], 1, 'kt'],
   ['npc-on-dinh', 'kiem-thu-npc-on-dinh.js', [], 1, 'kt'],
+  ['tro-choi-moi', 'kiem-thu-tro-choi-moi.js', [], 1, 'kt'],
   ['hieu-nang', 'kiem-thu-hieu-nang.js', [], 1, 'kt'],
 ];
 const RIENG = ['hieu-nang'];           // đo hiệu năng: chạy một mình sau cùng, khi các bộ khác đã xong (máy rảnh thì số đo mới đúng)

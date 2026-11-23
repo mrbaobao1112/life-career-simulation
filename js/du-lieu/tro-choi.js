@@ -37,3 +37,21 @@ const MG_DATA = {
     108: { pairs:[['phiShip(0 km)', '0đ'], ['phiShip(3 km)', '15.000đ'], ['phiShip(10 km)', '30.000đ'], ['phiShip(−2 km)', 'Báo lỗi'], ['phiShip(3 km, freeship)', '0đ (miễn phí)']] },
   },
 };
+
+/* =========================================================
+   v17.7 Phase 3: SỐ LIỆU 4 TRÒ CHƠI NHỎ KIỂU MỚI (mỗi mảng là 4 mức độ khó 0–3)
+   Độ khó tính trong khung-tro-choi.js: độ khó của việc, cách làm (kỹ: dễ hơn, nhanh: khó hơn), Chuyên môn cao thì dễ hơn.
+   ========================================================= */
+const MGM = {
+  ghep:{ mau:[4, 4, 5, 5],            // 🧩 Ghép code (ghép 3): số màu khối (ít màu thì dễ ghép)
+         muc:[21, 25, 29, 33] },      //   số khối phải dọn trong 20 giây (bot chơi đúng nước dọn 18 khối trong 6 giây; người chơi chậm hơn nhiều)
+  ne:{ toc:[140, 165, 190, 215],      // 🐞 Né bug (chạy, nhảy): tốc độ con bọ (điểm ảnh mỗi giây, khung rộng 300)
+       cach:[1.5, 1.3, 1.1, .95],     //   khoảng cách trung bình giữa hai con bọ (giây)
+       ca_phe:3.2 },                  //   cứ chừng này giây có một cốc cà phê để nhặt
+  hung:{ roi:[95, 115, 135, 155],     // 📦 Hứng dữ liệu (hứng đồ rơi): tốc độ rơi
+         cach:[.8, .7, .6, .5],       //   khoảng cách giữa hai gói (giây)
+         xau:[.2, .25, .3, .35] },    //   tỉ lệ gói lỗi màu đỏ (phải né)
+  nhip:{ bpm:[80, 92, 104, 116],      // ⌨️ Gõ theo nhịp: nhịp (phách mỗi phút), mỗi phách một phím
+         roi:1.6,                     //   thời gian phím rơi từ trên xuống vạch (giây)
+         lech:.16 },                  //   chạm sớm/muộn tối đa chừng này giây vẫn tính là trúng
+};

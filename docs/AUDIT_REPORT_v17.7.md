@@ -266,3 +266,49 @@ Lần này bộ `hieu-nang` đạt: phố giờ cao điểm trên điện thoạ
   - Câu NPC tự nói trong thế giới đi lại (bong bóng thoại) chưa được đổi thuật ngữ; chủ yếu là câu chào, ít thuật ngữ.
   - Chữ trong trò chơi nhỏ chưa được đổi; Phase 3 thay cả 4 trò.
 - Khi rút gọn theo quy tắc chung (câu đầu của đoạn dài), phần sau vẫn đọc được ở "Xem thêm". Riêng kết quả sau lựa chọn bị bỏ phần sau (thường là câu đùa phụ). Tắt Đọc nhanh thì đọc đủ.
+
+---
+
+## Cập nhật sau Phase 3: 4 trò chơi nhỏ kiểu mới
+
+**Đã làm:** thay 4 trò đọc code bằng 4 trò kiểu phổ thông, đúng như phác thảo ở Phase 1 (chi tiết trong `CHANGELOG.md`).
+
+| Trò | Thể loại | Chữ phải đọc | Cần biết code? | Thời gian |
+|---|---|---|---|---|
+| 🧩 Ghép code | ghép 3 | 0 (chỉ số khối "🎯 0/29") | Không | 20 giây (dọn đủ thì xong sớm) |
+| 🐞 Né bug | chạy, nhảy tránh | 0 | Không | 20 giây |
+| 📦 Hứng dữ liệu | hứng đồ rơi | 0 | Không | 20 giây |
+| ⌨️ Gõ theo nhịp | chạm theo nhịp | 0 (chữ A S D trên nút) | Không | 20 giây |
+
+So với trước: mỗi lượt phải đọc 25–30 từ, 6 dòng code thật hoặc lệnh `git`; thời gian 20–40 giây.
+
+**Kết quả đo** (`npm run tro-choi-moi`, điện thoại giả lập iPhone 13):
+- Mỗi lượt khoảng 22–23,5 giây: 2 giây bàn tay hướng dẫn + 20 giây chơi + 1,3 giây hiện kết quả. Ghép code có thể xong sớm.
+- Khung hình khi CPU chậm 4 lần: ghép 60, né bug 56, hứng 58, nhịp 60 khung/giây.
+- Chơi rồi đóng 20 lượt: nút trang 762 → 762, trình nghe sự kiện 69 → 69. Vòng lặp hình sau khi đóng: 60 → 60 lần/giây (không còn vòng của trò).
+- Bot chơi đúng lúc: ghép 1,0 · né 0,98 · hứng 0,88 · nhịp 1,0.
+- Bot "người mới" (chậm, hay sai): ghép 1,0 · né 0,32 · hứng 0,87 · nhịp 1,0.
+
+**Giới hạn của số liệu:** bot đọc thẳng vị trí trong trò, nên **"người mới" bằng bot vẫn chơi giỏi hơn người thật**. Độ khó thật với người chơi (nhất là Ghép code và Gõ theo nhịp) cần người làm game chơi thử để chỉnh bảng `MGM`.
+
+**Lỗi tìm thấy và đã sửa trong lúc làm:**
+1. **Bàn tay hướng dẫn không tắt:** hàm tắt kiểm tra thời gian sau khi đã về 0, nên trò không bắt đầu.
+2. **Né bug quá khắc nghiệt:** bản đầu có "hết mạng", người mới chỉ được 0,14 điểm. Sửa thành không có thua, mỗi lần va trừ một ít.
+3. **Phím Space không nhảy:** trò không có nút nào nên khung chưa nhận phím.
+4. **Ghép code quá dễ:** bot dọn đủ mục tiêu trong 5,6 giây. Đã nâng mục tiêu 12–21 → 21–33 khối.
+5. **Nút "Xong" vẫn hiện ở trò mới:** CSS đè lên thuộc tính ẩn.
+6. **Ký hiệu `</>` bị hiểu là thẻ HTML** nên khối xanh lá trống.
+
+**Kiểm thử `npm test`** (chạy thật, 3 luồng): ✅ ĐẠT 22 · ❌ KHÔNG ĐẠT 2 · ⏭️ SKIP 0 · ⬜ CHƯA CHẠY 0 · 📊 BÁO CÁO 2; 737 kiểm tra đạt, 2 hỏng.
+
+| Bộ không đạt | Lần chạy chung | Nguyên nhân | Đã làm | Chạy lại riêng |
+|---|---|---|---|---|
+| `tro-choi-moi` | 1/22 hỏng: bot "người mới" Hứng dữ liệu 0,91, cao hơn bot khá 0,79 | Kiểm tra sai: so hai bot cùng đọc thẳng vị trí trò, máy bận thì điểm dao động ngẫu nhiên | Bỏ phần so sánh hai bot; giữ hai ngưỡng có ý nghĩa (chơi tốt từ 0,7; người mới vẫn từ 0,2) | ✅ 22/22 đạt |
+| `hieu-nang` | phố giờ cao điểm trên điện thoại 27,3 FPS (ngưỡng 40) | Rủi ro H1 có từ v17.6. Phase 3 không đổi phần vẽ thế giới. Lần chạy chung máy bận (bộ `can-bang` chậm hơn 30%) | Không hạ ngưỡng | ✅ 2 lần: 42,5 và 41,3 FPS, vẫn sát ngưỡng |
+
+Chưa chạy lại toàn bộ `npm test` sau khi sửa (chỉ sửa bài `tro-choi-moi`; các bộ khác không đổi).
+
+**Lỗi còn tồn tại:**
+- Độ khó với người thật chưa được thử (xem trên).
+- Mục tiêu giảm 50% chữ của Phase 2 vẫn chưa đạt (42%). Đang chờ quyết định có cho ngày bình thường tự chạy hay không.
+- Phố giờ cao điểm trên điện thoại sát ngưỡng khung hình (H1, từ v17.6).

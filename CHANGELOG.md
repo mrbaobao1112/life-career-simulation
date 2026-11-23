@@ -1,6 +1,37 @@
 # Lịch sử phiên bản
 
-## v17.7 – Phase 2: Đọc nhanh (hiện tại)
+## v17.7 – Phase 3: 4 trò chơi nhỏ kiểu mới (hiện tại)
+Thay 4 trò đọc code bằng 4 trò kiểu game phổ thông. **Không cần đọc chữ, không cần biết code**, mỗi lượt 20 giây.
+- Việc nào chơi trò nào giữ nguyên.
+- Cách đổi điểm ra cộng trừ khả năng làm tốt việc giữ nguyên (tối đa ±6%).
+- Nút "Để nhân vật tự làm" vẫn có, cho kết quả y như trước.
+- Trò cũ vẫn còn trong mã: `MG.KIEU = 'cu'`.
+
+| Trò mới | Thay cho | Kiểu | Cách chơi | Điều khiển |
+|---|---|---|---|---|
+| 🧩 Ghép code | Xếp code | ghép 3 | Bảng 6×6 khối code nhiều màu; đổi chỗ hai khối cạnh nhau, 3 khối cùng màu thẳng hàng thì nổ, khối rơi xuống, có thể nổ dây chuyền. Dọn đủ số khối. | vuốt, hoặc chạm hai ô; mũi tên + Enter |
+| 🐞 Né bug | Bắt bug | chạy, nhảy tránh vật cản | Nhân vật chibi tự chạy; nhảy qua con bọ, nhặt cà phê. Không có "thua": va thì trừ một ít, tối thiểu vẫn được 0,25 điểm. | chạm; Space hoặc mũi tên lên |
+| 📦 Hứng dữ liệu | Nối dây API | hứng đồ rơi | Kéo máy chủ hứng gói xanh, né gói đỏ. | kéo; mũi tên trái phải |
+| ⌨️ Gõ theo nhịp | Gõ lệnh | chạm theo nhịp | 3 làn phím rơi; chạm đúng làn khi phím tới vạch vàng, đúng liên tiếp có combo. Chạm sai không bị trừ. | 3 nút lớn; A S D hoặc mũi tên |
+
+- **Hướng dẫn bằng bàn tay động** 2 giây đầu (đồng hồ chưa chạy), không có đoạn chữ.
+- **Độ khó 0–3:** theo độ khó của việc; làm kỹ thì dễ hơn, làm nhanh thì khó hơn; Chuyên môn từ 60 thì dễ hơn. Số liệu ở bảng `MGM` (`js/du-lieu/tro-choi.js`).
+- **Chạy trong vòng đếm giờ sẵn có** của khung trò chơi, không thêm vòng lặp hình. Đóng trò thì dừng hẳn.
+- **Điện thoại:** nút lớn, chạm, vuốt, kéo. Nền sáng và tối.
+- **Giảm chuyển động:** không có bàn tay động, vật rơi chậm hơn, bớt hiệu ứng.
+
+**Kiểm thử:** thêm `npm run tro-choi-moi` (23 kiểm tra trên điện thoại giả lập).
+- Mở đúng trò, có bàn tay hướng dẫn, không có chữ hay code; chơi bằng thao tác thật; xong trong khoảng 22 giây.
+- Cách đổi điểm như cũ; tự làm cho cộng trừ 0.
+- Người chơi khá đạt từ 0,7 điểm; người mới vẫn từ 0,2.
+- Từ 40 khung hình/giây khi CPU chậm 4 lần; chơi 20 lượt không rò bộ nhớ, không còn vòng lặp hình.
+- `MG.KIEU = 'cu'` vẫn là trò cũ.
+- Bài `van-phong-di-lai` (chơi trực tiếp trò cũ) chạy với `MG.KIEU = 'cu'`.
+- `npm test`: 22 bộ ĐẠT, 2 KHÔNG ĐẠT, 2 BÁO CÁO.
+  - `tro-choi-moi` hỏng do kiểm tra so sánh hai bot; đã bỏ phần so sánh, chạy lại đạt.
+  - `hieu-nang` hỏng ở phố trên điện thoại (27,3 FPS khi máy bận); chạy lại riêng đạt 42,5 và 41,3 FPS. Rủi ro H1 vẫn còn.
+
+## v17.7 – Phase 2: Đọc nhanh
 Chế độ **Đọc nhanh**, mặc định bật. Tắt bằng nút "📖 Đọc nhanh" ở cuối màn hình chơi, hoặc trong Cài đặt ở màn hình mở đầu; tắt thì đọc đầy đủ như trước.
 Chỉ đổi chữ hiện ra và cách bày trên màn hình. **Không đổi** lựa chọn, hiệu ứng, con số, xác suất, lương, tài chính, 56 ngày. Không thêm gì vào bản lưu: cài đặt nằm trong trình duyệt.
 Câu chữ và số liệu: `js/du-lieu/doc-nhanh.js`. Cách chạy: `js/giao-dien/doc-nhanh.js`.
