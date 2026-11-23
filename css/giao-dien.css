@@ -163,3 +163,24 @@ dialog::backdrop{background:rgba(10,14,20,.5)}
 .pt-dk{font-size:13.5px;color:var(--muted);margin:3px 0}
 .pt-dk.ok{color:var(--ink)}
 .pt-dk small{color:var(--muted)}
+/* v17.7: Đọc nhanh – phần thu gọn "Xem thêm", và bố cục gọn trên điện thoại để chữ và nút hiện ngay màn hình đầu */
+.dn-them{margin:6px 0 2px}
+.dn-them > summary{cursor:pointer;color:var(--blue);font-size:14px;font-weight:600;list-style:none;padding:4px 0}
+.dn-them > summary::-webkit-details-marker{display:none}
+.dn-them > summary::before{content:'▸ ';display:inline-block}
+.dn-them[open] > summary::before{content:'▾ '}
+.dn-them.dn-muc{border-top:1px solid var(--line);padding-top:4px;margin-top:8px}
+.dn-them.dn-muc > summary{font-size:16px;color:var(--ink)}
+@media (max-width:600px){
+  body.doc-nhanh .feed li:not(:last-child):not(.fmore){display:none}
+  body.doc-nhanh .feed .fmore{display:none}
+  body.doc-nhanh .scene > .panel,body.doc-nhanh .scene > .live{max-height:20vh;overflow:hidden}
+  body.doc-nhanh .scene > .panel svg,body.doc-nhanh .scene > .live svg{max-height:20vh;width:auto;max-width:100%;margin:0 auto;display:block}
+  body.doc-nhanh .top{grid-template-columns:76px 62px 1fr;gap:8px}
+  body.doc-nhanh .avatar svg{width:62px}
+  body.doc-nhanh .cal-num{font-size:34px}
+  body.doc-nhanh .cal-month{display:none}
+  body.doc-nhanh .cal-page{padding-bottom:5px}
+  body.doc-nhanh .phone-fab{width:48px;height:48px;font-size:22px;border-radius:15px}
+  body.doc-nhanh #app{padding-bottom:72px}
+}

@@ -420,6 +420,7 @@ function settingsHTML(st, view){
     ${swHTML('swSfx', 'Hiệu ứng âm thanh', SFX.on, 'Tiếng phố, chuông báo thức, tin nhắn, tiền… trong cả game')}
     <h3>Hiển thị</h3>
     ${swHTML('swMotion', 'Luôn giảm chuyển động', MOTION.pref === 'reduce', MOTION.pref === 'reduce' ? 'Đang bật theo lựa chọn của bạn' : `Đang theo hệ thống: ${sys ? 'hệ thống đang bật giảm chuyển động' : 'chuyển động đầy đủ'}`)}
+    ${typeof dnOn === 'function' ? swHTML('swDoc', 'Đọc nhanh', dnOn(), 'Câu chữ ngắn gọn, bớt chữ trên màn hình. Tắt để đọc đầy đủ') : ''}
     <div class="set-row"><span class="set-l"><span>Chất lượng hình ảnh</span><small>Game chưa có tùy chọn chất lượng riêng</small></span><span class="set-v">Tự động</span></div>
     <h3>Dữ liệu trò chơi</h3>
     ${st.kind === 'none' ? '<p class="set-note">Chưa có bản lưu. Tiến trình được lưu tự động trên trình duyệt này.</p>'
@@ -441,6 +442,7 @@ function openSettings(st, view){
   on('setX', closeSettings);
   on('swMusic', () => { MUSIC.set(!MUSIC.on); flip('swMusic', MUSIC.on); titleAudioApply(); });
   on('swSfx', () => { SFX.toggle(); flip('swSfx', SFX.on); titleAudioApply(); });
+  on('swDoc', () => { dnDat(!dnOn()); flip('swDoc', dnOn()); });   // v17.7: Đọc nhanh
   on('swMotion', () => { MOTION.set(MOTION.pref === 'reduce' ? 'auto' : 'reduce'); openSettings(st); titleRemount(); });
   on('setNew', () => openSettings(st, 'confirm'));
   on('setCancel', () => openSettings(st));
