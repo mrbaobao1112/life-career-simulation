@@ -28,7 +28,8 @@
     "luu-tai": "node --max-old-space-size=4096 kiem-thu-luu-tai.js",
     "npc-on-dinh": "node kiem-thu-npc-on-dinh.js",
     "hieu-nang": "node kiem-thu-hieu-nang.js",
-    "phat-trien": "node --max-old-space-size=4096 kiem-thu-phat-trien.js"
+    "phat-trien": "node --max-old-space-size=4096 kiem-thu-phat-trien.js",
+    "doc-nhanh": "node --max-old-space-size=4096 kiem-thu-doc-nhanh.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3",

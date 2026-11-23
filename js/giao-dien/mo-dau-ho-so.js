@@ -135,6 +135,7 @@ function renderSetup(){
     if (!st.bg || !st.fam) return;
     newGame(name, st.gender, st.bg, { ...st.look }, st.fam);
   });
+  if (typeof dnTaoNV === 'function') dnTaoNV();   // v17.7: Đọc nhanh (giao-dien/doc-nhanh.js)
 }
 
 /* ----- Hồ sơ ----- */
