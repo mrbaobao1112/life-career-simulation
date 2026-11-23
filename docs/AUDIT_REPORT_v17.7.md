@@ -182,4 +182,21 @@ Lấy cách chơi theo **thể loại** quen thuộc. Hình, tên, nội dung l�
 
 Phase 1 không đổi mã game, chỉ thêm `tests/audit/dem-chu.js` và `docs/phac-thao/`. Vẫn chạy lại toàn bộ `npm test` (kết quả ở mục dưới).
 
-KET_QUA_P1
+Chạy ngày 23/11/2026, `npm test`, 3 luồng, bộ hiệu năng chạy riêng sau cùng.
+
+**Tổng: ✅ ĐẠT 22 bộ · ❌ KHÔNG ĐẠT 0 · ⏭️ SKIP 0 · ⬜ CHƯA CHẠY 0 · 📊 BÁO CÁO 2 (chạy xong, không lỗi). Có 705 kiểm tra đạt, 0 hỏng.**
+
+Lần này bộ `hieu-nang` đạt: phố giờ cao điểm trên điện thoại giả lập 55,3 FPS. Lần chạy Phase 2 trước đó, bộ này không đạt (35,8 FPS). Phase 1 không đổi mã game, nên đây là **dao động của máy** chứ không phải đã sửa được. Rủi ro H1 (phố trên điện thoại sát ngưỡng 40 FPS) vẫn còn. Phase 3 khi thêm trò chơi chạy liên tục sẽ phải đo kỹ.
+
+## 8. Lỗi còn tồn tại
+
+| Mức | Vấn đề | Xử lý ở |
+|---|---|---|
+| P2 | Quá nhiều chữ (khoảng 20.500 từ mỗi ván) | Phase 2 |
+| P2 | Trò chơi nhỏ cần biết code | Phase 3 |
+| P2 | Nút lựa chọn nằm dưới màn hình đầu trên điện thoại; nút điện thoại che chữ | Phase 2 |
+| P2 | Cảnh "Thiếu ngủ" lặp mỗi sáng (G1 từ v17.6) | Phase 2 |
+| P3 | Phố giờ cao điểm trên điện thoại sát ngưỡng 40 FPS (H1) | Phase 3–4 |
+| P3 | Lỗi nhỏ cũ: P3-06, P3-07, P3-10, P3-12 | để sau |
+
+**Chờ duyệt kế hoạch Phase 2 và 4 phác thảo trò chơi trước khi sửa code game.**

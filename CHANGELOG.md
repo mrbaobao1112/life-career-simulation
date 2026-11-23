@@ -24,6 +24,8 @@
 - Công cụ `tests/audit/dem-chu.js` (đếm chữ người chơi phải đọc, theo ngày, theo loại, theo cảnh; dùng để so sánh trước/sau).
 - 4 phác thảo SVG.
 
+**Kiểm thử:** `npm test` gồm 22 bộ ĐẠT, 0 KHÔNG ĐẠT, 0 SKIP, 2 BÁO CÁO; 705 kiểm tra đạt. Lần này bộ hiệu năng đạt do máy dao động; rủi ro phố trên điện thoại sát ngưỡng vẫn còn.
+
 ## v17.6 – Phase 2: Nền tảng phát triển
 Chạy **song song** với chỉ số cũ (Chuyên môn, Kỹ năng mềm, điểm làm việc). **Không đổi** lương, tài chính, năng lượng, sức khỏe, hệ thống 56 ngày.
 Bản lưu cũ vẫn chơi tiếp được: chỉ thêm `S.pt`, tự tạo khi chưa có.
