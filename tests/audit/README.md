@@ -17,6 +17,7 @@ Các script dùng cho lần kiểm tra v17.3 (`docs/AUDIT_REPORT_v17.3.md`). Ch�
 | `hieu-nang.js` | FPS, khung hình chậm, CPU, bộ nhớ, thời gian tải và chuyển cảnh; 3 cấu hình: máy bàn, laptop (CPU chậm 4 lần), điện thoại (iPhone 13, CPU chậm 6 lần) | `node hieu-nang.js` (hoặc `node hieu-nang.js mobile`) | khoảng 3 phút |
 | `chay-lau.js` | Chạy liên tục N phút, đổi cảnh mỗi 90 giây; mỗi phút đo FPS, bộ nhớ, số nút trang | `node chay-lau.js 30` | N phút |
 | `trai-nghiem.js` | (v17.6) Bot chơi N ván 56 ngày bằng nút bấm, đếm ngày nhạt, sự kiện lặp, hoạt động được chọn, ngày nghỉ có ra ngoài, chuyện NPC còn nhớ | `node trai-nghiem.js 12` | khoảng 3 phút |
+| `dem-chu.js` | (v17.7) Đếm chữ người chơi phải đọc: mô tả, lựa chọn, kết quả, lời thoại, tin nhắn, nhật ký, tổng kết tuần; theo ngày và theo cảnh | `node dem-chu.js 6` | khoảng 3 phút |
 | `tim-ro.js` | Chơi vài phút rồi chụp bộ nhớ, tìm nút trang đã tách khỏi trang mà còn bị giữ, và in chuỗi giữ | `node tim-ro.js world 240` | khoảng 5 phút |
 
 **Lưu ý khi đọc số:**
