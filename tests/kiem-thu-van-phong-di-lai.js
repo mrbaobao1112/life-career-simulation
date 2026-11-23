@@ -14,7 +14,8 @@ async function open(browser, co = 'hotay', opts = {}){
   page.on('pageerror', e => page.errs.push(e.message));
   page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load/.test(m.text())) page.errs.push(m.text().slice(0, 200)); });
   await page.goto(URL); await page.click('#fresh'); await page.click('.bgopt[data-f] >> nth=1'); await page.click('.bgopt[data-b="tro"]'); await page.click('#go');
-  await page.evaluate(co => { S.once.roamTut = true; S.job = { co, salary:1e7, start:3 }; S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; OFFICE_BAL.ABSENT = 0; S.day = 9; }, co);
+  await page.evaluate(co => { MG.KIEU = 'cu';   // v17.7: bài này chơi trực tiếp 4 trò cũ (đọc code); trò mới kiểm thử ở kiem-thu-tro-choi-moi.js
+    S.once.roamTut = true; S.job = { co, salary:1e7, start:3 }; S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; OFFICE_BAL.ABSENT = 0; S.day = 9; }, co);
   return page;
 }
 // Mở một cảnh ở văn phòng

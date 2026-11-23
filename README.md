@@ -19,7 +19,7 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 - **Văn phòng đi lại được (v15):**
   - Ngày đi làm diễn ra trong văn phòng của công ty bạn. Có bốn kiểu văn phòng (lớn, không gian mở, startup, nhỏ), mỗi công ty trang trí riêng.
   - Đến chỗ họp nhấn E để họp đầu ngày; ngồi vào bàn nhấn E để làm task; muốn hỏi anh Dũng thì sang bàn anh ấy; ra cửa để ăn trưa và tan làm.
-  - Làm task có trò chơi nhỏ (bắt bug, xếp code, gõ lệnh, nối dây API). Chơi tốt thì khả năng làm tốt nhích lên tối đa 6%; bỏ qua thì tính như cũ.
+  - Làm task có trò chơi nhỏ 20 giây kiểu game phổ thông, không cần biết code (v17.7): Ghép code (ghép 3), Né bug (nhảy tránh), Hứng dữ liệu (hứng đồ rơi), Gõ theo nhịp. Chơi tốt thì khả năng làm tốt nhích lên tối đa 6%; bỏ qua thì tính như cũ.
   - Bỏ bàn quá lâu trong giờ làm thì chị Hạnh nhắc: nhắn tin, đến tận nơi, rồi trừ hiệu suất.
 - **Ra phố Hà Thành (v16):**
   - Bước ra cửa là ra ngõ nhà rồi ra phố Bán Nguyệt: cơm bụi, trà đá, cà phê, bia hơi, phường, thư viện, hồ, trung tâm thương mại, bến xe.
@@ -69,7 +69,7 @@ js/
   van-phong/      Văn phòng đi lại được: đồ đạc, bốn kiểu văn phòng của các công ty, đồng nghiệp, kỷ luật, một ngày làm việc
   song/           Thế giới sống: lịch sinh hoạt theo giờ của từng NPC, bộ máy hành vi (đi lại, ngồi, việc xen, giữ chỗ), dấu hiệu trên đầu, dân số theo giờ, phố và ngõ, người quen ngoài phố, sự kiện thế giới, trí nhớ của NPC, nét mặt theo tình huống
   pho/            Ra phố: bản đồ phố và ngõ nhà, bên trong 8 địa điểm, hồ Bán Nguyệt, xe máy, chuyện bất ngờ
-  tro-choi/       Trò chơi nhỏ khi làm task: khung chung và bốn trò (bắt bug, xếp code, gõ lệnh, nối dây)
+  tro-choi/       Trò chơi nhỏ khi làm task: khung chung, bốn trò mới (ghép code, né bug, hứng dữ liệu, gõ nhịp) và bốn trò cũ (MG.KIEU = 'cu')
   giao-dien/      Màn chơi, tổng kết tuần, màn mở đầu, hồ sơ
 tests/            Kiểm thử tự động (chạy bằng Node.js)
 docs/             Ghi chú thiết kế
@@ -102,7 +102,8 @@ Muốn sửa gì thì mở file nào:
 | Khung giờ trong ngày làm việc, việc nhỏ ở văn phòng (cà phê…), việc nào làm ở đâu | `js/van-phong/ngay-lam-viec.js` (bảng `VP`) |
 | Đồng nghiệp ra pantry bao lâu một lần, tư thế ngồi | `js/van-phong/dong-nghiep.js` |
 | Kỷ luật: rời bàn bao lâu thì bị nhắc, mức trừ | `js/van-phong/ky-luat.js` (bảng `KY_LUAT`) |
-| Trò chơi nhỏ: thời gian, mức cộng trừ tối đa | `js/tro-choi/khung-tro-choi.js` (bảng `MG`) |
+| Trò chơi nhỏ: thời gian, mức cộng trừ tối đa, trò mới hay trò cũ (`MG.KIEU`) | `js/tro-choi/khung-tro-choi.js` (bảng `MG`) |
+| 4 trò chơi nhỏ kiểu mới (ghép 3, né bug, hứng dữ liệu, gõ nhịp): độ khó, tốc độ, mục tiêu | `js/du-lieu/tro-choi.js` (bảng `MGM`); mỗi trò một file trong `js/tro-choi/` |
 | Câu đố của trò chơi nhỏ cho từng task, task nào chơi trò nào | `js/du-lieu/tro-choi.js` |
 | Lịch sinh hoạt của Tùng, bố mẹ, đồng nghiệp; chỗ ngồi trong nhà; việc xen | `js/song/lich-npc.js` (`HOME_DAY`, `VP_DAY`, `SONG_SPOTS`, `SONG_BEAT`, bảng `SONG`) |
 | NPC tự làm việc của mình: đi, ngồi, giữ chỗ, dấu hiệu | `js/song/hanh-vi-npc.js` |
@@ -139,6 +140,7 @@ npm run luu-tai       # v17.6: lưu/tải, bản lưu thật của các bản 16
 npm run npc-on-dinh   # v17.6: lịch không trùng, NPC không trùng mặt, không kẹt, không bận mãi ở 10 nơi; ra vào địa điểm liên tục (cần Playwright, khoảng 6 phút)
 npm run phat-trien    # v17.6 phase 2: kỹ năng nghề, cấp bậc, mục tiêu sống, lưu/tải; phần cuối chạy trên trình duyệt thật (khoảng 1 phút)
 npm run doc-nhanh     # v17.7 phase 2: Đọc nhanh: ngân sách chữ, thuật ngữ, bật/tắt cho cùng kết quả, nút hiện ngay màn đầu trên điện thoại (khoảng 1 phút)
+npm run tro-choi-moi  # v17.7 phase 3: 4 trò chơi nhỏ kiểu mới trên điện thoại giả lập: thao tác thật, điểm, người mới, khung hình, rò bộ nhớ (cần Playwright, khoảng 4 phút)
 npm run hieu-nang     # v17.6: FPS trên điện thoại giả lập, NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)

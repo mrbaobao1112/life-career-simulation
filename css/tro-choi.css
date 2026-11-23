@@ -59,3 +59,61 @@
 @media (max-width:380px){ .mg-match{gap:6px} .mg-cell{font-size:13px;padding:6px 8px} }
 @media (prefers-reduced-motion: reduce){ .mg,.mg-result,.mg .mg-ok,.mg .mg-bad{animation:none!important} }
 html.rm .mg,html.rm .mg-result,html.rm .mg .mg-ok,html.rm .mg .mg-bad{animation:none!important}
+
+/* ---------- v17.7: 4 trò kiểu mới (khung logic 300 rộng; vị trí đặt bằng transform theo tỉ lệ) ---------- */
+.mg-body.mgm{position:relative;user-select:none;-webkit-user-select:none}
+.mgm-san{position:relative;width:100%;max-width:340px;margin:0 auto;aspect-ratio:300/260;border-radius:14px;overflow:hidden;touch-action:none;background:#EAF2FF}
+.mgm-san > *{position:absolute;left:0;top:0;will-change:transform}
+.mgm-ne{aspect-ratio:300/200;background:linear-gradient(#DCEBFF 0 78%,#3B4252 78%)}
+.mgm-phim{inset:auto 0 0 0;top:auto!important;height:22%;background:repeating-linear-gradient(90deg,#4A5468 0 26px,#3B4252 26px 32px);opacity:.55}
+.mgm-nv{width:36px;height:46px;display:flex;flex-direction:column;align-items:center}
+.mgm-nv svg{width:30px;height:auto;display:block}
+.mgm-nv i{display:block;width:22px;height:18px;border-radius:7px 7px 4px 4px;background:var(--blue);margin-top:-2px}
+.mgm-nv.dau{animation:mgmNhay .18s steps(2) infinite}
+@keyframes mgmNhay{50%{opacity:.25}}
+.mgm-vat{font-size:24px;line-height:1}
+.mgm-mang,.mgm-cf,.mgm-diem,.mgm-combo{position:absolute;top:6px;font-size:15px;font-weight:800;color:#1B2230;z-index:2}
+.mgm-mang{left:8px}.mgm-cf{left:auto!important;right:10px}
+.mgm-diem{left:8px}
+.mgm-may{width:74px;height:28px;border-radius:9px;background:#1B2230;color:#fff;display:grid;place-items:center;font-size:16px;top:0}
+.mgm-goi{width:28px;height:22px;border-radius:6px;background:#2F6FD1;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800}
+.mgm-goi.xau{background:#E5484D}
+.mgm-nhip{background:#1B2230}
+.mgm-lan{inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 6px}
+.mgm-lan i{display:block;background:#273044;border-radius:10px}
+.mgm-vach{top:76.9%!important;left:2%!important;width:96%;height:4px;border-radius:2px;background:#F6C85F}
+.mgm-not{width:19%;height:22px;border-radius:8px;background:var(--c)}
+.mgm-not.trung{transform-origin:center;opacity:.2}
+.mgm-combo{left:auto!important;right:10px;color:#F6C85F}
+.mgm-nut{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:340px;margin:8px auto 0}
+.mgm-nut button{min-height:58px;border-radius:14px;border:0;background:var(--c);color:#fff;font:800 20px/1 inherit;cursor:pointer;touch-action:manipulation}
+.mgm-nut button.an{animation:mgmAn .15s ease-out}
+@keyframes mgmAn{50%{transform:scale(.92);filter:brightness(1.25)}}
+.mgm-muc{text-align:center;font-weight:800;font-size:16px;margin:0 0 6px}
+.mgm-luoi{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:5px;max-width:340px;margin:0 auto;touch-action:none}
+.mgm-o{aspect-ratio:1;border:0;border-radius:10px;background:var(--c);color:#fff;font:800 14px/1 ui-monospace,Menlo,Consolas,monospace;cursor:pointer;touch-action:none;padding:0}
+.mgm-o.chon{outline:3px solid #1B2230;outline-offset:1px;transform:scale(.92)}
+.mgm-o.no{animation:mgmNo .16s ease-in forwards}
+.mgm-o.moi{animation:mgmRoi .2s ease-out}
+.mgm-o:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+@keyframes mgmNo{to{transform:scale(.2);opacity:0}}
+@keyframes mgmRoi{from{transform:translateY(-40%);opacity:.3}}
+/* bàn tay hướng dẫn 2 giây đầu: chạm, vuốt, kéo, nhịp */
+.mgm-demo{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:5;background:rgba(15,20,32,.12);border-radius:14px}
+.mgm-demo span{font-size:44px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3))}
+.mgm-demo-cham span{animation:mgmCham .7s ease-in-out infinite}
+.mgm-demo-vuot span{animation:mgmVuot 1s ease-in-out infinite}
+.mgm-demo-keo span{animation:mgmKeo 1.1s ease-in-out infinite alternate}
+.mgm-demo-nhip span{animation:mgmCham .55s ease-in-out infinite}
+@keyframes mgmCham{50%{transform:translateY(10px) scale(.9)}}
+@keyframes mgmVuot{0%{transform:translate(-30px,0)}60%,100%{transform:translate(30px,0);opacity:.4}}
+@keyframes mgmKeo{from{transform:translateX(-70px)}to{transform:translateX(70px)}}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .mgm-san:not(.mgm-nhip){background:#22304A}
+  :root:not([data-theme="light"]) .mgm-ne{background:linear-gradient(#22304A 0 78%,#151B26 78%)}
+  :root:not([data-theme="light"]) .mgm-mang,:root:not([data-theme="light"]) .mgm-cf,:root:not([data-theme="light"]) .mgm-diem{color:#E8ECF2}
+  :root:not([data-theme="light"]) .mgm-o.chon{outline-color:#fff}
+}
+@media (prefers-reduced-motion: reduce){
+  .mgm-demo span,.mgm-o.no,.mgm-o.moi,.mgm-nv.dau,.mgm-nut button.an{animation:none}
+}
