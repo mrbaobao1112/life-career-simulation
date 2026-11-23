@@ -1,6 +1,23 @@
 # Lịch sử phiên bản
 
-## v17.7 – Phase 3: 4 trò chơi nhỏ kiểu mới (hiện tại)
+## v17.7 – Phase 4: Kiểm thử toàn bộ, đo lại, hoàn thiện (hiện tại)
+Tổng kết cả v17.7 ("game dễ chơi hơn cho mọi người"): xem `docs/AUDIT_REPORT_v17.7.md`, mục Phase 4.
+
+**Trước và sau:**
+- Chữ phải đọc cả ván **−42%** (20.485 → 11.978 từ), tuần đầu −37%, ngày đầu −28%. Mục tiêu −50% chưa đạt.
+- 15 phút đầu trên điện thoại: 97 → 70 từ mỗi màn.
+- Trò chơi nhỏ: từ 25–30 từ và 6 dòng code phải đọc xuống 0; không cần biết code; 20 giây.
+- Thuật ngữ khó trên màn hình: 0 khi bật Đọc nhanh.
+- Nút lựa chọn hiện ngay màn hình đầu trên điện thoại.
+
+**Sửa:** số phiên bản trong Cài đặt còn ghi v17.5, đã đổi thành v17.7.
+**Kiểm thử:**
+- Thêm bản lưu mẫu của 17.6 và 17.7. Bài `luu-tai` thử bản lưu thật của 7 phiên bản (16.1 → 17.7).
+- Chạy lại toàn bộ `npm test` (kết quả ở dưới).
+
+KQ_CHANGELOG
+
+## v17.7 – Phase 3: 4 trò chơi nhỏ kiểu mới
 Thay 4 trò đọc code bằng 4 trò kiểu game phổ thông. **Không cần đọc chữ, không cần biết code**, mỗi lượt 20 giây.
 - Việc nào chơi trò nào giữ nguyên.
 - Cách đổi điểm ra cộng trừ khả năng làm tốt việc giữ nguyên (tối đa ±6%).
