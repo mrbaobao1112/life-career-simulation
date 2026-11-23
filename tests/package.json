@@ -27,7 +27,8 @@
     "co-ban": "node kiem-thu-he-thong.js && node kiem-thu-tai-chinh.js && node kiem-thu-56-ngay.js && node choi-ngau-nhien.js 20",
     "luu-tai": "node --max-old-space-size=4096 kiem-thu-luu-tai.js",
     "npc-on-dinh": "node kiem-thu-npc-on-dinh.js",
-    "hieu-nang": "node kiem-thu-hieu-nang.js"
+    "hieu-nang": "node kiem-thu-hieu-nang.js",
+    "phat-trien": "node --max-old-space-size=4096 kiem-thu-phat-trien.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3",

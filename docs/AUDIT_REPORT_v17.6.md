@@ -247,3 +247,49 @@ Chỉ kiểm thử và tài liệu, **không đổi mã game**:
 - Báo SKIP thay vì đạt: 14 file `tests/kiem-thu-*.js`.
 - Công cụ đo trải nghiệm: `tests/audit/trai-nghiem.js`.
 - Tài liệu: `docs/AUDIT_REPORT_v17.6.md` (file này), `CHANGELOG.md`, `README.md`, `tests/audit/README.md`, `.gitignore`.
+
+---
+
+## Cập nhật sau Phase 2: Nền tảng phát triển
+
+**Đã làm** (chi tiết trong `CHANGELOG.md`):
+- 5 kỹ năng nghề chạy song song với chỉ số cũ.
+- Cấp bậc Junior → Middle (Senior, Team Leader, Manager có sẵn trong dữ liệu, cần nhiều năm).
+- Mục tiêu sống do game gợi ý theo hoàn cảnh.
+- Không đổi lương, tài chính, năng lượng, sức khỏe, 56 ngày.
+
+**Kết quả `npm test`** (20/11/2026, 3 luồng, hiệu năng chạy riêng):
+- ✅ ĐẠT 21 · ❌ KHÔNG ĐẠT 1 · ⏭️ SKIP 0 · ⬜ CHƯA CHẠY 0 · 📊 BÁO CÁO 2;
+- 704 kiểm tra đạt, 1 kiểm tra hỏng.
+
+| Bộ | Kết quả | Ghi chú |
+|---|---|---|
+| **phat-trien** (mới) | ✅ ĐẠT, 36 kiểm tra | 1 kiểm tra chạy trên trình duyệt thật |
+| 20 bộ cũ (có kiểm tra) | ✅ ĐẠT | giống Phase 1 |
+| can-bang, hai-thang | 📊 BÁO CÁO | chạy xong, không lỗi |
+| **hieu-nang** | ❌ KHÔNG ĐẠT (1/12) | Phố giờ cao điểm trên điện thoại giả lập: 35,8 FPS, dưới ngưỡng 40 |
+
+**Về kiểm tra hiệu năng không đạt (H1):**
+- Đo lại xen kẽ 6 lần trên main (trước Phase 2) và 6 lần trên nhánh Phase 2, cùng máy, cùng lúc:
+
+  | Bản | Các lần đo (FPS) | Trung bình |
+  |---|---|---|
+  | main | 43,4 · 34,5 · 41,2 · 28,5 · 45,2 · 32,2 | 37,5 |
+  | Phase 2 | 36,5 · 42,6 · 31,1 · 37,4 · 30,5 · 33,3 | 35,2 |
+
+- Hai bên chồng lấn hoàn toàn. Phase 2 không chạy gì trong vòng lặp hình: chỉ chạy khi chuyển buổi và sau mỗi lựa chọn.
+- Kết luận: **không phải do Phase 2**. Đây là rủi ro H1 đã ghi ở Phase 1: cảnh này dao động quanh ngưỡng 40 FPS kể cả trên main. Lúc Phase 1 máy rảnh hơn nên đo được 45–47.
+- **Không hạ ngưỡng** để bài đạt. Phase 3 (hiệu năng) sẽ xử lý H1.
+
+**Lỗi tìm thấy và đã sửa trong Phase 2:**
+- File mới bọc hàm `settleChoice` của `man-choi.js` nhưng được nạp trước file đó.
+  - Trên trình duyệt thật, game báo lỗi ngay khi mở.
+  - Bài jsdom không thấy, vì nó gộp mọi file thành một khối.
+  - Đã sửa thứ tự nạp. Bài `phat-trien` có thêm phần chạy trên trình duyệt thật.
+  - Bài `luu-tai` (phần trình duyệt) cũng sẽ bắt được lỗi loại này.
+- Mục tiêu "tham gia 6 hoạt động" bị làm tròn như số tiền thành 0. Đã sửa.
+- Hồ sơ hiện chữ tiếng Anh nội bộ ("good"). Đã đổi thành Tốt / Ổn / Bị nhắc nhở.
+
+**Lỗi còn tồn tại:**
+- Như Phase 1: G1–G4 (gameplay); H1, H2 (hiệu năng); P3-06, P3-07, P3-10, P3-12.
+- H1 hiện làm bài `hieu-nang` không đạt khi máy bận.

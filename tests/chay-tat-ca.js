@@ -19,6 +19,7 @@ const BO = [
   ['56-ngay', 'kiem-thu-56-ngay.js', [], 0, 'kt'],
   ['ngau-nhien', 'choi-ngau-nhien.js', ['40'], 0, 'kt', ['--max-old-space-size=6144']],
   ['luu-tai', 'kiem-thu-luu-tai.js', [], 0, 'kt', ['--max-old-space-size=4096']],
+  ['phat-trien', 'kiem-thu-phat-trien.js', [], 0, 'kt', ['--max-old-space-size=4096']],
   ['can-bang', 'can-bang-chien-luoc.js', [], 0, 'bc'],
   ['hai-thang', 'mo-phong-hai-thang.js', [], 0, 'bc'],
   ['van-phong', 'kiem-thu-van-phong.js', [], 1, 'kt'],
