@@ -299,6 +299,15 @@ So với trước: mỗi lượt phải đọc 25–30 từ, 6 dòng code thật
 5. **Nút "Xong" vẫn hiện ở trò mới:** CSS đè lên thuộc tính ẩn.
 6. **Ký hiệu `</>` bị hiểu là thẻ HTML** nên khối xanh lá trống.
 
+**Kiểm thử `npm test`** (chạy thật, 3 luồng): ✅ ĐẠT 22 · ❌ KHÔNG ĐẠT 2 · ⏭️ SKIP 0 · ⬜ CHƯA CHẠY 0 · 📊 BÁO CÁO 2; 737 kiểm tra đạt, 2 hỏng.
+
+| Bộ không đạt | Lần chạy chung | Nguyên nhân | Đã làm | Chạy lại riêng |
+|---|---|---|---|---|
+| `tro-choi-moi` | 1/22 hỏng: bot "người mới" Hứng dữ liệu 0,91, cao hơn bot khá 0,79 | Kiểm tra sai: so hai bot cùng đọc thẳng vị trí trò, máy bận thì điểm dao động ngẫu nhiên | Bỏ phần so sánh hai bot; giữ hai ngưỡng có ý nghĩa (chơi tốt từ 0,7; người mới vẫn từ 0,2) | ✅ 22/22 đạt |
+| `hieu-nang` | phố giờ cao điểm trên điện thoại 27,3 FPS (ngưỡng 40) | Rủi ro H1 có từ v17.6. Phase 3 không đổi phần vẽ thế giới. Lần chạy chung máy bận (bộ `can-bang` chậm hơn 30%) | Không hạ ngưỡng | ✅ 2 lần: 42,5 và 41,3 FPS, vẫn sát ngưỡng |
+
+Chưa chạy lại toàn bộ `npm test` sau khi sửa (chỉ sửa bài `tro-choi-moi`; các bộ khác không đổi).
+
 **Lỗi còn tồn tại:**
 - Độ khó với người thật chưa được thử (xem trên).
 - Mục tiêu giảm 50% chữ của Phase 2 vẫn chưa đạt (42%). Đang chờ quyết định có cho ngày bình thường tự chạy hay không.

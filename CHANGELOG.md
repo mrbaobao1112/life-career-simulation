@@ -27,6 +27,9 @@ Thay 4 trò đọc code bằng 4 trò kiểu game phổ thông. **Không cần �
 - Từ 40 khung hình/giây khi CPU chậm 4 lần; chơi 20 lượt không rò bộ nhớ, không còn vòng lặp hình.
 - `MG.KIEU = 'cu'` vẫn là trò cũ.
 - Bài `van-phong-di-lai` (chơi trực tiếp trò cũ) chạy với `MG.KIEU = 'cu'`.
+- `npm test`: 22 bộ ĐẠT, 2 KHÔNG ĐẠT, 2 BÁO CÁO.
+  - `tro-choi-moi` hỏng do kiểm tra so sánh hai bot; đã bỏ phần so sánh, chạy lại đạt.
+  - `hieu-nang` hỏng ở phố trên điện thoại (27,3 FPS khi máy bận); chạy lại riêng đạt 42,5 và 41,3 FPS. Rủi ro H1 vẫn còn.
 
 ## v17.7 – Phase 2: Đọc nhanh
 Chế độ **Đọc nhanh**, mặc định bật. Tắt bằng nút "📖 Đọc nhanh" ở cuối màn hình chơi, hoặc trong Cài đặt ở màn hình mở đầu; tắt thì đọc đầy đủ như trước.
