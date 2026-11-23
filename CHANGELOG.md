@@ -1,6 +1,44 @@
 # Lịch sử phiên bản
 
-## v17.7 – Phase 1: Đo thực tế để game dễ chơi hơn (hiện tại)
+## v17.7 – Phase 2: Đọc nhanh (hiện tại)
+Chế độ **Đọc nhanh**, mặc định bật. Tắt bằng nút "📖 Đọc nhanh" ở cuối màn hình chơi, hoặc trong Cài đặt ở màn hình mở đầu; tắt thì đọc đầy đủ như trước.
+Chỉ đổi chữ hiện ra và cách bày trên màn hình. **Không đổi** lựa chọn, hiệu ứng, con số, xác suất, lương, tài chính, 56 ngày. Không thêm gì vào bản lưu: cài đặt nằm trong trình duyệt.
+Câu chữ và số liệu: `js/du-lieu/doc-nhanh.js`. Cách chạy: `js/giao-dien/doc-nhanh.js`.
+
+**Câu chữ ngắn hơn (giữ ý, bỏ câu đùa phụ):**
+- **Thức dậy:** bỏ câu lịch bóc, chỉ còn "Ngủ … tiếng" và lịch hôm nay. Dòng giờ ra khỏi nhà để lại cho màn "Chuẩn bị đi làm".
+- **Việc mới:** bỏ mã việc (#LCS-…) và câu giới thiệu lặp lại; mô tả việc giữ câu đầu.
+- **Giờ rảnh:** ô chỉ còn tên ngắn (Học thêm, Cà phê, Trà đá…).
+- **Nhật ký cuối ngày, báo cáo tua nhanh:** tối đa 2 dòng ngắn.
+- **Tổng kết tuần:** chỉ hiện tóm tắt 2 câu và chỉ số; Công việc, Tiền bạc, Quan hệ, Danh hiệu… thu gọn, bấm để mở.
+- **Thiếu ngủ:** một dòng ngắn; gặp lại trong 3 ngày thì chỉ "Lại thiếu ngủ".
+- **Tính tiền tháng đầu, hết giờ làm, gặp cả team, tạo nhân vật:** bản ngắn.
+- **Mọi cảnh khác (quy tắc chung):**
+  - mô tả tối đa khoảng 20 từ hiện sẵn, phần còn lại ở "Xem thêm";
+  - nhãn lựa chọn dài hơn 12 từ chỉ giữ câu đầu;
+  - mỗi lựa chọn 1 thẻ gợi ý, bỏ dòng mô tả phụ;
+  - kết quả sau lựa chọn giữ câu đầu;
+  - dòng "vì sao xảy ra" giữ câu đầu.
+
+**Thuật ngữ đơn giản** (bảng `DN_THUAT_NGU`): task → việc, bug → lỗi, OT → làm thêm, standup → họp đầu ngày, review → xem lại, deploy → đưa bản mới lên, senior → người lâu năm, bỏ mã #LCS…
+- Đổi ở nhãn lựa chọn, kết quả, lời thoại, nhãn việc trong thế giới đi lại, và trên cảnh, điện thoại, hồ sơ, tổng kết tuần.
+- Không đổi chữ trong khung code, không đổi mã nội bộ.
+
+**Điện thoại:** nút lựa chọn hiện ngay ở màn hình đầu (trước phải cuộn). Tờ lịch, nhân vật, khung tranh gọn hơn; danh sách việc đã làm chỉ hiện việc gần nhất; nút điện thoại nhỏ hơn.
+
+**Kết quả đo** (`tests/audit/dem-chu.js`, 6 ván, cùng cách bấm):
+- Cả 56 ngày: 20.485 → 11.978 từ (**−42%**).
+- Tuần đầu: 4.032 → 2.543 (**−37%**).
+- Ngày đầu: 775 → 555 (**−28%**).
+- Màn tạo nhân vật: 283 → 169.
+- **Mục tiêu −50% chưa đạt.** Phần còn lại chủ yếu là tên lựa chọn ở các màn lặp mỗi ngày (giờ rảnh, thức dậy, nhật ký). Giảm thêm cần bớt số lần dừng lại, là thay đổi lối chơi nên chờ duyệt.
+
+**Kiểm thử:**
+- Thêm `npm run doc-nhanh` (12 kiểm tra).
+- `npm test`: 23 bộ ĐẠT, 0 KHÔNG ĐẠT, 0 SKIP, 2 BÁO CÁO; 717 kiểm tra đạt.
+- Các bài cũ đều chạy với Đọc nhanh bật và vẫn đạt.
+
+## v17.7 – Phase 1: Đo thực tế để game dễ chơi hơn
 **Không đổi mã game.** Chỉ đo, lập kế hoạch và phác thảo. Báo cáo: `docs/AUDIT_REPORT_v17.7.md`.
 
 **Vấn đề:** trò chơi nhỏ khó với người không biết code; quá nhiều chữ.

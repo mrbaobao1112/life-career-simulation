@@ -46,6 +46,7 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 - **Buổi sáng có lịch trình:** báo thức, chuẩn bị, đi xe máy, tắc đường, mưa, tính ra giờ đến nơi.
 - **Thói quen ăn uống:** dinh dưỡng tính theo khoảng 10 bữa gần nhất, hồ sơ thói quen trong mục Hồ sơ.
 - **Sự kiện ba loại:** có lịch hẹn, bất ngờ, hậu quả (kèm nguyên nhân).
+- **Đọc nhanh (v17.7, mặc định bật):** câu chữ ngắn gọn, thuật ngữ nghề lập trình nói đơn giản (task → việc, bug → lỗi, OT → làm thêm), tổng kết tuần chỉ hiện tóm tắt, nút lựa chọn hiện ngay màn hình đầu trên điện thoại. Tắt bằng nút "📖 Đọc nhanh" ở cuối màn hình hoặc trong Cài đặt để đọc đầy đủ.
 - **Điện thoại trong game:** tin nhắn, nhóm chat, trả lời ảnh hưởng độ thân, để "đã xem" quá lâu sẽ có hậu quả. Số đỏ trên nút điện thoại là số cuộc trò chuyện có tin mới; chỉ đổ chuông khi có tin cần trả lời; mỗi ngày tối đa 2 tin nhắn vu vơ; cuộc trò chuyện chờ trả lời lên đầu danh sách, và có vạch “Tin mới” ngăn tin cũ với tin chưa đọc.
 - **Tháng đầu đi thuê nhà:** lương thử việc theo ngày công, kế hoạch tháng đầu, nhờ vả gia đình, bạn bè, chủ nhà, tạm ứng lương, sổ nợ.
 - **Chạm vào nhân vật** để nhân vật phản ứng và nói câu theo tình trạng thật.
@@ -109,6 +110,7 @@ Muốn sửa gì thì mở file nào:
 | Câu nói giữa các NPC: chào, nói chuyện, hỏi việc, từ chối, bố mẹ, rủ về, ăn bánh | `js/du-lieu/xa-giao.js` |
 | NPC giao tiếp với nhau, sự kiện nhỏ (rủ về, chị Mai mang bánh) | `js/song/xa-giao-npc.js` (bảng `XGK`) |
 | Kỹ năng nghề (nguồn tăng, mức, trần mỗi ngày), cấp bậc (điều kiện lên cấp), mục tiêu sống (gợi ý theo hoàn cảnh, điều kiện xong) | `js/du-lieu/phat-trien.js` (bảng `PT`, `KY_NANG`, `KN_NGUON`, `CAP_BAC`, `MUC_TIEU`); cách chạy ở `js/he-thong/phat-trien.js` |
+| Đọc nhanh: ngân sách chữ, bảng thuật ngữ đơn giản, bản ngắn của các cảnh tốn chữ, tên ngắn của ô giờ rảnh | `js/du-lieu/doc-nhanh.js` (bảng `DN`, `DN_THUAT_NGU`, `DN_TEN`, `DN_CANH`); cách chạy ở `js/giao-dien/doc-nhanh.js` |
 | Chuyện tự nảy sinh (Linh rủ đi thư viện, đồng nghiệp giận rồi làm lành): điều kiện, số ngày, câu chữ | `js/du-lieu/cau-chuyen.js` (bảng `CC`, `CC_LOI`); cách chạy ở `js/song/cau-chuyen.js` (bảng `CC_STORIES`) |
 | Phố: vị trí, tên, màu các địa điểm; ngõ nhà từng hoàn cảnh | `js/pho/ban-do-pho.js` (`PHO_DOORS`, `PHO_LANE`) |
 | Bên trong các địa điểm: đồ đạc, người có mặt, việc nào làm ở đâu | `js/pho/noi-that-quan.js`, `js/pho/noi-that-lon.js`, `js/pho/ho-ban-nguyet.js` |
@@ -136,6 +138,7 @@ node chay-tat-ca.js tri-nho luu-tai   # chỉ chạy vài bộ (các bộ khác 
 npm run luu-tai       # v17.6: lưu/tải, bản lưu thật của các bản 16.1 → 17.5 (tests/du-lieu-mau/), bản lưu thiếu dữ liệu, lưu giữa lúc đang đi (khoảng 2 phút)
 npm run npc-on-dinh   # v17.6: lịch không trùng, NPC không trùng mặt, không kẹt, không bận mãi ở 10 nơi; ra vào địa điểm liên tục (cần Playwright, khoảng 6 phút)
 npm run phat-trien    # v17.6 phase 2: kỹ năng nghề, cấp bậc, mục tiêu sống, lưu/tải; phần cuối chạy trên trình duyệt thật (khoảng 1 phút)
+npm run doc-nhanh     # v17.7 phase 2: Đọc nhanh: ngân sách chữ, thuật ngữ, bật/tắt cho cùng kết quả, nút hiện ngay màn đầu trên điện thoại (khoảng 1 phút)
 npm run hieu-nang     # v17.6: FPS trên điện thoại giả lập, NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)

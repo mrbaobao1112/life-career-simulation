@@ -200,3 +200,69 @@ Lần này bộ `hieu-nang` đạt: phố giờ cao điểm trên điện thoạ
 | P3 | Lỗi nhỏ cũ: P3-06, P3-07, P3-10, P3-12 | để sau |
 
 **Chờ duyệt kế hoạch Phase 2 và 4 phác thảo trò chơi trước khi sửa code game.**
+
+---
+
+## Cập nhật sau Phase 2: Đọc nhanh (giảm chữ)
+
+**Đã làm** (chi tiết trong `CHANGELOG.md`):
+- Thêm chế độ **Đọc nhanh**, mặc định bật. Bật/tắt bằng nút ở cuối màn hình chơi, hoặc trong Cài đặt ở màn hình mở đầu.
+- Chế độ này chỉ đổi chữ hiện ra và cách bày trên màn hình. Không đổi lựa chọn, hiệu ứng, con số, xác suất. Bài kiểm thử so sánh bật/tắt trên 7 cảnh cho kết quả giống hệt, và cùng một lượt chơi đi đúng cùng một đường.
+
+**Số chữ trước và sau** (`tests/audit/dem-chu.js`, 6 ván, cùng hạt giống, cùng cách bấm):
+
+| | Trước (tắt Đọc nhanh) | Sau (bật) | Giảm |
+|---|---|---|---|
+| Ngày 1 | 775 | 555 | **28%** |
+| Tuần 1 | 4.032 | 2.543 | **37%** |
+| Cả 56 ngày | 20.485 | 11.978 | **42%** |
+
+| Loại chữ (56 ngày) | Trước | Sau | Giảm |
+|---|---|---|---|
+| Mô tả cảnh | 5.797 | 2.722 | 53% |
+| Lựa chọn | 5.297 | 4.021 | 24% |
+| Kết quả | 2.777 | 1.453 | 48% |
+| Nhật ký cuối ngày | 2.191 | 1.634 | 25% |
+| Tổng kết tuần | 2.849 | 692 | 76% |
+| Mẹo, lý do sự kiện | 460 | 345 | 25% |
+| Lời thoại, tin nhắn | 1.113 | 1.113 | 0% (đã ngắn) |
+
+**Mục tiêu giảm ít nhất 50%: CHƯA ĐẠT** (đạt 42% cả ván, 37% tuần đầu).
+- Chữ còn lại chủ yếu không còn là câu dài, mà là **số màn hình**:
+  - giờ rảnh khoảng 41 lần mỗi ván, giờ chỉ còn tên ngắn của các ô (`📖 Học thêm`, `☕ Cà phê 45.000đ`…);
+  - thức dậy khoảng 36 lần (giờ còn khoảng 15–20 từ);
+  - nhật ký cuối ngày khoảng 36 lần (khoảng 25 từ).
+- Phần lớn chữ còn lại là tên lựa chọn và con số cần thiết.
+- Muốn giảm thêm phải **bớt số lần dừng lại**. Ví dụ: ngày bình thường thì tự dậy, tự sang ngày mới, không hiện màn thức dậy và nhật ký. Làm vậy thì người chơi bớt cơ hội chọn (nằm thêm, ngủ nướng, tua). Đây là quyết định về lối chơi, **cần người làm game duyệt**, nên chưa làm.
+
+**Màn hình điện thoại:**
+- Nút lựa chọn đầu tiên giờ hiện ngay ở màn hình đầu: thử ở các màn việc, thức dậy, hết giờ làm, giờ rảnh; cả nền sáng và nền tối. Trước đây phải cuộn xuống.
+- Tờ lịch, nhân vật, khung tranh gọn hơn. Danh sách việc đã làm chỉ hiện việc gần nhất.
+- Nút điện thoại nhỏ hơn và có khoảng trống phía dưới, để không che chữ khi cuộn đến cuối.
+
+**Chơi thử 15 phút đầu** (63 màn đầu, đếm mọi chữ hiện trên màn hình kể cả lịch, chỉ số, nút): trung bình khoảng 90 từ/màn → **70 từ/màn**. Màn tạo nhân vật: 283 → 169 từ.
+
+**Lỗi tìm thấy và đã sửa trong lúc làm:**
+1. Cách đổi thuật ngữ đầu tiên dùng `MutationObserver` (theo dõi mọi thay đổi trên trang). Trong bài kiểm thử jsdom bấm liên tục, bản ghi thay đổi dồn lại và **làm hết bộ nhớ**. Đã bỏ, chuyển sang gọi đổi thuật ngữ đúng ở những chỗ vẽ chữ.
+2. Quy tắc rút gọn chung **giấu nhầm** lời chị Hạnh nhờ ở lại (màn hết giờ làm) vào "Xem thêm", vì đoạn đầu chỉ tả giờ giấc. Đã viết bản riêng giữ lời nhờ.
+3. Chú thích `//` trên cùng dòng với code làm hỏng cú pháp (lặp lại lỗi cũ). Đã sửa.
+4. Thu gọn đầu trang lần đầu làm vỡ bố cục 3 cột (nút bị đẩy xuống thêm khoảng 150 điểm ảnh). Đã sửa.
+
+**Kiểm thử `npm test`** (23/11/2026, chạy thật):
+- ✅ ĐẠT 23 bộ · ❌ KHÔNG ĐẠT 0 · ⏭️ SKIP 0 · ⬜ CHƯA CHẠY 0 · 📊 BÁO CÁO 2; 717 kiểm tra đạt.
+- Các bài cũ chạy với Đọc nhanh bật sẵn (mặc định) và vẫn đạt.
+- Bài mới `doc-nhanh` (12 kiểm tra):
+  - ngân sách chữ;
+  - không còn thuật ngữ khó;
+  - bật/tắt cho cùng lựa chọn, cùng hiệu ứng;
+  - cùng một lượt chơi đi cùng đường;
+  - tuần đầu giảm ít nhất 25% (ngưỡng chặn chữ dài trở lại, không phải mục tiêu);
+  - nút hiện ngay màn hình đầu trên điện thoại (sáng, tối);
+  - nút bật/tắt và công tắc Cài đặt.
+
+**Lỗi và giới hạn còn lại:**
+- Mục tiêu 50% chưa đạt (xem trên).
+- **Ngoài phạm vi Phase 2:**
+  - Câu NPC tự nói trong thế giới đi lại (bong bóng thoại) chưa được đổi thuật ngữ; chủ yếu là câu chào, ít thuật ngữ.
+  - Chữ trong trò chơi nhỏ chưa được đổi; Phase 3 thay cả 4 trò.
+- Khi rút gọn theo quy tắc chung (câu đầu của đoạn dài), phần sau vẫn đọc được ở "Xem thêm". Riêng kết quả sau lựa chọn bị bỏ phần sau (thường là câu đùa phụ). Tắt Đọc nhanh thì đọc đủ.
