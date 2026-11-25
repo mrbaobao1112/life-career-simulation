@@ -7,7 +7,7 @@
    ========================================================= */
 const ROAM = {
   VIEW_W:360, VIEW_H:220,
-  OFF_MS:400, OFF_PAD:40,     // v17.5: cứ chừng này mili giây xem ai ra ngoài khung nhìn (thêm lề chừng này) để dừng hoạt ảnh của họ
+  OFF_MS:250, OFF_PAD:90,     // v17.5/v17.8: cứ chừng này mili giây xem ai ra ngoài khung nhìn (thêm lề chừng này) để dừng hoạt ảnh và không vẽ; hoạt ảnh của họ
   Y0:148, Y1:212,            // dải sàn chân nhân vật đi được (phía trong → phía ngoài)
   S0:.44, SK:.0019,           // cỡ nhân vật ở phía trong cùng, và mức to thêm mỗi đơn vị đi ra phía ngoài
   SPEED:74,                  // tốc độ đi bộ (đơn vị hình mỗi giây, theo chiều ngang)

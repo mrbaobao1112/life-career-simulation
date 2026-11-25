@@ -1,6 +1,13 @@
 /* ---------- v14: thế giới tự do trong nhà ---------- */
 .world{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line);box-shadow:var(--shadow);background:#E6E0D2;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 .world svg{display:block;width:100%;height:auto;touch-action:none;cursor:pointer}
+/* v17.8: khung nhìn cắt phần ngoài; SVG bên trong rộng bằng cả nơi này, camera trượt cả khối bằng transform (card đồ hoạ làm, không vẽ lại) */
+.world .w-view{position:relative;overflow:hidden;touch-action:none}
+.world .w-truot{position:relative;will-change:transform}
+.world .w-truot > svg{position:relative;z-index:1;width:100%;max-width:none}
+.world .w-truot > svg.w-nen{position:absolute;left:0;top:0;z-index:0;pointer-events:none}
+/* v17.8: người ngoài khung nhìn không vẽ (đã dừng hoạt ảnh từ v17.5); lề OFF_PAD đủ rộng để người đi vào khung nhìn không hiện ra đột ngột */
+.world .actor.off{visibility:hidden}
 @media (max-width:600px){ .scene.roam .world{margin:0 -14px;border-radius:0;border-width:1px 0} }
 .world .w-obj{fill:transparent;stroke:transparent;stroke-width:1.6;cursor:pointer}
 .world .w-obj.near{fill:#FFF3B022;stroke:#F6C85F;stroke-dasharray:5 4;animation:objGlow 1.6s ease-in-out infinite}
@@ -20,7 +27,7 @@
 .w-hud{position:absolute;left:8px;top:8px;right:8px;display:flex;align-items:center;gap:8px;pointer-events:none}
 .w-clock{background:rgba(27,34,48,.8);color:#fff;font-size:14px;font-weight:600;padding:4px 10px;border-radius:999px;font-variant-numeric:tabular-nums}
 .w-left{width:60px;height:6px;border-radius:999px;background:rgba(27,34,48,.35);overflow:hidden}
-.w-left i{display:block;height:100%;background:#F6C85F;border-radius:999px;transition:width .3s linear}
+.w-left i{display:block;width:100%;height:100%;background:#F6C85F;border-radius:999px;transform-origin:0 50%;transition:transform .3s linear}
 .w-room{margin-left:auto;font-size:12.5px;font-weight:700;color:#1B2230;background:rgba(255,255,255,.82);padding:3px 10px;border-radius:999px}
 .w-room.pop{animation:roomPop .5s ease-out}
 @keyframes roomPop{from{transform:translateY(-6px);opacity:0}}

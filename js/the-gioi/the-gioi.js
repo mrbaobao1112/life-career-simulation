@@ -13,9 +13,10 @@ function roamHTML(ref){
   const H = roamPlace(ref).map();
   const hits = H.objs.map(o => `<rect class="w-obj" data-o="${o.id}" x="${o.hit[0]}" y="${o.hit[1]}" width="${o.hit[2] - o.hit[0]}" height="${o.hit[3] - o.hit[1]}" rx="6"/>`).join('');
   return `<div class="panel stage world" id="world" data-place="${roamPlace(ref).id}" data-house="${H.key || S.bg}">
-    <svg viewBox="0 0 ${ROAM.VIEW_W} ${ROAM.VIEW_H}" data-w="${H.W}" role="img" aria-label="${esc(H.name)}: tự đi lại và dùng đồ vật">
-      <g class="w-cam">${H.paint()}${H.deco()}<g class="w-hits">${hits}</g><g class="L-world"></g><rect class="w-tint" x="0" y="0" width="${H.W}" height="${ROAM.VIEW_H}" fill="#121836" opacity="0" pointer-events="none"/><g class="L-say"></g></g>
-    </svg>
+    <div class="w-view" style="aspect-ratio:${ROAM.VIEW_W}/${ROAM.VIEW_H}"><div class="w-truot" style="width:${(H.W / ROAM.VIEW_W * 100).toFixed(4)}%">
+    <svg viewBox="0 0 ${H.W} ${ROAM.VIEW_H}" data-w="${H.W}" role="img" aria-label="${esc(H.name)}: tự đi lại và dùng đồ vật">
+      <g class="w-cam">${H.deco()}<g class="w-hits">${hits}</g><g class="L-world"></g><rect class="w-tint" x="0" y="0" width="${H.W}" height="${ROAM.VIEW_H}" fill="#121836" opacity="0" pointer-events="none"/><g class="L-say"></g></g>
+    </svg><svg class="w-nen" viewBox="0 0 ${H.W} ${ROAM.VIEW_H}" aria-hidden="true">${H.paint()}</svg></div></div>
     <div class="w-hud"><span class="w-clock" aria-live="off">🕘 <b>--:--</b></span><span class="w-left" aria-hidden="true"><i></i></span><span class="w-room"></span></div>
     <button class="w-prompt" type="button" hidden></button>
     <div class="w-menu" role="menu" hidden></div>
@@ -61,22 +62,28 @@ function roamMount(root, ref){
     const h = (W.t / 60) % 24, night = h >= 19 || h < 5.5, dusk = h >= 17 && h < 19;
     $w('.w-tint').setAttribute('opacity', night ? .3 : dusk ? .1 : 0);
     $w('.w-tint').setAttribute('fill', dusk ? '#FF8A4C' : '#121836');
-    svg.querySelectorAll('.w-sky').forEach(s => s.setAttribute('fill', night ? '#24305E' : dusk ? '#F6B58A' : h < 9 ? '#D7ECFF' : '#BFE0FF'));
-    svg.querySelectorAll('.w-lampglow').forEach(g => g.setAttribute('opacity', night ? .34 : dusk ? .14 : 0));
-    svg.querySelectorAll('.w-hand-h').forEach(p => { const b = p.getAttribute('d').match(/M([\d.]+) ([\d.]+)/); p.setAttribute('transform', `rotate(${(h % 12) * 30} ${b[1]} ${b[2]})`); });
-    svg.querySelectorAll('.w-hand-m').forEach(p => { const b = p.getAttribute('d').match(/M([\d.]+) ([\d.]+)/); p.setAttribute('transform', `rotate(${(W.t % 60) * 6} ${b[1]} ${b[2]})`); });
+    el.querySelectorAll('.w-sky').forEach(s => s.setAttribute('fill', night ? '#24305E' : dusk ? '#F6B58A' : h < 9 ? '#D7ECFF' : '#BFE0FF'));
+    el.querySelectorAll('.w-lampglow').forEach(g => g.setAttribute('opacity', night ? .34 : dusk ? .14 : 0));
+    el.querySelectorAll('.w-hand-h').forEach(p => { const b = p.getAttribute('d').match(/M([\d.]+) ([\d.]+)/); p.setAttribute('transform', `rotate(${(h % 12) * 30} ${b[1]} ${b[2]})`); });
+    el.querySelectorAll('.w-hand-m').forEach(p => { const b = p.getAttribute('d').match(/M([\d.]+) ([\d.]+)/); p.setAttribute('transform', `rotate(${(W.t % 60) * 6} ${b[1]} ${b[2]})`); });
   };
   const hud = () => {
     const m = Math.floor(W.t); if (m === W.minute) return; W.minute = m;
     $w('.w-clock b').textContent = clockMin(m);
     if (ref.id === 'home_am') $w('.w-clock').classList.toggle('late', m > leaveBy());
     const wm = document.querySelector('#who .who-meta'); if (wm) wm.textContent = wm.textContent.replace(/\d\d:\d\d/, clockMin(m));   // dòng giờ ở đầu trang cũng chạy theo
-    $w('.w-left i').style.width = Math.max(0, Math.min(100, (W.end - W.t) / (W.end - h0 * 60) * 100)) + '%';
+    $w('.w-left i').style.transform = `scaleX(${Math.max(0, Math.min(1, (W.end - W.t) / (W.end - h0 * 60))).toFixed(3)})`;   // v17.8: co giãn bằng transform (không tính lại bố cục mỗi khung hình như width)
     if (m % 5 === 0 || W.minute < 0) light();
   };
   W.minute = -2; hud(); light();
 
   /* --- phần hiển thị trên khung (gợi ý, thực đơn, kết quả) --- */
+  // v17.8: hai lớp SVG rộng bằng cả nơi này, nằm trong .w-truot:
+  //   - .w-nen: khung phố, nhà tĩnh (H.paint), vẽ một lần; nhân vật cử động không làm nó phải vẽ lại;
+  //   - SVG chính (đứng trước trong mã, hiện bên trên): đồ vật có trạng thái (H.deco), vùng chạm, nhân vật, lớp tối buổi đêm, bong bóng thoại.
+  // Camera trượt cả khối .w-truot bằng CSS transform (card đồ hoạ dời hình đã vẽ sẵn), không đổi thuộc tính trong SVG nữa.
+  // Phần tử cần đổi theo giờ (bầu trời, đèn, kim đồng hồ) hay theo việc (màn hình, hơi nước…) tìm trong cả khung (el), vì có thể nằm ở một trong hai lớp.
+  const truot = $w('.w-truot'), camMove = () => { truot.style.transform = `translate3d(${(-W.cam / H.W * 100).toFixed(4)}%,0,0)`; };
   const scr = (x, y) => ({ left:((x - W.cam) / ROAM.VIEW_W * 100) + '%', top:(y / ROAM.VIEW_H * 100) + '%' });
   const anchor = n => n.npc ? { x:n.npc.x, y:n.npc.y - 140 * n.npc.s - 6 } : { x:(n.o.hit[0] + n.o.hit[2]) / 2, y:Math.max(14, n.o.hit[1] - 4) };
   const label = n => {
@@ -123,7 +130,7 @@ function roamMount(root, ref){
   };
 
   /* --- dùng đồ: diễn động tác, quay đồng hồ, rồi gọi đúng lựa chọn có sẵn --- */
-  const partOf = (sel, o) => [...svg.querySelectorAll(sel)].find(g => { const x = +g.dataset.x; return x >= o.hit[0] - 6 && x <= o.hit[2]; });
+  const partOf = (sel, o) => [...el.querySelectorAll(sel)].find(g => { const x = +g.dataset.x; return x >= o.hit[0] - 6 && x <= o.hit[2]; });
   let blanket = null;
   const pose = (o, on) => {
     const u = o.use || {};
@@ -230,7 +237,7 @@ function roamMount(root, ref){
   };
   svg.addEventListener('click', e => {
     if (W.busy || W.toast) return;
-    const r = svg.getBoundingClientRect(); if (!r.width) return;
+    const r = $w('.w-view').getBoundingClientRect(); if (!r.width) return;   // khung nhìn (SVG bên trong rộng bằng cả nơi này và trượt theo camera)
     const vx = (e.clientX - r.left) / r.width * ROAM.VIEW_W + W.cam, vy = (e.clientY - r.top) / r.height * ROAM.VIEW_H;
     const actor = e.target.closest && e.target.closest('.actor');
     if (actor && actor.dataset.who !== 'me') { const a = W.npcs.find(n => n.id === actor.dataset.who); if (a) { closeMenu(); return goTo({ npc:a }); } }
@@ -358,7 +365,7 @@ function roamMount(root, ref){
     // camera bám theo nhân vật
     const target = Math.max(0, Math.min(H.W - ROAM.VIEW_W, me.x - ROAM.VIEW_W / 2));
     const cam = C.still ? target : W.cam + (target - W.cam) * Math.min(1, dt * 7);
-    if (Math.abs(cam - W.cam) > .05 || W.cam === 0 && cam !== 0) { W.cam = Math.abs(target - cam) < .05 ? target : cam; $w('.w-cam').setAttribute('transform', `translate(${-W.cam.toFixed(2)} 0)`); placeMenu(); }
+    if (Math.abs(cam - W.cam) > .05 || W.cam === 0 && cam !== 0) { W.cam = Math.abs(target - cam) < .05 ? target : cam; camMove(); placeMenu(); }
     // v17.5: người ngoài khung nhìn hoặc đã đi khỏi thì dừng hoạt ảnh (đỡ nặng máy, nhất là điện thoại); vài lần mỗi giây là đủ
     if (now - (W.offT || 0) > ROAM.OFF_MS) { W.offT = now; const x0 = W.cam - ROAM.OFF_PAD, x1 = W.cam + ROAM.VIEW_W + ROAM.OFF_PAD;
       for (const a of W.npcs) { if (!a.el) continue; const off = !!a.gone || a.x < x0 || a.x > x1; if (off !== !!a.off) { a.off = off; a.el.classList.toggle('off', off); } } }
@@ -384,7 +391,7 @@ function roamMount(root, ref){
   }
   function saveRoam(noWrite){ const at = W.rest || me; S.roam = { d:S.day, bg:S.bg, place:pk, key, t:Math.round(W.t), x:Math.round(at.x), y:Math.round(at.y) };
     (S.roamPos = S.roamPos || {})[pk] = { d:S.day, x:Math.round(at.x), y:Math.round(at.y) }; if (!noWrite) save(); }   // noWrite: chỉ ghi vào S, lát nữa game tự lưu
-  W.cam = Math.max(0, Math.min(H.W - ROAM.VIEW_W, me.x - ROAM.VIEW_W / 2)); $w('.w-cam').setAttribute('transform', `translate(${-W.cam} 0)`);
+  W.cam = Math.max(0, Math.min(H.W - ROAM.VIEW_W, me.x - ROAM.VIEW_W / 2)); camMove();
   W.raf = requestAnimationFrame(frame);
   return W;
 }

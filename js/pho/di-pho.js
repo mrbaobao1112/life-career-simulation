@@ -140,4 +140,10 @@ function phoMiniMount(W, api){
   W.el.insertAdjacentElement('afterend', box); W.mini = box.querySelector('.w-mini-me');   // nằm ngay dưới khung, không che cảnh và gợi ý
   box.querySelectorAll('.w-mini-pin').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); if (W.busy || W.toast) return; const o = W.H.objs.find(x => x.use && x.use.to === b.dataset.to); if (o) api.goTo({ o }); }));
 }
-function phoMiniFrame(W){ if (W.mini) W.mini.style.left = (W.me.x / PHO.W * 100) + '%'; }
+// v17.8: dời dấu vị trí bằng transform theo bề rộng bản đồ đã đo sẵn (đổi left mỗi khung hình bắt tính lại bố cục cả trang); chỉ cập nhật khi đổi từ nửa điểm ảnh
+function phoMiniFrame(W){
+  if (!W.mini) return;
+  if (!W.miniW || W.miniWAt !== innerWidth) { W.miniW = W.mini.parentNode.clientWidth; W.miniWAt = innerWidth; }
+  const px = W.me.x / PHO.W * W.miniW; if (Math.abs(px - (W.miniX ?? -1e9)) < .5) return; W.miniX = px;
+  W.mini.style.transform = `translateX(${px.toFixed(1)}px) translateX(-50%)`;
+}
