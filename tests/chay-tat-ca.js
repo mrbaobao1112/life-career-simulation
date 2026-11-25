@@ -17,7 +17,7 @@ const BO = [
   ['he-thong', 'kiem-thu-he-thong.js', [], 0, 'kt'],
   ['tai-chinh', 'kiem-thu-tai-chinh.js', [], 0, 'kt'],
   ['56-ngay', 'kiem-thu-56-ngay.js', [], 0, 'kt'],
-  ['ngau-nhien', 'choi-ngau-nhien.js', ['40'], 0, 'kt', ['--max-old-space-size=6144']],
+  ['ngau-nhien', 'choi-ngau-nhien.js', ['40'], 0, 'kt', ['--max-old-space-size=1024']],   // v17.9: trước cần 6 GB (P3-10)
   ['luu-tai', 'kiem-thu-luu-tai.js', [], 0, 'kt', ['--max-old-space-size=4096']],
   ['phat-trien', 'kiem-thu-phat-trien.js', [], 0, 'kt', ['--max-old-space-size=4096']],
   ['doc-nhanh', 'kiem-thu-doc-nhanh.js', [], 0, 'kt', ['--max-old-space-size=4096']],

@@ -64,7 +64,7 @@
 .w-pad{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:8px;padding:6px 4px}
 .w-pad[hidden]{display:none}
 .w-padhint{flex:1;text-align:center;font-size:12.5px;line-height:1.4;color:var(--muted)}   /* v17.9: ba dòng ngắn, không gãy chữ trên điện thoại */
-@media (max-width:360px){.w-pad{flex-wrap:wrap}.w-padhint{order:3;flex-basis:100%}}   /* v17.9: điện thoại nhỏ (iPhone SE): hướng dẫn xuống hàng riêng dưới vòng tròn và nút ✋, trước đây chỉ rộng 50px, gãy thành 9 dòng */
+@media (max-width:360px){.w-pad{flex-wrap:wrap}.w-padhint{order:3;flex-basis:100%}}   /* v17.9: điện thoại nhỏ (iPhone SE): hướng dẫn xuống hàng riêng dưới vòng tròn và nút ✋, trước đây chỉ rộng 50px, gãy thành 11 dòng */
 .w-joy{position:relative;flex:none;width:104px;height:104px;border-radius:50%;background:var(--chip);border:2px solid var(--line);touch-action:none}
 .w-knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--blue);box-shadow:0 2px 6px rgba(0,0,0,.3);pointer-events:none}
 .w-use{flex:none;width:72px;height:72px;border-radius:50%;border:0;background:#F6C85F;color:#1B2230;font-size:30px;box-shadow:0 3px 10px rgba(0,0,0,.25);cursor:pointer}

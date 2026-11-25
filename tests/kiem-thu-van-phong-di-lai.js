@@ -30,11 +30,11 @@ async function solve(page, good){
       const kind = 'bug', tid = WORLD.ref.arg.tid, bad = MG_DATA.bug[tid].bad;
       box.querySelectorAll('.mg-line').forEach(b => { if (bad.includes(+b.dataset.i) === good) b.click(); });
     } else if (box.querySelector('.mg-order')) {                             // xếp code
-      if (good) { const lines = MG_DATA.order[WORLD.ref.arg.tid].lines;
-        for (let p = 0; p < lines.length; p++) for (let n = 0; n < 12; n++) {
-          const rows = [...box.querySelectorAll('.mg-row')], at = rows.findIndex(r => r.querySelector('code').textContent === lines[p]);
-          if (at <= p) break; rows[at].querySelector('[data-mv="-1"]').click(); await wait(10); } }
-      else box.querySelector('.mg-done').click();
+      // chơi giỏi: xếp đúng thứ tự. Chơi kém: xếp NGƯỢC rồi bấm Xong (v17.9: trước đây bấm Xong ngay, thứ tự xáo ngẫu nhiên đôi khi có sẵn nhiều dòng đúng nên điểm ra 0, bài chập chờn)
+      const goc = MG_DATA.order[WORLD.ref.arg.tid].lines, lines = good ? goc : [...goc].reverse();
+      for (let p = 0; p < lines.length; p++) for (let n = 0; n < 12; n++) {
+        const rows = [...box.querySelectorAll('.mg-row')], at = rows.findIndex(r => r.querySelector('code').textContent === lines[p]);
+        if (at <= p || !document.body.contains(box)) break; rows[at].querySelector('[data-mv="-1"]').click(); await wait(10); }
     } else if (box.querySelector('.mg-term')) {                              // gõ lệnh
       const inp = box.querySelector('input'), items = [...box.querySelectorAll('.mg-cmds li code')];
       for (const it of items) { inp.value = good ? it.textContent : 'sai'; inp.dispatchEvent(new Event('input')); inp.dispatchEvent(new KeyboardEvent('keydown', { key:'Enter', bubbles:true })); await wait(10); if (!good) break; }
