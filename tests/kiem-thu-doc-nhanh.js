@@ -89,6 +89,11 @@ const KHO = /(?<![\p{L}\d])(task|Task|bug|Bug|OT|standup|deploy|Deploy|review|Re
       const r = await p.evaluate(() => ({ y:document.querySelector('#stage .choice').getBoundingClientRect().top, h:innerHeight, tran:document.documentElement.scrollWidth > innerWidth + 1 }));
       if (r.y + 30 > r.h || r.tran) thap.push(`${q.slice(6, 14)}: nút ở ${Math.round(r.y)}/${r.h}${r.tran ? ', tràn ngang' : ''}`);
     }
+    // v17.8: khung thế giới đi lại không bị thu nhỏ hay cắt khi bật Đọc nhanh (lỗi của v17.7)
+    await p.evaluate(() => { S.opt.roam = true; S.once.roamTut = true; S.flags.pho = { d:8, met:1, vendor:1, rain:1, jam:1 }; S.day = 8; S.slot = 'afternoon'; S.roam = { d:8, t:15 * 60 }; S.roamPos = {}; S.where = { d:8, slot:'afternoon', at:'street', bike:null }; S.queue = [{ id:'activity', arg:'afternoon' }]; S.cur = null; advance(); });
+    await p.waitForTimeout(600);
+    const wv = await p.evaluate(() => { const w = document.querySelector('#world'), v = w.querySelector('.w-view'); return { w:w.clientWidth, vw:v.clientWidth, vh:v.clientHeight, ty:getComputedStyle(w).maxHeight }; });
+    check(`Điện thoại (${scheme === 'light' ? 'nền sáng' : 'nền tối'}): khung thế giới đi lại giữ nguyên cỡ khi bật Đọc nhanh (không bị thu nhỏ, cắt)`, wv.vw === wv.w && Math.abs(wv.vh - wv.vw * 220 / 360) <= 2 && wv.ty === 'none', JSON.stringify(wv));
     check(`Điện thoại (${scheme === 'light' ? 'nền sáng' : 'nền tối'}): nút lựa chọn đầu tiên hiện ngay màn hình đầu, không tràn ngang (việc, thức dậy, hết giờ làm, giờ rảnh)`, !thap.length, thap.join(' | '));
     if (scheme === 'light') {
       const t = await p.evaluate(() => { const b = document.querySelector('#btnDoc'), a = b.textContent; b.click(); const c = b.textContent, full = document.querySelector('#stage').textContent.length; b.click(); return { a, c, on:dnOn(), lop:document.body.classList.contains('doc-nhanh'), full, ngan:document.querySelector('#stage').textContent.length }; });

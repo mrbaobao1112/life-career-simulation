@@ -141,7 +141,7 @@ npm run npc-on-dinh   # v17.6: lịch không trùng, NPC không trùng mặt, kh
 npm run phat-trien    # v17.6 phase 2: kỹ năng nghề, cấp bậc, mục tiêu sống, lưu/tải; phần cuối chạy trên trình duyệt thật (khoảng 1 phút)
 npm run doc-nhanh     # v17.7 phase 2: Đọc nhanh: ngân sách chữ, thuật ngữ, bật/tắt cho cùng kết quả, nút hiện ngay màn đầu trên điện thoại (khoảng 1 phút)
 npm run tro-choi-moi  # v17.7 phase 3: 4 trò chơi nhỏ kiểu mới trên điện thoại giả lập: thao tác thật, điểm, người mới, khung hình, rò bộ nhớ (cần Playwright, khoảng 4 phút)
-npm run hieu-nang     # v17.6: FPS trên điện thoại giả lập, NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
+npm run hieu-nang     # v17.6/v17.8: FPS trên điện thoại giả lập, NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào, cách vẽ thế giới đỡ tốn (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)
 npm run the-gioi      # tự đi lại trong nhà: phím, va chạm, đồng hồ, dùng đồ, đi ngủ, joystick trên điện thoại (cần Playwright, khoảng 1 phút)

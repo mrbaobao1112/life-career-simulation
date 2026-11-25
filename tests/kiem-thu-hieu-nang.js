@@ -67,6 +67,15 @@ const metrics = async page => { const m = (await page.cdp.send('Performance.getM
     check('NPC ngoài khung nhìn hoặc đã đi khỏi: không còn hoạt ảnh nào chạy', r.off > 0 && r.chayNgoai === 0, JSON.stringify(r));
     check('NPC trong khung nhìn vẫn cử động bình thường', r.on > 0 && r.chayTrong > 0, JSON.stringify(r));
 
+    // v17.8: cách vẽ thế giới đỡ tốn: camera trượt cả khối bằng transform, khung phố tĩnh ở lớp riêng, không cập nhật bằng thuộc tính gây tính lại bố cục
+    await page.keyboard.down('d'); await page.waitForTimeout(3500); await page.keyboard.up('d');   // đi đủ xa để camera bắt đầu chạy
+    const v = await page.evaluate(() => { const t = document.querySelector('#world .w-truot'); return { cam:Math.round(WORLD.cam), truot:t ? t.style.transform : '', camAttr:document.querySelector('#world .w-cam').getAttribute('transform'),
+      nen:!!document.querySelector('#world svg.w-nen'), nenNguoi:document.querySelectorAll('#world svg.w-nen .actor').length, bgTrongChinh:document.querySelectorAll('#world svg:not(.w-nen) .w-sky').length,
+      thoiGian:document.querySelector('#world .w-left i').style.width === '' && /scaleX/.test(document.querySelector('#world .w-left i').style.transform),
+      banDo:(() => { const m = document.querySelector('.w-mini-me'); return !m || (m.style.left === '' && /translateX/.test(m.style.transform)); })() }; });
+    check('Camera trượt cả khối bằng transform (không đổi thuộc tính trong SVG); khung phố tĩnh ở lớp riêng, không có người', v.cam > 0 && /translate3d\(-/.test(v.truot) && !v.camAttr && v.nen && !v.nenNguoi && !v.bgTrongChinh, JSON.stringify(v));
+    check('Thanh thời gian và dấu trên bản đồ nhỏ cập nhật bằng transform (không làm tính lại bố cục mỗi khung hình)', v.thoiGian && v.banDo, JSON.stringify(v));
+
     // 3. Tìm đường trên phố (bản đồ dài nhất)
     const p = await page.evaluate(() => { const H = WORLD.H, pts = []; let s = 7; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
       for (let i = 0; i < 300; i++) pts.push([{ x:20 + r() * (H.W - 40), y:ROAM.Y0 + r() * (ROAM.Y1 - ROAM.Y0) }, { x:20 + r() * (H.W - 40), y:ROAM.Y0 + r() * (ROAM.Y1 - ROAM.Y0) }]);
