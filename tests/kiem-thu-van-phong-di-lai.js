@@ -60,6 +60,17 @@ async function solve(page, good){
     const dup = new Set(r.spots).size !== r.spots.length;
     check(`${r.name} (${r.kind}): mở văn phòng, đủ 4 đồng nghiệp, có biển tên công ty`, r.place === 'office' && r.npcs === 'boss,dung,mai,phong' && r.sign, r.npcs);
     check(`${r.name}: mọi đồ vật đi tới được, không ai đứng trùng chỗ`, !r.unreach.length && !dup, r.unreach.join(', '));
+    // v17.9 (P3-06): đồng nghiệp rời ghế đi tới mọi đồ vật, mọi bàn khác: dò từng điểm ảnh, chân không chạm bàn, vách ngăn
+    const xuyen = await page.evaluate(() => { const H = WORLD.H, ghe = Object.values(H.desks), dich = [...H.objs.map(o => o.spot).filter(Boolean), ...ghe, ...ghe.map(d => ({ x:d.x + 34, y:d.y })), ...ghe.map(d => ({ x:d.x - 34, y:d.y }))], sai = [];
+      const cham = (a, q) => { const n = Math.ceil(Math.hypot(q.x - a.x, q.y - a.y)); for (let i = 1; i <= n; i++) { const x = a.x + (q.x - a.x) * i / n, y = a.y + (q.y - a.y) * i / n; if (!roamFree(H, x, y)) return `${Math.round(x)},${Math.round(y)}`; } return ''; };
+      for (const f of ghe) for (const g of dich) { const gg = roamNearestFree(H, g); if (!gg) continue; const duong = roamPath(H, f, gg) || [gg]; let a = f; for (const q of duong) { const c = cham(a, q); if (c) { sai.push(`${f.x}→${Math.round(gg.x)}: chạm ${c}`); break; } a = q; } }
+      return { n:ghe.length * dich.length, sai }; });
+    check(`${r.name}: đồng nghiệp rời ghế đi tới mọi chỗ không cắt qua mép bàn, vách (${xuyen.n} đường)`, !xuyen.sai.length, `${xuyen.sai.length} đường: ${xuyen.sai.slice(0, 3).join(' | ')}`);
+    // v17.9 (P3-07): biển tên công ty không đè lên đồng hồ, thanh thời gian và chữ neon trên tường
+    const de = await page.evaluate(() => { const hop = el => el && el.getBoundingClientRect(), bien = hop(document.querySelector('#world .o-sign'));
+      const cham = (a, b) => !!(a && b && a.width && b.width && a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1);
+      return ['.w-clock', '.w-left', '#world .o-neon'].filter(q => cham(bien, hop(document.querySelector(q)))); });
+    check(`${r.name}: biển tên công ty không đè lên đồng hồ, thanh thời gian, chữ neon`, !de.length, de.join(', '));
     check(`${r.name}: không lỗi`, !page.errs.length, page.errs[0] || '');
     await page.context().close();
   }

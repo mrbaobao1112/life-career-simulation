@@ -21,8 +21,9 @@ function roamStep(H, p, dx, dy){
   if (dy && roamFree(H, p.x, p.y + dy)) { p.y += dy; moved = true; }
   return moved;
 }
+// v17.9 (P3-06): dò từng điểm ảnh (trước đây 3 điểm ảnh một lần, lọt chỗ chân cắt qua mép bàn khi đồng nghiệp rời ghế: ghế chỉ cách mép bàn 1–2 điểm ảnh)
 function roamLine(H, a, b){
-  const n = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 3);
+  const n = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / ROAM.DO);
   for (let i = 1; i <= n; i++) if (!roamFree(H, a.x + (b.x - a.x) * i / n, a.y + (b.y - a.y) * i / n)) return false;
   return true;
 }
@@ -41,12 +42,14 @@ function roamPath(H, from, to){
   const pos = n => ({ x:H.x0 + (n % nx) * C, y:ROAM.Y0 + Math.floor(n / nx) * C });
   const idx = p => Math.max(0, Math.min(ny - 1, Math.round((p.y - ROAM.Y0) / C))) * nx + Math.max(0, Math.min(nx - 1, Math.round((p.x - H.x0) / C)));
   const free = new Map(), ok = n => { if (!free.has(n)) { const q = pos(n); free.set(n, roamFree(H, q.x, q.y)); } return free.get(n); };
-  let s = idx(from); const t = idx(goal);
-  if (!ok(s)) {                                                     // đang đứng sát đồ đạc: bắt đầu từ ô trống gần nhất
-    let best = -1, bd = Infinity; const sj = Math.floor(s / nx), si = s % nx;
-    for (let dj = -3; dj <= 3; dj++) for (let di = -3; di <= 3; di++) { const i = si + di, j = sj + dj; if (i < 0 || j < 0 || i >= nx || j >= ny) continue; const n = j * nx + i, q = pos(n), d = Math.hypot(q.x - from.x, q.y - from.y); if (d < bd && ok(n) && roamLine(H, from, q)) { bd = d; best = n; } }
-    if (best < 0) return null; s = best;
-  }
+  let s = idx(from), t = idx(goal);
+  const ganNhat = (c, p) => {                                       // ô trống gần điểm p nhất (trong 3 ô quanh ô c) mà đi thẳng tới p được
+    let best = -1, bd = Infinity; const cj = Math.floor(c / nx), ci = c % nx;
+    for (let dj = -3; dj <= 3; dj++) for (let di = -3; di <= 3; di++) { const i = ci + di, j = cj + dj; if (i < 0 || j < 0 || i >= nx || j >= ny) continue; const n = j * nx + i, q = pos(n), d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bd && ok(n) && roamLine(H, p, q)) { bd = d; best = n; } }
+    return best;
+  };
+  if (!ok(t)) { t = ganNhat(t, goal); if (t < 0) return null; }    // v17.9: điểm đến sát vách ngăn hay đồ đạc: ô lưới của nó bị vướng, trước đây không tìm được đường nên nhân vật đi thẳng xuyên vách
+  if (!ok(s)) { s = ganNhat(s, from); if (s < 0) return null; }   // đang đứng sát đồ đạc: bắt đầu từ ô trống gần nhất
   const g = new Map([[s, 0]]), came = new Map(), open = new Set([s]), done = new Set();
   const h = n => { const a = pos(n), b = pos(t); const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y); return Math.max(dx, dy) + (Math.SQRT2 - 1) * Math.min(dx, dy); };
   const f = new Map([[s, h(s)]]);
@@ -67,7 +70,7 @@ function roamPath(H, from, to){
   }
   if (!found) return null;
   const pts = []; for (let n = t; n !== s; n = came.get(n)) pts.unshift(pos(n));
-  pts.unshift(pos(s)); pts[pts.length - 1] = goal;
+  pts.unshift(pos(s)); pts.push(goal);                              // v17.9: thêm điểm đến sau ô cuối (ô cuối có thể là ô thay thế ở trên); bước rút gọn bỏ điểm thừa
   // rút gọn: từ mỗi điểm, nhảy thẳng tới điểm xa nhất còn nhìn thấy
   const out = []; let a = from, i = 0;
   while (i < pts.length) { let j = pts.length - 1; while (j > i && !roamLine(H, a, pts[j])) j--; out.push(pts[j]); a = pts[j]; i = j + 1; }

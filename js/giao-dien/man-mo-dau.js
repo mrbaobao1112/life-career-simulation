@@ -65,7 +65,7 @@ function titleSceneSVG(slot){
 /* ----- Âm thanh 8-bit: nhạc nền, tiếng phố, âm thanh theo sự kiện -----
    Hai tùy chọn độc lập: Nhạc nền (MUSIC, chỉ có ở màn mở đầu) và Hiệu ứng âm thanh (SFX, dùng chung với trong game:
    tiếng phố, còi xe, tiếng rao, tiếng cười ở màn mở đầu và mọi âm thanh trong lúc chơi). */
-const GAME_VERSION = '17.8';
+const GAME_VERSION = '17.9';
 const MUSIC = (() => { let on = true; try { on = localStorage.getItem('lcs-music') !== 'off'; } catch (e) {}
   return { get on(){ return on; }, set(v){ on = !!v; try { localStorage.setItem('lcs-music', on ? 'on' : 'off'); } catch (e) {} } }; })();
 const TA = { on:false, vol:0, timers:[], bar:0, unlocked:false };
@@ -175,6 +175,7 @@ function titleMount(root, look){
 
   // nhân vật chính đứng trước cửa hàng, hơi lệch phải
   const hero = add('me', 252, 162, 'back', '', 'happy', { look, s:.44 });
+  window.TITLE_DEBUG = { noi:(t = 'Chào!') => say(hero, t, 1700) };   // v17.9: dành cho kiểm thử: cho nhân vật chính nói một câu ngay (không phải chờ câu ngẫu nhiên)
   // quán trà đá: hai người khách ngồi ghế nhựa, lần lượt nói và uống, thỉnh thoảng cùng cười
   const guests = [add('p', 50, 164, 'back', 'act-talk', 'happy', { id:'g1', look:PASSER_LOOKS[0], s:.42, dy:6 }), add('p', 100, 164, 'back', 'act-drink', 'happy', { id:'g2', look:PASSER_LOOKS[3], s:.42, dy:6 })];
   face(guests[1], true);

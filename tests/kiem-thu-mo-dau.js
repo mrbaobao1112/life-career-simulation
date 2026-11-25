@@ -171,7 +171,9 @@ async function makeSave(page){ await page.click('#fresh'); await page.click('.bg
     check('Không nhân đôi hẹn giờ, trình nghe hay âm thanh', maxT < 2.2 * Math.max(t0, 6) && s.pd === 1 && s.aTimers <= 4 && s.audio, `hẹn giờ ${t0} → nhiều nhất ${maxT}, trình nghe ${s.pd}, âm thanh ${s.aTimers}`);
     check('Đóng Cài đặt thì con trỏ bàn phím quay về nút Cài đặt', focus === 'tGear', String(focus));
     // mở trong lúc đang có hoạt cảnh và đóng giữa chừng
-    let got = false; for (let i = 0; i < 200 && !got; i++) { await page.waitForTimeout(250); got = await page.evaluate(() => document.querySelectorAll('.title-scene .say').length > 0); }   // máy bận thì đợi lâu hơn
+    // v17.9: cho nhân vật nói ngay rồi mở Cài đặt (trước đây chờ câu ngẫu nhiên tới 50 giây, máy bận thì có lần không thấy)
+    await page.evaluate(() => { TITLE_DEBUG.noi('Chào buổi sáng!'); });
+    const got = await page.waitForFunction(() => document.querySelectorAll('.title-scene .say').length > 0, null, { timeout:5000 }).then(() => true, () => false);
     await page.click('#tGear'); await page.waitForTimeout(900); await page.click('#setX');
     let actors = 0; for (let i = 0; i < 40 && actors < 3; i++) { await page.waitForTimeout(200); actors = (await state(page)).actors; }   // hoạt cảnh tiếp tục: đợi đến khi đủ người (máy chậm thì lâu hơn)
     const same2 = await page.evaluate(() => document.querySelector('.title-scene svg') === window.__svg0);

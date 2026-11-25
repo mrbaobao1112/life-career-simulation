@@ -227,6 +227,14 @@ const hold = async (page, keys, ms) => { for (const k of keys) await page.keyboa
     check('Ở ghép buổi tối: ngồi sofa khi Tùng đang ngồi chơi game thì ngồi chỗ trống bên cạnh', d >= 32, `cách Tùng ${Math.round(d)}`);
     check('Không lỗi', !page.errs.length, page.errs[0] || ''); await page.context().close(); }
 
+  // v17.9: dòng hướng dẫn cạnh vòng tròn điều khiển không gãy chữ trên điện thoại nhỏ và vừa (iPhone SE trước đây gãy thành 9 dòng)
+  for (const dv of ['iPhone SE', 'iPhone 13', 'Pixel 5']) {
+    const page = await open(browser, 'tro', { ...devices[dv] }); await scene(page);
+    const h = await page.evaluate(() => { const e = document.querySelector('.w-padhint'), r = e.getBoundingClientRect(); return { dong:Math.round(r.height / parseFloat(getComputedStyle(e).lineHeight)), rong:Math.round(r.width), tran:document.documentElement.scrollWidth > innerWidth + 1 }; });
+    check(`${dv}: hướng dẫn điều khiển gọn trong 3 dòng, không tràn ngang`, h.dong <= 3 && !h.tran, JSON.stringify(h));
+    await page.context().close();
+  }
+
   await browser.close();
   console.log(fail ? `\n${fail} mục chưa đạt` : '\nTất cả đều đạt');
   process.exit(fail ? 1 : 0);

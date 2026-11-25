@@ -23,7 +23,7 @@ function roamHTML(ref){
     <div class="w-wake" hidden></div>
     <div class="w-tut" role="status" hidden></div>
   </div>
-  <div class="w-pad" hidden><div class="w-joy" aria-hidden="true"><i class="w-knob"></i></div><span class="w-padhint">Kéo vòng tròn để đi, kéo sát mép để chạy<br>Chạm vào đồ vật để tự đi tới</span><button class="w-use" type="button" disabled aria-label="Dùng đồ vật">✋</button></div>
+  <div class="w-pad" hidden><div class="w-joy" aria-hidden="true"><i class="w-knob"></i></div><span class="w-padhint">Kéo vòng tròn: đi<br>Kéo sát mép: chạy<br>Chạm đồ vật: tới đó</span><button class="w-use" type="button" disabled aria-label="Dùng đồ vật">✋</button></div>
   <div class="w-toast" role="status" hidden></div>`;
 }
 
