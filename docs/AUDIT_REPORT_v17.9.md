@@ -28,7 +28,7 @@ Nguyên tắc: tìm nguyên nhân rồi sửa cách đo; **không hạ ngưỡng
 
 **Ghi chú về bộ nhớ heap (bài `hieu-nang`, ra vào 20 lần):**
 - Số nút trang (3281 → 2547, cả 4 mốc sau giống nhau) và trình nghe sự kiện (69 → 60) **không tăng**.
-- Heap JS: 3046 → 3233 → 3312 → 3345 → 3365 KB. Có tăng, nhưng tăng chậm dần (+187, +79, +33, +20), giống bộ nhớ đệm đang đầy dần hơn là rò. Bài không kiểm tra heap. Nên theo dõi ở lần sau.
+- Heap JS: 3046 → 3233 → 3312 → 3345 → 3365 KB (lần chạy sau: 3056 → 3243 → 3320 → 3353 → 3381). Có tăng, nhưng tăng chậm dần (+187, +79, +33, +20), giống bộ nhớ đệm đang đầy dần hơn là rò. Kiểm tra heap vẫn đạt, vì mốc cuối không cao hơn hai mốc đầu quá ngưỡng. Nên theo dõi ở lần sau.
 
 ## 2. Lỗi nhỏ đã sửa
 
