@@ -1,6 +1,31 @@
 # Lịch sử phiên bản
 
-## v17.7 – Phase 4: Kiểm thử toàn bộ, đo lại, hoàn thiện (hiện tại)
+## v17.8 – Tốc độ trên điện thoại (hiện tại)
+Không đổi lối chơi, điều khiển, NPC, bản lưu. Báo cáo: `docs/AUDIT_REPORT_v17.8.md`.
+
+**Sửa lỗi của v17.7:** bật Đọc nhanh (mặc định) thì trên điện thoại **khung thế giới đi lại bị thu nhỏ, cắt** (217×133 thay vì 352×215), vì quy tắc thu nhỏ tranh minh hoạ cũng khớp với khung thế giới. Đã sửa và thêm kiểm tra.
+
+**Tăng tốc vẽ** (tìm nguyên nhân bằng Chrome tracing, công cụ `tests/audit/do-ve.js`):
+- **Khung phố tĩnh tách thành SVG riêng.** Nhân vật cử động không làm cả dãy phố phải vẽ lại.
+- **Camera trượt cả khối bằng CSS `transform`** (card đồ hoạ làm), không đổi thuộc tính bên trong SVG nữa.
+- **Thanh thời gian còn lại và dấu vị trí trên bản đồ nhỏ** dùng `transform`. Trước đây chúng đổi `width`/`left`, bắt cả trang tính lại bố cục mỗi khung hình.
+- **Người ngoài khung nhìn không vẽ** (trước chỉ dừng hoạt ảnh). Lề rộng hơn nên người đi vào khung nhìn không hiện ra đột ngột.
+
+**Kết quả** (phố giờ cao điểm, điện thoại giả lập, CPU chậm 6 lần):
+- Mỗi khung hình: **vẽ −41%** (5,6 → 3,3 ms), bố cục −20%.
+- Khung/giây trung bình 43 → 46,5, thấp nhất 36 → 45.
+- Bài `hieu-nang` trong `npm test`: phố 53,8 khung/giây (trước có lần chỉ 27–36).
+- Phần còn tốn nhất là chia lớp và kiểu dáng của nhân vật (tay chân chuyển động bằng hoạt ảnh CSS); giảm tiếp cần làm lại cách vẽ nhân vật.
+
+**Đính chính v17.7:** "bật Đọc nhanh làm phố chậm 15–20%" là nhiễu đo. Tracing cho thấy bật/tắt tốn như nhau.
+
+**Kiểm thử:**
+- `hieu-nang` thêm kiểm tra cách vẽ mới; `doc-nhanh` thêm kiểm tra cỡ khung thế giới.
+- `npm test`: 22 ĐẠT, 2 KHÔNG ĐẠT, 2 BÁO CÁO.
+  - Hai bộ không đạt là `mo-dau` (chờ câu nói ngẫu nhiên) và `tro-choi-moi` (mốc đo rò bộ nhớ). Mỗi bộ chạy lại riêng 2 lần đều đạt; xem báo cáo.
+- Phiên bản trong Cài đặt: v17.8.
+
+## v17.7 – Phase 4: Kiểm thử toàn bộ, đo lại, hoàn thiện
 Tổng kết cả v17.7 ("game dễ chơi hơn cho mọi người"): xem `docs/AUDIT_REPORT_v17.7.md`, mục Phase 4.
 
 **Trước và sau:**
