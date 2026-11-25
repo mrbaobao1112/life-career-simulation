@@ -18,7 +18,7 @@ Không đổi lối chơi, tài chính, lương, năng lượng, sức khỏe, h
 - Dòng hướng dẫn cạnh vòng tròn điều khiển: trên iPhone SE chỉ rộng 50 điểm ảnh, gãy thành 11 dòng. Giờ xuống hàng riêng trên màn hình nhỏ; câu ngắn lại còn 3 dòng trên mọi máy.
 - Các màn còn lại không tràn ngang, không lỗi. Việc còn lại xem báo cáo.
 
-**Kiểm thử:** xem kết quả 3 lần chạy `npm test` liên tiếp trong báo cáo. Phiên bản trong Cài đặt: v17.9.
+**Kiểm thử:** `npm test` 3 lần liên tiếp: mỗi lần 24 ĐẠT, 0 KHÔNG ĐẠT, 0 SKIP, 2 BÁO CÁO (770 kiểm tra đạt). Lần chạy đầu tiên lộ thêm một kiểm tra chập chờn (Xếp code: chơi kém đôi khi ra 0 vì thứ tự xáo ngẫu nhiên); đã sửa trước 3 lần này. Phiên bản trong Cài đặt: v17.9.
 
 ## v17.8 – Tốc độ trên điện thoại
 Không đổi lối chơi, điều khiển, NPC, bản lưu. Báo cáo: `docs/AUDIT_REPORT_v17.8.md`.

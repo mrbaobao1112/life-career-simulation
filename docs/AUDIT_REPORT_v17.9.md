@@ -135,7 +135,17 @@ Chụp trên iPhone 13 giả lập, nền sáng và tối:
 
 `npm test` chạy 3 lần liên tiếp, mỗi lần toàn bộ 26 bộ:
 
-KẾT_QUẢ_3_LẦN
+| Lần | ĐẠT | KHÔNG ĐẠT | SKIP | CHƯA CHẠY | BÁO CÁO | Kiểm tra | Phố giờ cao điểm (2 lần đo) |
+|---|---|---|---|---|---|---|---|
+| 1 (trước khi sửa bài "Xếp code") | 23 | **1** (`van-phong-di-lai`: Xếp code, xem mục 1) | 0 | 0 | 2 | 769 đạt, 1 hỏng | 51,6 (51,6; 51) |
+| 2 | **24** | **0** | 0 | 0 | 2 | 770 đạt, 0 hỏng | 42,8 (38,9; 42,8) |
+| 3 | **24** | **0** | 0 | 0 | 2 | 770 đạt, 0 hỏng | 53,8 (48,9; 53,8) |
+| 4 | **24** | **0** | 0 | 0 | 2 | 770 đạt, 0 hỏng | 50,1 (46,6; 50,1) |
+
+- **3 lần liên tiếp sau khi sửa (lần 2–4): không có bộ KHÔNG ĐẠT.** Đạt mục tiêu.
+- Lần 1 lộ thêm một kiểm tra chập chờn (Xếp code). Tôi đã sửa rồi chạy lại đủ 3 lần.
+- 2 bộ BÁO CÁO (`can-bang`, `hai-thang`) chỉ in số liệu cân bằng, không có tiêu chí đạt/không đạt; cả 3 lần đều chạy xong không lỗi.
+- **Lưu ý trung thực về tốc độ phố:** ở lần 2, lần đo đầu chỉ được 38,9 khung/giây, dưới ngưỡng 40. Lần đo thứ hai đạt 42,8 nên kiểm tra đạt. Máy kiểm thử có 4 nhân và chạy song song nhiều việc, nên số đo còn dao động (38,9–53,8). Ngưỡng 40 giữ nguyên. Nếu một ngày cả hai lần đo đều dưới 40, đó là tín hiệu thật cần xem lại, không phải lỗi bài kiểm thử.
 
 **Bài kiểm thử mới / đổi:**
 - `van-phong-di-lai`:
