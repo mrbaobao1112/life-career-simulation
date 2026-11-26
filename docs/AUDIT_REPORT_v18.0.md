@@ -132,6 +132,14 @@ Khi thử "bật và tắt tự chạy cho cùng kết quả", lần đầu **kh
 - `56-ngay` phần 7: bài kiểm tra từng cảnh khi tự chơi (dựng lại cảnh task lần hai), nên tắt tự chạy riêng ở phần này.
 - Bài `gia-dinh-cong-viec` (ngày review, khách đến) hỏng ở lần chạy đầu. Nó giúp tìm ra điểm dừng "ngày đặc biệt ở công ty": sau khi thêm điểm dừng này, bài đạt mà không phải sửa bài.
 
+**Kiểm thử chập chờn lộ ra khi chạy nhiều lần** (máy bận hơn vì có thêm bài `tu-chay`; sửa đúng nguyên nhân, không hạ ngưỡng):
+
+| Bộ | Hiện tượng | Nguyên nhân | Cách sửa |
+|---|---|---|---|
+| `the-gioi-song` | 2 lần: lúc 9,87 giờ thấy Tùng "nấu ăn" thay vì "tắm" | Bài nhảy đồng hồ tới giờ cần xem rồi chờ NPC đổi việc tới 15 giây. Trong lúc chờ, đồng hồ game vẫn chạy 2 phút/giây; máy bận thì giờ tắm đã trôi qua | Giữ đồng hồ game đứng yên trong lúc chờ (`WORLD.hold`). Thử 3 bản chạy cùng lúc: đạt cả 3 |
+| `npc-on-dinh` | 1 lần: một người đi đường "kẹt" ở phố lúc 19,8 giờ | Đồng hồ chạy nhanh gấp 3 nên trong 30 giây theo dõi luôn chạm giờ kết thúc buổi (19,8 giờ ở mọi lần chạy). Hết giờ thì thế giới tạm dừng theo thiết kế, người đang đi dở dừng giữa đường | Ngừng theo dõi khi đồng hồ game chạm giờ kết thúc |
+| `hieu-nang` | 2 lần: phố dưới 40 khung/giây (38,9; 36,6 rồi 29,9) | Bài chạy ngay sau khoảng 30 phút chạy nặng; máy còn nóng tải. Đo xen kẽ lúc rảnh: main 46,9 và 49,6; v18.0 54,4 và 51 (**v18.0 không chậm hơn**) | Chờ tải trung bình 1 phút của máy xuống dưới 1 (tối đa 90 giây) rồi mới đo; in con số tải ra. Ngưỡng 40 giữ nguyên |
+
 ## 5. Kết quả `npm test`
 
 KẾT_QUẢ_3_LẦN

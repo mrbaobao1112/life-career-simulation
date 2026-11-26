@@ -39,7 +39,7 @@ const theoDoi = (page, giay) => page.evaluate(async giay => {
   const move = new Map(), busy = new Map();
   const t0 = performance.now();
   while (performance.now() - t0 < giay * 1000) {
-    await new Promise(r => setTimeout(r, 250)); if (WORLD !== W || W.dead) break; out.mau++;
+    await new Promise(r => setTimeout(r, 250)); if (WORLD !== W || W.dead || W.t >= W.end) break; out.mau++;   // v18.0: hết giờ của buổi thì thế giới tạm dừng (đúng thiết kế); người đang đi dở dừng giữa đường, không phải kẹt
     const now = performance.now(), seen = {};
     for (const a of W.npcs) {
       if (!a.el) continue;
