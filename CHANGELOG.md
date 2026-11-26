@@ -10,6 +10,7 @@ Không đổi tài chính, lương, năng lượng, sức khỏe, hệ thống 5
 - Cảnh đáng dừng vẫn hiện như cũ: sự kiện, ngày đặc biệt, chuyện tự nảy sinh, lỗi cũ quay lại, được nhờ OT, được rủ đi chơi, lương, tổng kết tháng… Tự chạy chạy tới đúng cảnh đó, dừng cho bạn chọn, rồi chạy tiếp.
 - Việc lặp lại cũng không tự chạy khi:
   - lần đầu gặp việc đó;
+  - ngày đặc biệt ở công ty (review, khách đến, chạy hạn chót…): cả ban ngày để bạn tự chơi;
   - năng lượng, sức khỏe hay tinh thần thấp;
   - tiền sắp không đủ (mỗi đợt, mỗi hóa đơn dừng một lần);
   - đi làm muộn hay còn mệt vì tối qua;
@@ -27,10 +28,10 @@ Không đổi tài chính, lương, năng lượng, sức khỏe, hệ thống 5
   - Không đổi luật hay tỷ lệ nào.
 
 **Số đo:**
-- Chế độ mặc định (đi lại được), một ngày làm việc bình thường: số màn hình ban ngày phải xử lý **12 → 2** (giảm 83%). Trước đây 4 trong số đó ở văn phòng, phải đi tới chỗ.
-- Chế độ thẻ (không đi lại), cả ván: lần bấm −4%, chữ −33% so với v17.6.
+- Chế độ mặc định (đi lại được), một ngày làm việc bình thường: số màn hình ban ngày phải xử lý **11 → 2** (giảm 82%). Trước đây 4 trong số đó ở văn phòng, phải đi tới chỗ. Khoảng một nửa số ngày làm việc được tự chạy; còn lại là ngày đặc biệt ở công ty, có tin nhắn mới…
+- Chế độ thẻ (không đi lại), cả ván: lần bấm −3%, chữ −32% so với v17.6.
   - Mục tiêu 50% chữ và 30% lần bấm **chưa đạt** ở chế độ này, vì từ v17 ban ngày ở chế độ thẻ đã gần như tự qua. Chi tiết trong báo cáo.
-- Phần chơi ở buổi tối và cuối tuần (theo lần bấm): 62% → 69%.
+- Phần chơi ở buổi tối và cuối tuần (theo lần bấm): 62% → 68%.
 
 **Kiểm thử:** bộ mới `tu-chay` (`npm run tu-chay`). Phiên bản trong Cài đặt: v18.0.
 
