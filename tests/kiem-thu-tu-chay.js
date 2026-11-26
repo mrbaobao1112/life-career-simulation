@@ -100,13 +100,13 @@ function choi(w, den = 99){
   // 2. Điểm dừng bắt buộc: ngày làm việc buổi sáng, việc "họp đầu ngày" (đã gặp) có tự chạy không
   { const thu = (dat, kt = "S.cur && S.cur.id") => { const w = mo(9); batDau(w, 1);
       const r = w.eval(`S.job = { co:'hotay', salary:1e7, start:3 }; S.day = 10; S.slot = 'morning'; S.money = 3e6; S.energy = 80; S.health = 75; S.mood = 65; S.bills = []; S.npcMem = []; S.phone.pending = {}; S.lateToday = false; S.flags.hangoverToday = false;
-        tcGap(); Object.keys(TC_LAP).forEach(k => S.tcGap[k] = 1); habit().lunchWork = 'team'; ${dat}; S.queue = [{ id:'standup' }, { id:'task', arg:{ tid:102 } }]; S.cur = null; advance(); ${kt}`); w.close(); return r; };
+        NGAY.ON = false; tcGap(); Object.keys(TC_LAP).forEach(k => S.tcGap[k] = 1); habit().lunchWork = 'team'; ${dat}; S.queue = [{ id:'standup' }, { id:'task', arg:{ tid:102 } }]; S.cur = null; advance(); ${kt}`); w.close(); return r; };
     // (chế độ thẻ: "họp đầu ngày" đã tự qua từ v17 khi không đi lại được, nên việc lặp lại đầu tiên có thể dừng là task buổi sáng)
     const CA = [['Bình thường (đối chứng)', '', 'tu-chay'], ['Năng lượng thấp', 'S.energy = 20', 'task'], ['Sức khỏe yếu', 'S.health = 30', 'task'], ['Tinh thần thấp', 'S.mood = 20', 'task'],
       ['Tiền ít', 'S.money = 100000', 'task'], ['Hóa đơn sắp đến hạn, không đủ tiền', "S.money = 1e6; S.bills = [{ id:'x', kind:'rent', amount:2e6, due:11, paid:false }]", 'task'],
       ['Đi làm muộn', 'S.lateToday = true', 'task'], ['Có tin nhắn chưa trả lời', "S.phone.pending = { family:{ id:'fam_eat', deadline:99 } }", 'task'],
       ['Đồng nghiệp còn chuyện muốn nhắc (đi lại được: dừng ở văn phòng)', "S.opt.roam = true; S.npcMem = [{ w:'dung', o:'me', k:'ev:coffee_run', v:1, d:8, n:0 }]", 'standup'],
-      ['Đồng nghiệp còn chuyện muốn nhắc (chế độ thẻ: không có lúc nhắc nên không dừng)', "S.npcMem = [{ w:'dung', o:'me', k:'ev:coffee_run', v:1, d:8, n:0 }]", 'tu-chay'], ['Lần đầu làm task buổi sáng', 'delete S.tcGap.task', 'task'],
+      ['Đồng nghiệp còn chuyện muốn nhắc (chế độ thẻ: không có lúc nhắc nên không dừng)', "S.npcMem = [{ w:'dung', o:'me', k:'ev:coffee_run', v:1, d:8, n:0 }]", 'tu-chay'], ['Lần đầu làm task buổi sáng', 'delete S.tcGap.task', 'task'], ['Ngày đặc biệt ở công ty (ngày review)', "NGAY.ON = true; ngayLoai.memo = { 'hotay:3:10':'review' }", 'task'],
       ['Bấm "Tự chọn hôm nay"', 'S.tcTay = S.day', 'task'], ['Tắt tự chạy', 'tcDat(false)', 'task']];
     const sai = [];
     for (const [ten, dat, mong] of CA) { const r = thu(dat, "S.cur ? (S.cur.id === 'task' ? 'task' : S.cur.id) : 'không'"); const ok = mong === 'tu-chay' ? !['standup', 'task'].includes(r) : r === mong; if (!ok) sai.push(`${ten}: dừng ở ${r}`); }
@@ -143,13 +143,13 @@ function choi(w, den = 99){
     await p.goto(URL); await p.evaluate(v => localStorage.setItem('lcs-tu-chay', v), tc ? '1' : '0'); await p.goto(URL);
     await p.click('#fresh'); await p.click('.bgopt[data-f] >> nth=1'); await p.click('.bgopt[data-b="tro"]'); await p.click('#go');
     await p.evaluate(() => { S.once.roamTut = true; S.once.tcGioiThieu = true; S.job = { co:'hotay', salary:1e7, start:3 }; habit().lunchWork = 'team'; habit().work = 'careful'; S.day = 9; tcGap(); Object.keys(TC_LAP).forEach(k => S.tcGap[k] = 1);
-      S.npcMem = []; S.phone.pending = {}; pushCommute = () => {}; maybeMsg = () => {}; maybeEvent = () => {}; ngayQueue = () => false; S.cur = null; S.queue = []; S.slot = 'night'; startDay(); });
+      S.npcMem = []; S.phone.pending = {}; pushCommute = () => {}; maybeMsg = () => {}; maybeEvent = () => {}; NGAY.ON = false; COMPANIES.hotay.ot = 0; BAL.TRADA_INVITE = 0; S.tech = 100; S.bugs = []; S.cur = null; S.queue = []; S.slot = 'night'; startDay(); });
     await p.waitForTimeout(500);
   };
   // Đi hết ban ngày như người chơi: mỗi màn hình cần người chơi (cảnh, màn kết quả) tính một lần; chọn như nếp (việc lặp lại), không thì lựa chọn đầu không tốn tiền
   const quaBanNgay = async p => { let man = 0, vp = 0;
     for (let i = 0; i < 30 && await p.evaluate(() => !(S.cur && S.cur.id === 'tcTomTat') && ['morning','noon','afternoon'].includes(S.slot)); i++) {
-      const r = await p.evaluate(() => { const o = document.querySelector('#world') && document.querySelector('#world').dataset.place === 'office' ? 1 : 0, n = document.querySelector('#next');
+      const r = await p.evaluate(() => { const o = document.querySelector('#world') && document.querySelector('#world').dataset.place === 'office' && S.cur && TC_LAP[S.cur.id] && tcChonNep(S.cur, current) >= 0 ? 1 : 0, n = document.querySelector('#next');   // việc lặp lại (đáng lẽ tự qua) hiện ở văn phòng
         if (n) n.click(); else if (S.cur && current && current.choices) { const j = TC_LAP[S.cur.id] ? tcChonNep(S.cur, current) : -1; choose(j >= 0 ? j : Math.max(0, current.choices.findIndex(c => !c.disabled && !c.cost && !/Nằm/.test(c.label)))); }
         return o; }); man++; vp += r; await p.waitForTimeout(150); }
     return { man, vp }; };

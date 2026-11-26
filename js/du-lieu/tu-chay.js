@@ -15,6 +15,7 @@ const TC = {
 // Lý do dừng (ghi trong báo cáo kiểm thử, và để người chơi hiểu vì sao hôm nay không tự chạy)
 const TC_LY_DO = {
   'lan-dau':'lần đầu gặp việc này',
+  'ngay-dac-biet':'ngày đặc biệt ở công ty (review, khách đến, chạy hạn chót…)',
   'nang-luong':'năng lượng thấp',
   'suc-khoe':'sức khỏe yếu',
   'tinh-than':'tinh thần đi xuống',

@@ -7,7 +7,7 @@
      Vì vậy bật hay tắt tự chạy, cùng hạt giống và cùng lựa chọn thì ra cùng kết quả.
    - Mọi cảnh khác (sự kiện, ngày đặc biệt, chuyện tự nảy sinh, tin nhắn, lương, tổng kết tháng, được nhờ OT, được rủ đi chơi…)
      vẫn hiện ra như cũ; tự chạy chạy tới đúng cảnh đó, dừng cho người chơi chọn, rồi chạy tiếp.
-   - Luôn dừng (không tự chạy việc lặp lại) khi: lần đầu gặp việc đó; năng lượng, sức khỏe, tinh thần thấp; tiền sắp không đủ;
+   - Luôn dừng (không tự chạy việc lặp lại) khi: lần đầu gặp việc đó; ngày đặc biệt ở công ty (cả ban ngày); năng lượng, sức khỏe, tinh thần thấp; tiền sắp không đủ;
      đi làm muộn hay còn mệt; có tin nhắn chưa trả lời; đồng nghiệp còn chuyện cũ muốn nhắc (TC_LY_DO).
    - Buổi tối, đêm, cuối tuần, ngày nghỉ: không bao giờ tự chạy.
    - Bật/tắt: tùy chọn chung của máy (như Đọc nhanh), lưu trong localStorage, mặc định bật. "Tự chọn hôm nay" chỉ cho ngày đó.
@@ -53,6 +53,7 @@ const tcNguoiQuen = () => typeof memAll !== 'function' ? '' : memAll().filter(m 
 // Lý do phải dừng ở việc lặp lại này ('' nếu không có)
 function tcDung(ref){
   if (!tcGap()[ref.id]) return 'lan-dau';
+  if (typeof ngayLoai === 'function' && ngayLoai(S.day)) return 'ngay-dac-biet';   // ngày review, khách đến, chạy hạn chót…: không phải ngày bình thường, cả ban ngày để người chơi tự chơi
   if (S.energy < TC.NANG_LUONG) return 'nang-luong';
   if (S.health < TC.SUC_KHOE) return 'suc-khoe';
   if (S.mood < TC.TINH_THAN) return 'tinh-than';
