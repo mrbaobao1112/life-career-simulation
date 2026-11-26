@@ -27,6 +27,8 @@
 
 .ffbar{margin-top:12px;display:flex;justify-content:center}
 .ffbar .ghost{width:100%}
+.tc-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;margin:10px 0 0;padding:8px 10px;border-radius:12px;background:var(--chip);color:var(--ink);font-size:14px;line-height:1.4}   /* v18.0: màn thức dậy: báo trước ban ngày sẽ tự qua */
+.tc-bar .ghost{flex:none}
 
 .hrow{display:flex;flex-direction:column;gap:4px;margin-top:12px;font-size:14.5px}
 .hrow span{color:var(--muted);font-size:13.5px}

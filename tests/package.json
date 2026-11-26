@@ -30,7 +30,8 @@
     "hieu-nang": "node kiem-thu-hieu-nang.js",
     "phat-trien": "node --max-old-space-size=4096 kiem-thu-phat-trien.js",
     "doc-nhanh": "node --max-old-space-size=4096 kiem-thu-doc-nhanh.js",
-    "tro-choi-moi": "node kiem-thu-tro-choi-moi.js"
+    "tro-choi-moi": "node kiem-thu-tro-choi-moi.js",
+    "tu-chay": "node --max-old-space-size=1024 kiem-thu-tu-chay.js"
   },
   "devDependencies": {
     "jsdom": "24.1.3",

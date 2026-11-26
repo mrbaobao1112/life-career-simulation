@@ -100,10 +100,16 @@ const speakerName = w => w === 'me' ? S.name : (NPC[w] ? NPC[w].name : w);
 const avKey = th => (THREADS[th] && THREADS[th].av) || th;
 
 let talkIdx = 0;
-function renderScene(){
+// v18.0: VẼ DÙNG SỐ NGẪU NHIÊN RIÊNG. Hình, hoạt cảnh, âm thanh khi vẽ một màn hình cũng gọi Math.random; nếu dùng chung với luật chơi
+// thì bỏ qua một màn (tự chạy ban ngày) làm lệch cả dãy số ngẫu nhiên phía sau, và sự kiện sau đó khác đi dù người chơi chọn y hệt.
+// Trong lúc vẽ, Math.random tạm là một bộ số riêng; luật chơi (dựng cảnh, áp dụng lựa chọn, xếp lịch) vẫn dùng bộ số của game.
+const VE_RND = (() => { let s = (Date.now() % 2147483646) + 1; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+function veRieng(fn){ const g = Math.random; Math.random = VE_RND; try { return fn(); } finally { Math.random = g; } }
+function renderScene(){ return veRieng(renderSceneGoc); }
+function renderSceneGoc(){
   const ref = S.cur;
   stageStop(); roamLeave();                                // chuyển cảnh: dừng mọi hoạt cảnh và lịch nhân vật của cảnh trước
-  current = buildScene(ref);
+  current = advance.sc && advance.sc.ref === ref ? advance.sc.sc : buildScene(ref); advance.sc = null;   // v18.0: dùng lại cảnh vòng chạy vừa dựng (không dựng lần hai)
   const ty = sceneType(ref);
   updateHUD();
   const isAct = ref.id === 'activity';
@@ -148,7 +154,8 @@ function renderScene(){
   else if (current.kind === 'phone') SFX.play('notify');
   else if (ty.t) SFX.play({ random:'pop', consequence:'dun', scheduled:'bell' }[ty.t]);
 }
-function showTalk(focus){
+function showTalk(focus){ return veRieng(() => showTalkGoc(focus)); }
+function showTalkGoc(focus){
   const talk = current.talk, line = talk[talkIdx], isMe = line.w === 'me', last = talkIdx >= talk.length - 1;
   const side = isMe ? (current.npc ? 'me' : 'solo') : 'npc';
   if (talkIdx > 0 || focus) { bobSpeaker(isMe ? 'me' : 'npc'); SFX.play('talk'); }
@@ -170,7 +177,7 @@ function settleChoice(ch){
     learnHabit(ref, ch);
     if (typeof memNote === 'function') memNote(ref, before);     // NPC ghi nhớ chuyện đáng nhớ (thế giới sống phase 4)
     const daily = ['meal','bedtime','activity'].includes(ref.id);
-    const quiet = ['wake','dayReport','ffReport','monthReport','hangout_pick','plan','cut'].includes(ref.id) || (out.silent && !daily && S.money === before.money);
+    const quiet = ['wake','dayReport','ffReport','monthReport','hangout_pick','plan','cut','tcTomTat'].includes(ref.id) || (out.silent && !daily && S.money === before.money);
     if (!out.go && !quiet)
       feedAdd(ref, ch.icon || current.icon, ref.id === 'bedtime' ? feedText(ref, current, ch) : daily ? ch.label + '.' : current.title + '.', S.money - before.money);
   }
@@ -194,11 +201,12 @@ function choose(i){
   if (!nExpr && npc && S.rel[npc] !== undefined) { const d = S.rel[npc] - before.rel[npc]; nExpr = d > 0 ? 'happy' : d < 0 ? 'annoyed' : (npc === sceneNpc ? current.npcExpr : undefined); }
   if (!nExpr && npc === 'family') { const d = S.rel.family - before.rel.family; nExpr = d > 0 ? 'happy' : d < 0 ? 'sad' : undefined; }
   const bg = out.bg || ch.bg || (current.kind === 'phone' ? 'home' : current.bg);
+  S.cur = null; save();
+  if (out.silent || (!out.text && !chips.length)) return advance();
+  veRieng(() => {                                            // v18.0: phần vẽ dùng số ngẫu nhiên riêng (xem veRieng)
   const fx = resultFx(out, before);
   const live = !ref ? null : stageFor(ref, { bg, npc }) ? stagePanel(ref, { bg, npc, title:current.title }, { meExpr:out.meExpr, meAnim:fx.anim, npcExpr:nExpr, result:true })
     : livePanel(ref, { bg, npc, title:current.title }, { bg, npc, actId:ch.actId, meExpr:out.meExpr, npcExpr:nExpr, meAnim:fx.anim });
-  S.cur = null; save();
-  if (out.silent || (!out.text && !chips.length)) return advance();
   stageStop(); roamLeave(); updateHUD();
   $('#stage').innerHTML = `<article class="scene result">
     ${live ? live.html : `<div class="panel">${panelSVG(bg, npc, nExpr, out.meExpr, current.title, { meAnim: fx.anim, npcAnim: npcReact(nExpr) })}</div>`}
@@ -209,6 +217,7 @@ function choose(i){
   if (live) live.mount($('#stage'));
   const nb = $('#next'); nb.addEventListener('click', advance); nb.focus({ preventScroll:true });
   armPanelSkip(); if (fx.snd) SFX.play(fx.snd);
+  });
 }
 
 /* ----- Giao diện điện thoại ----- */

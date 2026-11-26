@@ -65,7 +65,7 @@ function titleSceneSVG(slot){
 /* ----- Âm thanh 8-bit: nhạc nền, tiếng phố, âm thanh theo sự kiện -----
    Hai tùy chọn độc lập: Nhạc nền (MUSIC, chỉ có ở màn mở đầu) và Hiệu ứng âm thanh (SFX, dùng chung với trong game:
    tiếng phố, còi xe, tiếng rao, tiếng cười ở màn mở đầu và mọi âm thanh trong lúc chơi). */
-const GAME_VERSION = '17.9';
+const GAME_VERSION = '18.0';
 const MUSIC = (() => { let on = true; try { on = localStorage.getItem('lcs-music') !== 'off'; } catch (e) {}
   return { get on(){ return on; }, set(v){ on = !!v; try { localStorage.setItem('lcs-music', on ? 'on' : 'off'); } catch (e) {} } }; })();
 const TA = { on:false, vol:0, timers:[], bar:0, unlocked:false };
@@ -422,6 +422,7 @@ function settingsHTML(st, view){
     <h3>Hiển thị</h3>
     ${swHTML('swMotion', 'Luôn giảm chuyển động', MOTION.pref === 'reduce', MOTION.pref === 'reduce' ? 'Đang bật theo lựa chọn của bạn' : `Đang theo hệ thống: ${sys ? 'hệ thống đang bật giảm chuyển động' : 'chuyển động đầy đủ'}`)}
     ${typeof dnOn === 'function' ? swHTML('swDoc', 'Đọc nhanh', dnOn(), 'Câu chữ ngắn gọn, bớt chữ trên màn hình. Tắt để đọc đầy đủ') : ''}
+    ${typeof tcOn === 'function' ? swHTML('swTc', TC_CHU.caiDat[0], tcOn(), TC_CHU.caiDat[1]) : ''}
     <div class="set-row"><span class="set-l"><span>Chất lượng hình ảnh</span><small>Game chưa có tùy chọn chất lượng riêng</small></span><span class="set-v">Tự động</span></div>
     <h3>Dữ liệu trò chơi</h3>
     ${st.kind === 'none' ? '<p class="set-note">Chưa có bản lưu. Tiến trình được lưu tự động trên trình duyệt này.</p>'
@@ -444,6 +445,7 @@ function openSettings(st, view){
   on('swMusic', () => { MUSIC.set(!MUSIC.on); flip('swMusic', MUSIC.on); titleAudioApply(); });
   on('swSfx', () => { SFX.toggle(); flip('swSfx', SFX.on); titleAudioApply(); });
   on('swDoc', () => { dnDat(!dnOn()); flip('swDoc', dnOn()); });   // v17.7: Đọc nhanh
+  on('swTc', () => { tcDat(!tcOn()); flip('swTc', tcOn()); });   // v18.0: Tự chạy ban ngày
   on('swMotion', () => { MOTION.set(MOTION.pref === 'reduce' ? 'auto' : 'reduce'); openSettings(st); titleRemount(); });
   on('setNew', () => openSettings(st, 'confirm'));
   on('setCancel', () => openSettings(st));
