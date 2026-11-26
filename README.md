@@ -46,6 +46,7 @@ Bản chơi thử hiện tại là **tám tuần đầu tiên sau khi tốt nghi
 - **Buổi sáng có lịch trình:** báo thức, chuẩn bị, đi xe máy, tắc đường, mưa, tính ra giờ đến nơi.
 - **Thói quen ăn uống:** dinh dưỡng tính theo khoảng 10 bữa gần nhất, hồ sơ thói quen trong mục Hồ sơ.
 - **Sự kiện ba loại:** có lịch hẹn, bất ngờ, hậu quả (kèm nguyên nhân).
+- **Tự chạy ban ngày (v18.0, mặc định bật):** ngày làm việc bình thường, buổi sáng và chiều tự qua theo nếp sinh hoạt, cuối ngày hiện một thẻ tóm tắt ngắn. Buổi tối và cuối tuần luôn để bạn tự chơi. Sự kiện, chuyện với người quen, tin nhắn mới, tiền sắp hết, sức khỏe yếu… vẫn dừng lại cho bạn chọn. Muốn tự chơi cả ngày thì bấm "Tự chọn hôm nay" ở màn thức dậy; tắt hẳn bằng nút "🌤️ Tự chạy ban ngày" ở cuối màn hình hoặc trong Cài đặt.
 - **Đọc nhanh (v17.7, mặc định bật):** câu chữ ngắn gọn, thuật ngữ nghề lập trình nói đơn giản (task → việc, bug → lỗi, OT → làm thêm), tổng kết tuần chỉ hiện tóm tắt, nút lựa chọn hiện ngay màn hình đầu trên điện thoại. Tắt bằng nút "📖 Đọc nhanh" ở cuối màn hình hoặc trong Cài đặt để đọc đầy đủ.
 - **Điện thoại trong game:** tin nhắn, nhóm chat, trả lời ảnh hưởng độ thân, để "đã xem" quá lâu sẽ có hậu quả. Số đỏ trên nút điện thoại là số cuộc trò chuyện có tin mới; chỉ đổ chuông khi có tin cần trả lời; mỗi ngày tối đa 2 tin nhắn vu vơ; cuộc trò chuyện chờ trả lời lên đầu danh sách, và có vạch “Tin mới” ngăn tin cũ với tin chưa đọc.
 - **Tháng đầu đi thuê nhà:** lương thử việc theo ngày công, kế hoạch tháng đầu, nhờ vả gia đình, bạn bè, chủ nhà, tạm ứng lương, sổ nợ.
@@ -140,6 +141,7 @@ npm run luu-tai       # v17.6: lưu/tải, bản lưu thật của các bản 16
 npm run npc-on-dinh   # v17.6: lịch không trùng, NPC không trùng mặt, không kẹt, không bận mãi ở 10 nơi; ra vào địa điểm liên tục (cần Playwright, khoảng 6 phút)
 npm run phat-trien    # v17.6 phase 2: kỹ năng nghề, cấp bậc, mục tiêu sống, lưu/tải; phần cuối chạy trên trình duyệt thật (khoảng 1 phút)
 npm run doc-nhanh     # v17.7 phase 2: Đọc nhanh: ngân sách chữ, thuật ngữ, bật/tắt cho cùng kết quả, nút hiện ngay màn đầu trên điện thoại (khoảng 1 phút)
+npm run tu-chay       # v18.0: tự chạy ban ngày: bật/tắt cho cùng kết quả cả ván, không bỏ sót cảnh đáng dừng, điểm dừng bắt buộc, thẻ tóm tắt, lưu/tải, điện thoại (cần Playwright, khoảng 6 phút)
 npm run tro-choi-moi  # v17.7 phase 3: 4 trò chơi nhỏ kiểu mới trên điện thoại giả lập: thao tác thật, điểm, người mới, khung hình, rò bộ nhớ (cần Playwright, khoảng 4 phút)
 npm run hieu-nang     # v17.6/v17.8/v17.9: FPS trên điện thoại giả lập (đo 2 lần, lấy lần tốt hơn), NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào, cách vẽ thế giới đỡ tốn (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép

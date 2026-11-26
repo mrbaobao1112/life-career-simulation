@@ -98,8 +98,9 @@ for (const bg of ['tro', 'ghep', 'nha']) {
   w.close(); }
 
 // 7. Sân khấu văn phòng (v8): cảnh ở công ty có đủ 5 nhân vật; tắt đi thì về hình tĩnh; phân cảnh không chặn đường
+//    (v18.0: tắt tự chạy ban ngày ở phần này vì kiểm tra từng cảnh khi tự chơi; tự chạy kiểm thử ở kiem-thu-tu-chay.js)
 { const w = mk(); start(w, 'tro'); const d = w.document;
-  w.eval(`NGAY.ON = false; S.opt.roam = false; S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; S.job = { co:'hotay', salary:10000000, start:3 }; S.deck = shuffle(TASKS.map(t => t.id)); OFFICE_BAL.ABSENT = 0; S.day = 8; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);
+  w.eval(`tcDat(false); NGAY.ON = false; S.opt.roam = false; S.habit = { meal:'rice', lunchWork:'team', bed:23.5, work:'careful' }; S.job = { co:'hotay', salary:10000000, start:3 }; S.deck = shuffle(TASKS.map(t => t.id)); OFFICE_BAL.ABSENT = 0; S.day = 8; S.slot = 'night'; S.queue = []; S.cur = null; startDay();`);
   d.querySelector('#stage .choice').click();                                   // thức dậy
   const id1 = w.eval('S.cur.id'), actors = d.querySelectorAll('.panel.stage svg .actor').length;
   check('Ngày đi làm: cảnh task hiện trên sân khấu với 5 nhân vật', id1 === 'task' && actors === 5 && !w.errs.length, `cảnh ${id1}, ${actors} nhân vật ${w.errs[0] || ''}`);
