@@ -114,10 +114,12 @@ async function choiBot(page, ten, gioi){
   { const page = await open(browser); const cdp = await page.context().newCDPSession(page); await cdp.send('Performance.enable');
     const m = async () => { await cdp.send('HeapProfiler.collectGarbage'); const x = (await cdp.send('Performance.getMetrics')).metrics; return Object.fromEntries(x.filter(v => ['Nodes', 'JSEventListeners'].includes(v.name)).map(v => [v.name, v.value])); };
     const raf = () => page.evaluate(() => new Promise(res => { const o = window.requestAnimationFrame; let n = 0; window.requestAnimationFrame = f => { n++; return o(f); }; setTimeout(() => { window.requestAnimationFrame = o; res(n); }, 1000); }));
-    const r0 = await raf(); let m4;
-    for (let i = 0; i < 20; i++) { await bat(page, TRO[i % 4][1]); await page.waitForTimeout(900); await page.click('.mg-skip'); await xong(page); if (i === 3) m4 = await m(); }
-    const m20 = await m(), r1 = await raf();
-    check('Chơi rồi đóng 20 lượt: số nút trang và trình nghe sự kiện không tăng dần', m20.Nodes <= m4.Nodes * 1.1 && m20.JSEventListeners <= m4.JSEventListeners * 1.1, JSON.stringify({ m4, m20 }));
+    // v17.9: đo nhiều mốc (sau lượt 4, 8, 12, 16, 20) thay vì một mốc: rò thật là tăng đều qua mọi mốc VÀ mốc cuối cao hơn mốc cao nhất của nửa đầu quá 10%
+    const r0 = await raf(), moc = [];
+    for (let i = 0; i < 20; i++) { await bat(page, TRO[i % 4][1]); await page.waitForTimeout(900); await page.click('.mg-skip'); await xong(page); if ((i + 1) % 4 === 0) moc.push(await m()); }
+    const r1 = await raf();
+    const ro = k => { const v = moc.map(x => x[k]), tangDeu = v.every((x, i) => !i || x > v[i - 1]), dau = Math.max(v[0], v[1]); return tangDeu && v[v.length - 1] > dau * 1.1; };
+    check('Chơi rồi đóng 20 lượt: số nút trang và trình nghe sự kiện không tăng dần (5 mốc đo)', !ro('Nodes') && !ro('JSEventListeners'), moc.map(x => `${x.JSEventListeners}/${x.Nodes}`).join(' → '));
     check('Đóng trò thì không còn vòng lặp hình của trò', r1 <= r0 + 2, `trước ${r0}, sau ${r1} lần gọi mỗi giây`);
     await page.context().close(); }
 

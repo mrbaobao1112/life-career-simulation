@@ -49,7 +49,7 @@ function buildOffice(k){
     deco.push(OFURN.printer(lx + 66));
     objs.push(obj('printer', 'printer', 'Máy in', '🖨️', [lx + 64, 84, lx + 108, 152], [lx + 64, 0, lx + 108, 154], { x:lx + 86, y:166 }));
   }
-  if (L.neon) deco.push(OFURN.neon(lx + T.lobby / 2 + 20, 70, L.neon[0], L.neon[1]));
+  if (L.neon) deco.push(OFURN.neon(lx + T.lobby / 2 + 20, 84, L.neon[0], L.neon[1]));   // v17.9: hạ chữ neon xuống (biển tên đã dời xuống dưới thanh thời gian)
   if (L.helmets) deco.push(OFURN.helmets(lx + 50));
   parts.push(x);
 

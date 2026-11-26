@@ -141,7 +141,7 @@ npm run npc-on-dinh   # v17.6: lịch không trùng, NPC không trùng mặt, kh
 npm run phat-trien    # v17.6 phase 2: kỹ năng nghề, cấp bậc, mục tiêu sống, lưu/tải; phần cuối chạy trên trình duyệt thật (khoảng 1 phút)
 npm run doc-nhanh     # v17.7 phase 2: Đọc nhanh: ngân sách chữ, thuật ngữ, bật/tắt cho cùng kết quả, nút hiện ngay màn đầu trên điện thoại (khoảng 1 phút)
 npm run tro-choi-moi  # v17.7 phase 3: 4 trò chơi nhỏ kiểu mới trên điện thoại giả lập: thao tác thật, điểm, người mới, khung hình, rò bộ nhớ (cần Playwright, khoảng 4 phút)
-npm run hieu-nang     # v17.6/v17.8: FPS trên điện thoại giả lập, NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào, cách vẽ thế giới đỡ tốn (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
+npm run hieu-nang     # v17.6/v17.8/v17.9: FPS trên điện thoại giả lập (đo 2 lần, lấy lần tốt hơn), NPC ngoài màn hình, tìm đường, rò bộ nhớ khi ra vào, cách vẽ thế giới đỡ tốn (cần Playwright, khoảng 2 phút; nên chạy khi máy rảnh)
 npm run 56-ngay       # lịch, các mốc, tua nhanh, lưu và tải lại, bản lưu cũ, tính cách, xin nghỉ phép
 npm run van-phong     # ngày làm việc có sự kiện bất ngờ, chạy trong trình duyệt thật (cần Playwright, mất khoảng 3 phút)
 npm run the-gioi      # tự đi lại trong nhà: phím, va chạm, đồng hồ, dùng đồ, đi ngủ, joystick trên điện thoại (cần Playwright, khoảng 1 phút)
@@ -158,7 +158,7 @@ npm run gia-dinh-cong-viec # v17.5 phase 3: ngày làm việc đặc biệt, b�
 npm run cau-chuyen   # v17.5 phase 4: chuyện tự nảy sinh, thông báo điện thoại, xe máy trên phố chính, dừng hoạt ảnh ngoài màn hình (cần Playwright, khoảng 2 phút)
 # Công cụ kiểm tra toàn diện (quan sát, chơi thử, hiệu năng, bản lưu cũ): xem tests/audit/README.md
 npm run mo-dau        # màn hình mở đầu: âm thanh, ra vào, chuyển tab, bản lưu hỏng, giảm chuyển động, hiệu năng (cần Playwright, khoảng 3 phút; thêm DAI=1 để để yên 5 phút)
-npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày
+npm run ngau-nhien    # 40 lượt chơi ngẫu nhiên trọn 56 ngày (v17.9: chỉ cần 1 GB bộ nhớ, trước cần 6 GB)
 npm run can-bang      # so sánh 5 cách sống trong 56 ngày để kiểm tra cân bằng (mất vài phút)
 npm run tai-chinh     # kiểm thử sổ hóa đơn và mô phỏng tài chính cả tháng
 npm run hai-thang     # mô phỏng hai tháng, so sánh thu xếp sớm và phút chót

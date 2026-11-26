@@ -15,6 +15,7 @@ const ROAM = {
   FOOT:[6, 3],               // nửa bề ngang và nửa bề sâu của bàn chân khi tính va chạm
   NEAR:24,                   // đứng gần đồ vật chừng này thì hiện gợi ý [E]
   CELL:6,                    // cỡ một ô lưới khi tìm đường
+  DO:1,                      // v17.9: kiểm tra đường thẳng có vướng không: dò cách chừng này điểm ảnh một lần (3 thì lọt mép bàn)
   MIN_PER_SEC:2,             // đồng hồ trong game: 1 giây ngoài đời = 2 phút trong game (buổi sáng chừng 1,5–2 phút chơi)
   ACT_MS:1500,               // thời gian diễn động tác khi dùng đồ (đồng hồ quay nhanh đến cuối buổi)
   SHOWER_MIN:20, SHOWER_MOOD:2,   // tắm: mất 20 phút, tinh thần +2, mỗi ngày tính một lần

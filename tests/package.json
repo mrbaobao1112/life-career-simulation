@@ -8,7 +8,7 @@
     "van-phong": "node kiem-thu-van-phong.js",
     "mo-dau": "node kiem-thu-mo-dau.js",
     "he-thong": "node kiem-thu-he-thong.js",
-    "ngau-nhien": "node --max-old-space-size=6144 choi-ngau-nhien.js 40",
+    "ngau-nhien": "node --max-old-space-size=1024 choi-ngau-nhien.js 40",
     "can-bang": "node can-bang-chien-luoc.js",
     "tai-chinh": "node kiem-thu-tai-chinh.js",
     "hai-thang": "node mo-phong-hai-thang.js",

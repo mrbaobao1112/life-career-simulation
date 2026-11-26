@@ -3,6 +3,7 @@ const fs = require('fs');
 const html = require('./nap-game')();
 let st = {runs:0, errors:0, lastDay:{}, jobs:{}, noJob:0, fail:[], scenes:{}, replies:0, hang:0, msgs:0, steps:[]};
 const N = +process.argv[2] || 300;
+(async () => {
 for (let run=0; run<N; run++){
   const errs=[];
   const dom = new JSDOM(html, { runScripts:'dangerously', pretendToBeVisual:true, url:'https://example.org/',
@@ -48,9 +49,12 @@ for (let run=0; run<N; run++){
   st.runs++;
   if (errs.length){ st.errors++; if (st.fail.length<6) st.fail.push(errs.slice(0,3)); }
   w.close();
+  // v17.9 (P3-10): nghỉ một nhịp để jsdom dọn cửa sổ vừa đóng; trước đây vòng lặp chạy liền một mạch nên bộ nhớ không được giải phóng (40 lượt cần 6 GB)
+  await new Promise(r => setTimeout(r, 0)); if (global.gc) global.gc(); if (process.env.DO_BO_NHO) console.error("heap", run, Math.round(process.memoryUsage().heapUsed / 1048576));
 }
 const avg=a=>Math.round(a.reduce((x,y)=>x+y,0)/a.length);
 console.log(JSON.stringify({runs:st.runs, errors:st.errors, ngayKetThuc:st.lastDay, jobs:st.jobs, noJob:st.noJob, replies:st.replies, hang:st.hang, avgMsgsPerRun:Math.round(st.msgs/st.runs), avgSteps:avg(st.steps), fail:st.fail, scenes:st.scenes},null,1));
 // v17.6: in kết quả dạng đạt/không đạt để bộ chạy tổng đếm được
 console.log((st.errors ? '❌' : '✅') + ` Chơi ngẫu nhiên ${st.runs} lượt (bấm bừa, mở điện thoại, tua): không kẹt, không lỗi, kết thúc đúng ngày 56, không hiện undefined/NaN` + (st.errors ? ` → ${st.errors} lượt lỗi` : ''));
 if (st.errors) process.exit(1);
+})();

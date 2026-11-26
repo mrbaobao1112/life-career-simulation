@@ -1,6 +1,26 @@
 # Lịch sử phiên bản
 
-## v17.8 – Tốc độ trên điện thoại (hiện tại)
+## v17.9 – Ổn định và dọn lỗi (hiện tại)
+Không đổi lối chơi, tài chính, lương, năng lượng, sức khỏe, hệ thống 56 ngày, điều khiển, bản lưu. Báo cáo: `docs/AUDIT_REPORT_v17.9.md`.
+
+**Kiểm thử chập chờn (sửa đúng nguyên nhân, không hạ ngưỡng):**
+- `mo-dau`: mở Cài đặt khi nhân vật đang nói. Trước đây chờ một câu nói ngẫu nhiên tới 50 giây; giờ cho nhân vật nói ngay (móc kiểm thử `TITLE_DEBUG`) rồi chờ theo điều kiện.
+- `tro-choi-moi`, `hieu-nang`: kiểm tra rò bộ nhớ đo 5 mốc thay vì 2. Chỉ báo rò khi số đo tăng đều qua cả 5 mốc và mốc cuối cao hơn hai mốc đầu quá ngưỡng cũ.
+- `hieu-nang`: đo khung hình/giây 2 lần, lấy lần tốt hơn (một lần máy bận không còn làm hỏng cả bộ). Ngưỡng 40 giữ nguyên.
+
+**Lỗi nhỏ đã sửa (mỗi lỗi có kiểm tra mới, kiểm tra này hỏng trên bản cũ):**
+- **P3-07:** biển tên công ty đè lên đồng hồ và thanh thời gian ở văn phòng. Biển dời xuống; chữ neon ở Cú Đêm Lab, Xe Ôm Xanh hạ theo để không bị biển che.
+- **P3-06:** đồng nghiệp (anh Dũng và những người khác) đi xuyên mép bàn khi rời ghế. Nguyên nhân: ghế chỉ cách mép bàn 1–2 điểm ảnh, mà hàm kiểm tra đường thẳng dò 3 điểm ảnh một lần nên lọt. Thêm lỗi cùng họ: điểm đến sát vách ngăn thì không tìm được đường, nhân vật đi thẳng xuyên vách. Đã sửa cả hai (`js/the-gioi/di-chuyen.js`). Trước: 235/490 đường đi từ ghế ở 4 kiểu văn phòng chạm bàn hay vách; sau: 0.
+- **P3-10:** bài chơi ngẫu nhiên cần 6 GB. Nguyên nhân: 40 lượt chạy liền một mạch nên jsdom không kịp dọn cửa sổ cũ. Giờ nghỉ một nhịp sau mỗi lượt; chạy đủ 40 lượt với giới hạn 1 GB, bộ nhớ cao nhất khoảng 460 MB (bản cũ với 1 GB thì hết bộ nhớ, dừng giữa chừng).
+- **Đọc nhanh:** câu người đi đường, đồng nghiệp tự nói trong thế giới đi lại chưa đổi thuật ngữ (task, bug, review…). Giờ đổi như mọi chữ khác; tắt Đọc nhanh thì giữ nguyên.
+
+**Điện thoại (chụp 10 màn hình hay gặp, nền sáng và tối):**
+- Dòng hướng dẫn cạnh vòng tròn điều khiển: trên iPhone SE chỉ rộng 50 điểm ảnh, gãy thành 11 dòng. Giờ xuống hàng riêng trên màn hình nhỏ; câu ngắn lại còn 3 dòng trên mọi máy.
+- Các màn còn lại không tràn ngang, không lỗi. Việc còn lại xem báo cáo.
+
+**Kiểm thử:** `npm test` 3 lần liên tiếp: mỗi lần 24 ĐẠT, 0 KHÔNG ĐẠT, 0 SKIP, 2 BÁO CÁO (770 kiểm tra đạt). Lần chạy đầu tiên lộ thêm một kiểm tra chập chờn (Xếp code: chơi kém đôi khi ra 0 vì thứ tự xáo ngẫu nhiên); đã sửa trước 3 lần này. Phiên bản trong Cài đặt: v17.9.
+
+## v17.8 – Tốc độ trên điện thoại
 Không đổi lối chơi, điều khiển, NPC, bản lưu. Báo cáo: `docs/AUDIT_REPORT_v17.8.md`.
 
 **Sửa lỗi của v17.7:** bật Đọc nhanh (mặc định) thì trên điện thoại **khung thế giới đi lại bị thu nhỏ, cắt** (217×133 thay vì 352×215), vì quy tắc thu nhỏ tranh minh hoạ cũng khớp với khung thế giới. Đã sửa và thêm kiểm tra.

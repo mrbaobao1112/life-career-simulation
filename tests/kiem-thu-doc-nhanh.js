@@ -94,6 +94,10 @@ const KHO = /(?<![\p{L}\d])(task|Task|bug|Bug|OT|standup|deploy|Deploy|review|Re
     await p.waitForTimeout(600);
     const wv = await p.evaluate(() => { const w = document.querySelector('#world'), v = w.querySelector('.w-view'); return { w:w.clientWidth, vw:v.clientWidth, vh:v.clientHeight, ty:getComputedStyle(w).maxHeight }; });
     check(`Điện thoại (${scheme === 'light' ? 'nền sáng' : 'nền tối'}): khung thế giới đi lại giữ nguyên cỡ khi bật Đọc nhanh (không bị thu nhỏ, cắt)`, wv.vw === wv.w && Math.abs(wv.vh - wv.vw * 220 / 360) <= 2 && wv.ty === 'none', JSON.stringify(wv));
+    // v17.9: câu người đi đường, đồng nghiệp tự nói trong thế giới đi lại cũng đổi thuật ngữ (bật), giữ nguyên (tắt)
+    const noi = await p.evaluate(async () => { const C = WORLD.api.C, a = WORLD.npcs.find(x => !x.gone) || WORLD.me, cau = 'Fix bug của task này rồi review nhé', doc = () => [...document.querySelectorAll('#world .say text')].map(t => t.textContent);
+      C.say(a, cau, 400); const bat = doc().pop(); await new Promise(r => setTimeout(r, 500)); dnOn.nho = false; C.say(a, cau, 400); const tat = doc().pop(); dnOn.nho = true; return { bat, tat }; });
+    check(`Thế giới đi lại (${scheme === 'light' ? 'nền sáng' : 'nền tối'}): câu nhân vật tự nói đổi thuật ngữ khi bật Đọc nhanh, giữ nguyên khi tắt`, noi.bat === 'Fix lỗi của việc này rồi xem lại nhé' && noi.tat === 'Fix bug của task này rồi review nhé', JSON.stringify(noi));
     check(`Điện thoại (${scheme === 'light' ? 'nền sáng' : 'nền tối'}): nút lựa chọn đầu tiên hiện ngay màn hình đầu, không tràn ngang (việc, thức dậy, hết giờ làm, giờ rảnh)`, !thap.length, thap.join(' | '));
     if (scheme === 'light') {
       const t = await p.evaluate(() => { const b = document.querySelector('#btnDoc'), a = b.textContent; b.click(); const c = b.textContent, full = document.querySelector('#stage').textContent.length; b.click(); return { a, c, on:dnOn(), lop:document.body.classList.contains('doc-nhanh'), full, ngan:document.querySelector('#stage').textContent.length }; });
