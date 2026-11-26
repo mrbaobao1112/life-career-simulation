@@ -50,6 +50,12 @@ const metrics = async page => { const m = (await page.cdp.send('Performance.getM
 (async () => {
   const browser = await chromium.launch();
 
+  // v18.0: đo khung hình khi máy đã nguội. Bài này chạy ngay sau cả bộ kiểm thử (khoảng 30 phút chạy nặng); tải trung bình của máy
+  // còn cao thì CPU giả lập chậm 6 lần càng chậm, số đo tụt (từng thấy 30–39 dù đo lúc rảnh được 47–54). Chờ tải 1 phút xuống dưới 1, tối đa 90 giây.
+  const taiDau = require('os').loadavg()[0];
+  for (let w = 0; w < 90 && require('os').loadavg()[0] >= 1; w += 3) await new Promise(r => setTimeout(r, 3000));
+  console.log(`   (tải trung bình của máy trước khi đo: ${taiDau.toFixed(2)} → ${require('os').loadavg()[0].toFixed(2)})`);
+
   // 1. Điện thoại
   { const page = await open(browser, { ...devices['iPhone 13'] }, 6);
     for (const [ten, at, day, h] of [['phố giờ cao điểm', 'street', 8, 17.5], ['văn phòng', 'office', 9, 10], ['quán cà phê đông', 'in:cafe', 6, 17]]) {

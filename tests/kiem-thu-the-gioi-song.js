@@ -22,9 +22,11 @@ const office = (page, ref = { id:'standup' }) => page.evaluate(ref => { S.job = 
 const D = page => page.evaluate(() => SONG_DEBUG());
 // Đặt đồng hồ đến giờ h rồi chờ NPC làm xong việc chuyển (tối đa ms)
 async function at(page, h, ms = 15000){
-  await page.evaluate(h => { WORLD.t = h * 60; WORLD.end = 1e9; }, h);
+  // v18.0: giữ đồng hồ game đứng yên trong lúc chờ (WORLD.hold). Trước đây đồng hồ vẫn chạy 2 phút/giây; máy bận thì chờ lâu,
+  // giờ đã trôi qua việc cần xem (ví dụ Tùng tắm xong, sang nấu ăn) nên bài chập chờn
+  await page.evaluate(h => { WORLD.t = h * 60; WORLD.end = 1e9; WORLD.hold = true; }, h);
   for (let w = 0; w < ms; w += 300) { await page.waitForTimeout(300); if (await page.evaluate(() => SONG_DEBUG().every(a => !a.busy))) break; }
-  return D(page);
+  const r = await D(page); await page.evaluate(() => { WORLD.hold = false; }); return r;
 }
 const settled = list => list.filter(a => !a.gone && !a.busy);
 const overlap = list => { const s = settled(list); for (let i = 0; i < s.length; i++) for (let j = i + 1; j < s.length; j++) if (Math.abs(s[i].x - s[j].x) < 24 && Math.abs(s[i].y - s[j].y) < 14) return `${s[i].who}/${s[j].who}`; return ''; };

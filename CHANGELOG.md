@@ -1,6 +1,49 @@
 # Lịch sử phiên bản
 
-## v17.9 – Ổn định và dọn lỗi (hiện tại)
+## v18.0 – Ngày bình thường tự chạy ban ngày, buổi tối để sống (hiện tại)
+Không đổi tài chính, lương, năng lượng, sức khỏe, hệ thống 56 ngày, điều khiển, bản lưu, độ khó trò chơi nhỏ. Báo cáo: `docs/AUDIT_REPORT_v18.0.md`.
+
+**Tự chạy ban ngày** (mặc định bật):
+- Ngày làm việc bình thường: những việc lặp lại ban ngày tự qua theo nếp sinh hoạt. Đó là chuẩn bị ra khỏi nhà, đến công ty, họp đầu ngày, task theo cách quen tay, tan làm.
+- Cuối ban ngày hiện **thẻ tóm tắt** (tối đa 3 dòng: đã làm gì, tiền và chỉ số thay đổi, một chi tiết ở công ty). Thẻ chờ bấm "Tiếp".
+- **Buổi tối, đêm, cuối tuần, ngày nghỉ không bao giờ tự chạy.**
+- Cảnh đáng dừng vẫn hiện như cũ: sự kiện, ngày đặc biệt, chuyện tự nảy sinh, lỗi cũ quay lại, được nhờ OT, được rủ đi chơi, lương, tổng kết tháng… Tự chạy chạy tới đúng cảnh đó, dừng cho bạn chọn, rồi chạy tiếp.
+- Việc lặp lại cũng không tự chạy khi:
+  - lần đầu gặp việc đó;
+  - ngày đặc biệt ở công ty (review, khách đến, chạy hạn chót…): cả ban ngày để bạn tự chơi;
+  - năng lượng, sức khỏe hay tinh thần thấp;
+  - tiền sắp không đủ (mỗi đợt, mỗi hóa đơn dừng một lần);
+  - đi làm muộn hay còn mệt vì tối qua;
+  - có tin nhắn mới chưa trả lời (mỗi tin dừng một lần);
+  - đồng nghiệp có chuyện cũ muốn nhắc (khi chơi chế độ đi lại).
+- Màn thức dậy báo trước "Ban ngày hôm nay sẽ tự qua theo nếp", kèm nút **"Tự chọn hôm nay"**.
+  - Nút nằm ở đây vì đến tối thì ban ngày đã qua rồi.
+- Bật/tắt bằng nút "🌤️ Tự chạy ban ngày" ở cuối màn hình, hoặc công tắc trong Cài đặt. Game nhớ lựa chọn.
+- Lần đầu có thêm một dòng giải thích và nút tắt.
+- **Kết quả giống hệt khi tự bấm theo nếp.** Tự chạy dùng đúng hàm áp dụng lựa chọn như khi bạn bấm. Bài kiểm thử chơi trọn 56 ngày ở 3 hoàn cảnh: bật hay tắt cho cùng tiền, chỉ số, quan hệ, công việc và cùng chuỗi cảnh.
+
+**Sửa nền để làm được điều trên:**
+- Phần vẽ màn hình dùng bộ số ngẫu nhiên riêng, màn hình dùng lại cảnh vòng chạy vừa dựng.
+  - Trước đây vẽ một màn hình cũng làm lệch dãy số ngẫu nhiên của game, nên bỏ qua một màn làm sự kiện sau đó khác đi.
+  - Không đổi luật hay tỷ lệ nào.
+
+**Số đo:**
+- Chế độ mặc định (đi lại được), một ngày làm việc bình thường: số màn hình ban ngày phải xử lý **11 → 2** (giảm 82%). Trước đây 4 trong số đó ở văn phòng, phải đi tới chỗ. Khoảng một nửa số ngày làm việc được tự chạy; còn lại là ngày đặc biệt ở công ty, có tin nhắn mới…
+- Chế độ thẻ (không đi lại), cả ván: lần bấm −3%, chữ −32% so với v17.6.
+  - Mục tiêu 50% chữ và 30% lần bấm **chưa đạt** ở chế độ này, vì từ v17 ban ngày ở chế độ thẻ đã gần như tự qua. Chi tiết trong báo cáo.
+- Phần chơi ở buổi tối và cuối tuần (theo lần bấm): 62% → 68%.
+
+**Kiểm thử:**
+- Bộ mới `tu-chay` (`npm run tu-chay`).
+- Bài cũ:
+  - `56-ngay` tắt tự chạy ở phần kiểm tra từng cảnh khi tự chơi;
+  - `the-gioi-song` giữ đồng hồ game đứng yên khi chờ NPC đổi việc;
+  - `npc-on-dinh` ngừng theo dõi khi hết giờ buổi;
+  - `hieu-nang` chờ máy nguội rồi mới đo, ngưỡng giữ nguyên.
+- `npm test` 3 lần liên tiếp: mỗi lần 25 ĐẠT, 0 KHÔNG ĐẠT, 2 BÁO CÁO (810 kiểm tra đạt).
+- Phiên bản trong Cài đặt: v18.0.
+
+## v17.9 – Ổn định và dọn lỗi
 Không đổi lối chơi, tài chính, lương, năng lượng, sức khỏe, hệ thống 56 ngày, điều khiển, bản lưu. Báo cáo: `docs/AUDIT_REPORT_v17.9.md`.
 
 **Kiểm thử chập chờn (sửa đúng nguyên nhân, không hạ ngưỡng):**

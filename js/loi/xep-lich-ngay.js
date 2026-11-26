@@ -110,6 +110,7 @@ function advance(){
       buildSlot();
     }
     const ref = S.cur = S.queue.shift();
+    if (typeof tcTomTatTruoc === 'function' && tcTomTatTruoc(ref)) break;   // v18.0: hết ban ngày có tự chạy: hiện thẻ tóm tắt, chờ bấm Tiếp
     if (ref.id === 'dayReport') {
       const f = S.fast;
       if (f && f.multi) {
@@ -120,8 +121,13 @@ function advance(){
       break;
     }
     const sc = buildScene(ref), i = autoPick(ref, sc);
+    if (i < 0 && typeof tcChon === 'function') {             // v18.0: việc lặp lại ban ngày tự qua theo nếp (loi/tu-chay.js)
+      const j = tcChon(ref, sc);
+      if (j >= 0) { if (tcChay(ref, sc, j)) return; continue; }
+    }
     if (i < 0) {                                             // cần người chơi: dừng tua, hiện tóm tắt những ngày đã qua (nếu có)
       if (endFast()) { S.queue.unshift(ref); S.cur = { id:'ffReport' }; }
+      else advance.sc = { ref, sc };                         // v18.0: màn hình dùng lại cảnh này (renderScene), không dựng lại
       break;
     }
     runAuto(ref, sc, i);
