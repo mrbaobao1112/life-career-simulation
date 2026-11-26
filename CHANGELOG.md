@@ -33,7 +33,15 @@ Không đổi tài chính, lương, năng lượng, sức khỏe, hệ thống 5
   - Mục tiêu 50% chữ và 30% lần bấm **chưa đạt** ở chế độ này, vì từ v17 ban ngày ở chế độ thẻ đã gần như tự qua. Chi tiết trong báo cáo.
 - Phần chơi ở buổi tối và cuối tuần (theo lần bấm): 62% → 68%.
 
-**Kiểm thử:** bộ mới `tu-chay` (`npm run tu-chay`). Phiên bản trong Cài đặt: v18.0.
+**Kiểm thử:**
+- Bộ mới `tu-chay` (`npm run tu-chay`).
+- Bài cũ:
+  - `56-ngay` tắt tự chạy ở phần kiểm tra từng cảnh khi tự chơi;
+  - `the-gioi-song` giữ đồng hồ game đứng yên khi chờ NPC đổi việc;
+  - `npc-on-dinh` ngừng theo dõi khi hết giờ buổi;
+  - `hieu-nang` chờ máy nguội rồi mới đo, ngưỡng giữ nguyên.
+- `npm test` 3 lần liên tiếp: mỗi lần 25 ĐẠT, 0 KHÔNG ĐẠT, 2 BÁO CÁO (810 kiểm tra đạt).
+- Phiên bản trong Cài đặt: v18.0.
 
 ## v17.9 – Ổn định và dọn lỗi
 Không đổi lối chơi, tài chính, lương, năng lượng, sức khỏe, hệ thống 56 ngày, điều khiển, bản lưu. Báo cáo: `docs/AUDIT_REPORT_v17.9.md`.

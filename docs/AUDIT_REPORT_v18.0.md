@@ -142,7 +142,20 @@ Khi thử "bật và tắt tự chạy cho cùng kết quả", lần đầu **kh
 
 ## 5. Kết quả `npm test`
 
-KẾT_QUẢ_3_LẦN
+3 lần liên tiếp, sau khi sửa xong mọi bài chập chờn (mục 4):
+
+| Lần | ĐẠT | KHÔNG ĐẠT | SKIP | CHƯA CHẠY | BÁO CÁO | Kiểm tra | Phố giờ cao điểm (2 lần đo) |
+|---|---|---|---|---|---|---|---|
+| 1 | 25 | 0 | 0 | 0 | 2 | 810 đạt, 0 hỏng | 42,8 (34,4; 42,8) |
+| 2 | 25 | 0 | 0 | 0 | 2 | 810 đạt, 0 hỏng | 45 (45; 37,2) |
+| 3 | 25 | 0 | 0 | 0 | 2 | 810 đạt, 0 hỏng | 45 (43,1; 45) |
+
+- 2 bộ BÁO CÁO (`can-bang`, `hai-thang`) chỉ in số liệu cân bằng; cả 3 lần đều chạy xong không lỗi.
+- **Trước 3 lần này còn các lần chạy khác, ghi lại trung thực:**
+  - lần đầu tiên: 21 ĐẠT, 4 KHÔNG ĐẠT, do bài cũ chưa chỉnh cho tự chạy (mục 4);
+  - sau đó: 1 lần 25 ĐẠT; 1 lần 23 ĐẠT (`the-gioi-song`, `hieu-nang`); 2 lần 25 ĐẠT; 1 lần 23 ĐẠT (`npc-on-dinh`, `hieu-nang`).
+  - Mỗi lần có bộ hỏng, tôi tìm nguyên nhân, sửa, rồi chạy lại từ đầu đủ 3 lần.
+- **Tốc độ phố vẫn dao động giữa các lần đo** (29,9 đến 54,4 khung/giây trong cả phase). Mỗi lượt trên đều có một lần đo dưới 40, nhưng lần còn lại đạt. Máy kiểm thử dùng chung và giả lập CPU chậm 6 lần nên rất nhạy với tải. Nên đo trên điện thoại thật.
 
 ## 6. Còn lại
 
